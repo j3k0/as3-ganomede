@@ -1,25 +1,19 @@
-# AS3-CLI-Boilerplate
+# AS3-Ganomede
 
-This is a starting point project for small tools written for the command line in actionscript 3.
-
-"Why?" I hear you say. Because.
+This is a client-side library in AS3 to interact with a Ganomede server.
 
 ## Getting started
 
 Install Adobe Air, make sure air tools are in the PATH.
 
-Build
 ```sh
+# Build
 make build
-```
 
-Run
-```sh
+# Run
 make run
-```
 
-Clean
-```sh
+# Clean
 make clean
 ```
 
