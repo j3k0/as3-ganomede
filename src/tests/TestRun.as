@@ -196,7 +196,7 @@ package tests
 
             var users:GanomedeUsers = client.users;
             var me:GanomedeUser = new GanomedeUser({
-                username: 'testuser',
+                username: 'testuser@fovea.cc', // note: it's possible to use email as username
                 password: 'Changeme1'
             });
             users.login(me)
@@ -205,6 +205,7 @@ package tests
                         .then(function(user:GanomedeUser):void {
                             test(function():void {
                                 Assert.isTrue(user == me);
+                                Assert.isTrue(user.username == "testuser"); // username fixed
                                 Assert.isTrue(user.email == "testuser@fovea.cc");
                                 Assert.isTrue(user.givenName == "Test");
                                 Assert.isTrue(user.surname == "Ganomede Login");

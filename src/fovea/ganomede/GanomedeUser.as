@@ -24,6 +24,7 @@ package fovea.ganomede
         }
 
         public function fromJSON(obj:Object):void {
+            if (obj.username) username = obj.username;
             if (obj.givenName) givenName = obj.givenName;
             if (obj.surname) surname = obj.surname;
             if (obj.email) email = obj.email;

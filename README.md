@@ -111,9 +111,11 @@ users.login(me)
 #### Profile
 
 ```js
-users.fetch(user.me)
+users.fetch(users.me)
     .then(function(user:GanomedeUser):void {
-        trace(
+        trace(user.email);
+        trace(user.givenName);
+        trace(user.surname);
     });
 ```
 
