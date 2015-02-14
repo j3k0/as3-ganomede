@@ -30,7 +30,7 @@ client.initialize()
 
 ### Registry
 
-The registry allows you to retrieve informations about running services.
+The `registry` module allows you to retrieve informations about running services.
 
 ```js
 var registry:GanomedeRegistry = client.registry;
@@ -52,6 +52,16 @@ registry.getServicesAsync()
         }
     });
 ```
+
+### User management
+
+The `user` module allows you to manage your session.
+
+#### Sign up
+
+#### Login
+
+#### Profile
 
 ## Author
 Jean-Christophe Hoelt <hoelt@fovea.cc>

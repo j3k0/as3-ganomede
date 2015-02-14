@@ -13,9 +13,13 @@ package fovea.ganomede
                 msg += " status:" + status;
             }
             super(msg, 1838012);
+            _code = code;
             _status = status;
             _data = data;
         }
+
+        private var _code:String = null;
+        public function get code():String { return _code; }
 
         private var _status:int = 0;
         public function get status():int { return _status; }

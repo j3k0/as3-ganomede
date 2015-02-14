@@ -16,8 +16,11 @@ package
         {
             var testRun:TestRun = new TestRun();
             testRun.run()
-                .always(function():void {
+                .then(function():void {
                     exit(0);
+                })
+                .error(function():void {
+                    exit(1);
                 });
         }
 

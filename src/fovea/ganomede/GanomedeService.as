@@ -6,6 +6,7 @@ package fovea.ganomede
     {
         public var type:String;
         public var version:String;
+        public var description:String;
         public var host:String;
         public var port:int;
         public var pingMs:int;
@@ -13,6 +14,7 @@ package fovea.ganomede
         public function GanomedeService(obj:Object) {
             type = obj.type;
             version = obj.version;
+            description = obj.description;
             host = obj.host;
             port = obj.port;
             pingMs = obj.pingMs;

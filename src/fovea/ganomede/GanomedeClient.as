@@ -11,9 +11,13 @@ package fovea.ganomede
         private var _registry:GanomedeRegistry;
         public function get registry():GanomedeRegistry { return _registry; }
 
+        private var _users:GanomedeUsers;
+        public function get users():GanomedeUsers { return _users; }
+
         public function GanomedeClient(url:String) {
             super(url);
             _registry = new GanomedeRegistry(url + "/registry/v1");
+            _users = new GanomedeUsers(url + "/users/v1");
         }
 
         public function initialize():Promise {

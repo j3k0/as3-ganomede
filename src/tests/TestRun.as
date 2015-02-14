@@ -6,6 +6,9 @@ package tests
     import fovea.async.*;
 
     public class TestRun {
+
+        public static const GANOMEDE_URL:String = "http://192.168.59.103:80";
+
         public function TestRun() {
         }
 
@@ -15,7 +18,16 @@ package tests
                 testService,
                 testRegitry,
                 testRegitryGetServicesAsync,
-                testInitialize]);
+                testInitialize,
+                testUserSignUp,
+                testUserLogin
+                ])
+                .error(function(err:Error):void {
+                    trace(err);
+                    if (err as ApiError) {
+                        trace(JSON.stringify((err as ApiError).data));
+                    }
+                });
         }
 
         private function test(t:Function, promise:Deferred):void {
@@ -33,7 +45,7 @@ package tests
         public function testClient():Promise {
             trace("testClient");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
 
             client.ajax("GET", "/registry/v1/services")
                 .then(function(result:Object):void {
@@ -50,7 +62,7 @@ package tests
         public function testService():Promise {
             trace("testService");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
             var service:ApiClient = client.service("registry/v1");
 
             service.ajax("GET", "/services")
@@ -68,7 +80,7 @@ package tests
         public function testRegitry():Promise {
             trace("testRegitry");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
             var registry:GanomedeRegistry = client.registry;
 
             registry.initialize().
@@ -87,7 +99,7 @@ package tests
         public function testRegitryGetServicesAsync():Promise {
             trace("testRegitryGetServicesAsync");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
             var registry:GanomedeRegistry = client.registry;
 
             registry.getServicesAsync().
@@ -105,13 +117,70 @@ package tests
         public function testInitialize():Promise {
             trace("testInitialize");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
 
             client.initialize()
                 .then(function():void {
                     test(function():void {
                         Assert.isTrue(client.initialized);
                         Assert.isTrue(client.registry.initialized);
+                    }, deferred);
+                })
+                .error(deferred.reject);
+
+            return deferred;
+        }
+
+        public function testUserSignUp():Promise {
+            trace("testUserSignUp");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+
+            var users:GanomedeUsers = client.users;
+            var me:GanomedeUser = new GanomedeUser({
+                username: 'testsignup',
+                givenName: 'Test',
+                surname: 'Ganomede Signup',
+                email: 'testsignup@fovea.cc',
+                password: 'Password1234!'
+            });
+            users.signUp(me)
+                .then(function():void {
+                    test(function():void {
+                        Assert.isTrue(users.me == me, "me should be the current user");
+                        Assert.isTrue(me.token, "me should have a token");
+                    }, deferred);
+                })
+                .error(function(err:Error):void {
+                    test(function():void {
+                        // If signup fails because the user already exists, we're good.
+                        Assert.instanceOf(err, ApiError);
+                        var apiErr: ApiError = err as ApiError;
+                        Assert.isTrue(apiErr.code == "HTTP");
+                        Assert.isTrue(apiErr.status == 409, "User already exists");
+                        Assert.isTrue(apiErr.data.code == "StormpathResourceError2001");
+                    }, deferred);
+                });
+
+            return deferred;
+        }
+
+        public function testUserLogin():Promise {
+            trace("testUserLogin");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+
+            var users:GanomedeUsers = client.users;
+            var me:GanomedeUser = new GanomedeUser({
+                username: 'testuser',
+                password: 'Changeme1'
+            });
+            users.login(me)
+                .then(function():void {
+                    test(function():void {
+                        Assert.isTrue(users.me == me, "me should be the current user");
+                        Assert.isTrue(me.token, "me should have a token");
+                        Assert.isTrue(me.authenticated);
                     }, deferred);
                 })
                 .error(deferred.reject);

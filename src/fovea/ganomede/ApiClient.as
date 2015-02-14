@@ -3,6 +3,7 @@ package fovea.ganomede
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
+    import flash.net.URLRequestHeader;
     import flash.events.Event;
     import flash.events.SecurityErrorEvent;
     import flash.events.IOErrorEvent;
@@ -38,6 +39,12 @@ package fovea.ganomede
             var urlRequest:URLRequest= new URLRequest(this.url + path);
             urlRequest.method = method.toUpperCase();
 
+            if (options.data)
+                urlRequest.data = JSON.stringify(options.data);
+
+            var hdr:URLRequestHeader = new URLRequestHeader("Content-type", "application/json");
+            urlRequest.requestHeaders.push(hdr);
+
             var urlLoader:URLLoader = new URLLoader();
             configureListeners(urlLoader, deferred, options);
             urlLoader.load(urlRequest);
@@ -48,41 +55,37 @@ package fovea.ganomede
         private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object):void {
 
             var status:int = 0;
-            var dataLoaded:Boolean = false;
             var data:Object = null;
 
             var removeListeners:Function;
 
             function done():void {
-                if (status && dataLoaded) {
-                    removeListeners(dispatcher);
-                    if (status >= 200 && status <= 299) {
-                        var obj:Object = {
-                            status: status,
-                            data: data
-                        };
-                        if (options.parse)
-                            obj.data = options.parse(data);
-                        if (options.cacheID)
-                            _cache[options.cacheID] = obj;
-                        deferred.resolve(obj);
-                        return;
-                    }
-                    deferred.reject(new ApiError(ApiError.HTTP_ERROR, status, data));
+                removeListeners(dispatcher);
+                if (status >= 200 && status <= 299) {
+                    var obj:Object = {
+                        status: status,
+                        data: data
+                    };
+                    if (options.parse)
+                        obj.data = options.parse(data);
+                    if (options.cacheID)
+                        _cache[options.cacheID] = obj;
+                    deferred.resolve(obj);
+                    return;
                 }
+                deferred.reject(new ApiError(ApiError.HTTP_ERROR, status, data));
             }
 
             function complete(event:Event):void {
+                // trace("complete: " + event);
                 var loader:URLLoader = URLLoader(event.target);
                 data = jsonData(loader);
-                dataLoaded = true;
                 done();
             }
 
             function httpStatus(event:HTTPStatusEvent):void {
-                // trace("httpStatusHandler: " + event);
+                // trace("httpStatus: " + event);
                 status = event.status;
-                done();
             }
 
             /* dispatcher.addEventListener(Event.OPEN, function(event:Event):void {
@@ -91,15 +94,22 @@ package fovea.ganomede
                 trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal); }); */
 
             function securityError(event:SecurityErrorEvent):void {
-                trace("securityErrorHandler: " + event);
-                deferred.reject(new ApiError(ApiError.SECURITY_ERROR));
+                //trace("securityErrorHandler: " + event);
                 removeListeners(dispatcher);
+                deferred.reject(new ApiError(ApiError.SECURITY_ERROR));
             }
 
             function ioError(event:IOErrorEvent):void {
-                trace("ioErrorHandler: " + event);
-                deferred.reject(new ApiError(ApiError.IO_ERROR));
-                removeListeners(dispatcher);
+                // trace("ioErrorHandler: " + event);
+                var loader:URLLoader = URLLoader(event.target);
+                data = jsonData(loader);
+                if (data) {
+                    done();
+                }
+                else {
+                    removeListeners(dispatcher);
+                    deferred.reject(new ApiError(ApiError.IO_ERROR, status, data));
+                }
             }
 
             dispatcher.addEventListener(Event.COMPLETE, complete);
