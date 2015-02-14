@@ -45,6 +45,26 @@ package fovea.ganomede
             });
         }
 
+        public function fetch(user:GanomedeUser):Promise {
+            var deferred:Deferred = new Deferred();
+            if ((user.username == me.username) ||
+                (user.email == me.username) ||
+                (user.username == me.email)) {
+                ajax("GET", "/auth/" + me.token + "/me", {
+                    parse: parseMe
+                })
+                .then(function():void {
+                    deferred.resolve(user);
+                })
+                .error(deferred.reject);
+            } 
+            else {
+                deferred.reject(new ApiError(ApiError.IO_ERROR)); // TODO
+            }
+
+            return deferred;
+        }
+
         private function parseMe(obj:Object):Object {
             _me.fromJSON(obj);
             return _me;

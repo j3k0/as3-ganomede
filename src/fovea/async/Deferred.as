@@ -32,10 +32,10 @@ package fovea.async
          *
          * @parm outcome    The optional result of the Deferred operation.
          */
-        public function resolve(outcome : * = null) : void
+        public function resolve(outcome : * = null) : Deferred
         {
             if (_state != PENDING) {
-                return;
+                return this;
             }
 
             _outcome = outcome;
@@ -48,6 +48,7 @@ package fovea.async
 
             clearListeners();
             invokeFinalCallback();
+            return this;
         }
 
         /**
@@ -56,10 +57,10 @@ package fovea.async
          *
          * @param error     Error object which explains how or why the operation was unsuccesful.
          */
-        public function reject(error : Error) : void
+        public function reject(error : Error) : Deferred
         {
             if (_state != PENDING) {
-                return;
+                return this;
             }
 
             // By contact, we will always supply an Error object to the fail handlers.
@@ -73,6 +74,7 @@ package fovea.async
 
             clearListeners();
             invokeFinalCallback();
+            return this;
         }
 
         /**

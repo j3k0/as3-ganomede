@@ -21,7 +21,8 @@ package tests
                 testInitialize,
                 testUserSignUp,
                 testUserLogin,
-                testUserLoginFailed
+                testUserLoginFailed,
+                testUserProfile
                 ])
                 .error(function(err:Error):void {
                     trace(err);
@@ -182,6 +183,34 @@ package tests
                         Assert.isTrue(me.token, "me should have a token");
                         Assert.isTrue(me.authenticated);
                     }, deferred);
+                })
+                .error(deferred.reject);
+
+            return deferred;
+        }
+
+        public function testUserProfile():Promise {
+            trace("testUserProfile");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+
+            var users:GanomedeUsers = client.users;
+            var me:GanomedeUser = new GanomedeUser({
+                username: 'testuser',
+                password: 'Changeme1'
+            });
+            users.login(me)
+                .then(function():void {
+                    users.fetch(me)
+                        .then(function(user:GanomedeUser):void {
+                            test(function():void {
+                                Assert.isTrue(user == me);
+                                Assert.isTrue(user.email == "testuser@fovea.cc");
+                                Assert.isTrue(user.givenName == "Test");
+                                Assert.isTrue(user.surname == "Ganomede Login");
+                            }, deferred);
+                        })
+                        .error(deferred.reject);
                 })
                 .error(deferred.reject);
 

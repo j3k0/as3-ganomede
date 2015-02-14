@@ -57,7 +57,7 @@ registry.getServicesAsync()
 
 The `users` module allows you to manage user session (registration, login, profile (registration, login, profile).
 
-Retrieve the clients `GanomedeUsers` instance:
+To retrieve the client's `GanomedeUsers` instance:
 
 ```js
 var users:GanomedeUsers = client.users;
@@ -80,7 +80,7 @@ users.signUp(me)
         trace("I am now authenticated");
     })
     .error(function(err:ApiError):void {
-        trace("Authentication failed");
+        trace("Registration failed");
         if (err.apiCode == ALREADY_EXISTS)
             trace("User already exists");
     });
@@ -109,6 +109,13 @@ users.login(me)
 ```
 
 #### Profile
+
+```js
+users.fetch(user.me)
+    .then(function(user:GanomedeUser):void {
+        trace(
+    });
+```
 
 ## Author
 Jean-Christophe Hoelt <hoelt@fovea.cc>
