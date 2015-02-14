@@ -16,14 +16,14 @@ package fovea.async
         var deferred:Deferred = new Deferred();
 
         if (fn.length === 0) {
-            setTimeout(deferred.resolve, 0);
+            deferred.resolve();
             return deferred;
         }
 
-        setTimeout(function():void {
+        setTimeout(function onTick():void {
             var f:Function = fn.shift();
             f()
-                .then(function():void {
+                .then(function onResolve():void {
                     waterfall(fn)
                         .then(deferred.resolve)
                         .error(deferred.reject);

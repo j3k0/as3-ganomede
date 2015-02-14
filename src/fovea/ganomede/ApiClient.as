@@ -14,6 +14,7 @@ package fovea.ganomede
     public class ApiClient
     {
         public var url:String;
+        private var _cache:Object = {}; // cache requests result
 
         public function ApiClient(url:String) {
             this.url = url;
@@ -23,22 +24,29 @@ package fovea.ganomede
             return new ApiClient(this.url + "/" + type);
         }
 
-        public function ajax(method:String, path:String):Promise {
+        public function ajax(method:String, path:String, options:Object = null):Promise {
 
             var deferred:Deferred = new Deferred();
+
+            if (!options) {
+                options = {};
+            }
+            if (options.cache) {
+                options.cacheID = method + ":" + path;
+            }
 
             // Prepare the request
             var urlRequest:URLRequest= new URLRequest(this.url + path);
             urlRequest.method = method.toUpperCase();
 
             var urlLoader:URLLoader = new URLLoader();
-            configureListeners(urlLoader, deferred);
+            configureListeners(urlLoader, deferred, options);
             urlLoader.load(urlRequest);
 
             return deferred;
         }
 
-        private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred):void {
+        private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object):void {
 
             var status:int = 0;
             var dataLoaded:Boolean = false;
@@ -50,10 +58,14 @@ package fovea.ganomede
                 if (status && dataLoaded) {
                     removeListeners(dispatcher);
                     if (status >= 200 && status <= 299) {
-                        deferred.resolve({
+                        var obj:Object = {
                             status: status,
                             data: data
-                        });
+                        };
+                        if (options.cacheID) {
+                            _cache[options.cacheID] = obj;
+                        }
+                        deferred.resolve(obj);
                         return;
                     }
                     deferred.reject(new ApiError(ApiError.HTTP_ERROR, status, data));
@@ -100,6 +112,23 @@ package fovea.ganomede
                 dispatcher.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, securityError);
                 dispatcher.removeEventListener(IOErrorEvent.IO_ERROR, ioError);
                 dispatcher.removeEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatus);
+            }
+        }
+
+        public function cached(method:String, path:String):Object {
+            return _cache[method + ":" + path];
+        }
+
+        public function cachedAjax(method:String, path:String):Promise {
+            var obj:Object = cached(method, path);
+            if (obj) {
+                var deferred:Deferred = new Deferred();
+                deferred.resolve(obj);
+                ajax(method, path, { cache: true });
+                return deferred;
+            }
+            else {
+                return ajax(method, path, { cache: true });
             }
         }
 
