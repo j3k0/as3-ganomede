@@ -1,6 +1,5 @@
 package fovea.ganomede
 {
-    import fovea.ganomede.ApiClient;
     import fovea.async.*;
 
     public class GanomedeClient extends ApiClient
@@ -14,14 +13,18 @@ package fovea.ganomede
         private var _users:GanomedeUsers;
         public function get users():GanomedeUsers { return _users; }
 
+        private var _invitations:GanomedeInvitations;
+        public function get invitations():GanomedeInvitations { return _invitations; }
+
         public function GanomedeClient(url:String) {
             super(url);
             _registry = new GanomedeRegistry(url + "/registry/v1");
             _users = new GanomedeUsers(url + "/users/v1");
+            _invitations = new GanomedeInvitations(this, url + "/invitations/v1");
         }
 
         public function initialize():Promise {
-            return when(registry.initialize())
+            return when(registry.initialize(), users.initialize(), invitations.initialize())
                 .then(function():void {
                     _initialized = true;
                 });

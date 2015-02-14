@@ -22,14 +22,15 @@ package tests
                 testUserSignUp,
                 testUserLogin,
                 testUserLoginFailed,
-                testUserProfile
-                ])
-                .error(function(err:Error):void {
-                    trace(err);
-                    if (err as ApiError) {
-                        trace(JSON.stringify((err as ApiError).data));
-                    }
-                });
+                testUserProfile,
+                testInvitations
+            ])
+            .error(function(err:Error):void {
+                trace(err);
+                if (err as ApiError) {
+                    trace(JSON.stringify((err as ApiError).data));
+                }
+            });
         }
 
         private function test(t:Function, promise:Deferred):void {
@@ -237,6 +238,17 @@ package tests
                         Assert.isTrue(err.apiCode == ApiError.INVALID, "should fail with apiCode INVALID");
                     }, deferred);
                 });
+
+            return deferred;
+        }
+
+        public function testInvitations():Promise {
+            trace("testInvitations");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+            var invitations:GanomedeInvitations = client.invitations;
+
+            deferred.resolve();
 
             return deferred;
         }
