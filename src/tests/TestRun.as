@@ -13,14 +13,15 @@ package tests
         }
 
         public function run():Promise {
-            return waterfall([
+            return parallel([
                 testClient,
                 testService,
                 testRegitry,
                 testRegitryGetServicesAsync,
                 testInitialize,
                 testUserSignUp,
-                testUserLogin
+                testUserLogin,
+                testUserLoginFailed
                 ])
                 .error(function(err:Error):void {
                     trace(err);
@@ -151,14 +152,13 @@ package tests
                         Assert.isTrue(me.token, "me should have a token");
                     }, deferred);
                 })
-                .error(function(err:Error):void {
+                .error(function(err:ApiError):void {
                     test(function():void {
                         // If signup fails because the user already exists, we're good.
                         Assert.instanceOf(err, ApiError);
-                        var apiErr: ApiError = err as ApiError;
-                        Assert.isTrue(apiErr.code == "HTTP");
-                        Assert.isTrue(apiErr.status == 409, "User already exists");
-                        Assert.isTrue(apiErr.data.code == "StormpathResourceError2001");
+                        Assert.isTrue(err.code == "HTTP");
+                        Assert.isTrue(err.status == 409, "User already exists");
+                        Assert.isTrue(err.data.code == ApiError.ALREADY_EXISTS);
                     }, deferred);
                 });
 
@@ -184,6 +184,29 @@ package tests
                     }, deferred);
                 })
                 .error(deferred.reject);
+
+            return deferred;
+        }
+
+        public function testUserLoginFailed():Promise {
+            trace("testUserLoginFailed");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+            var users:GanomedeUsers = client.users;
+            var me:GanomedeUser = new GanomedeUser({
+                username: 'testuser',
+                password: 'wrongPassword'
+            });
+            users.login(me)
+                .then(deferred.reject)
+                .error(function(err:ApiError):void {
+                    test(function():void {
+                        Assert.isTrue(users.me == me, "me should be the current user");
+                        Assert.isTrue(!me.authenticated, "me should not be authenticated");
+                        Assert.isTrue(err.status == 400, "should fail with status 400");
+                        Assert.isTrue(err.apiCode == ApiError.INVALID, "should fail with apiCode INVALID");
+                    }, deferred);
+                });
 
             return deferred;
         }

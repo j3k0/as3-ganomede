@@ -40,7 +40,7 @@ for (var i:int = 0; i < registry.services.length; ++i) {
 }
 ```
 
-The code above will display the list of services as retrieve at initialization or at the last call to
+The code above will display the list of services as retrieves at initialization or at the last call to
 `getServices`. If you really want the most up-to-date, non-cached list of running services, you can:
 
 ```js
@@ -53,13 +53,60 @@ registry.getServicesAsync()
     });
 ```
 
-### User management
+### Users management
 
-The `user` module allows you to manage your session.
+The `users` module allows you to manage user session (registration, login, profile (registration, login, profile).
+
+Retrieve the clients `GanomedeUsers` instance:
+
+```js
+var users:GanomedeUsers = client.users;
+```
 
 #### Sign up
 
+Create a new `GanomedeUser` and sign him up.
+
+```js
+var me:GanomedeUser = new GanomedeUser({
+    username: 'testsignup',
+    givenName: 'Test',
+    surname: 'Ganomede Signup',
+    email: 'testsignup@fovea.cc',
+    password: 'Password1234!'
+});
+users.signUp(me)
+    .then(function():void {
+        trace("I am now authenticated");
+    })
+    .error(function(err:ApiError):void {
+        trace("Authentication failed");
+        if (err.apiCode == ALREADY_EXISTS)
+            trace("User already exists");
+    });
+```
+
 #### Login
+
+Create a new `GanomedeUser` with a username and password, login:
+
+```js
+var me:GanomedeUser = new GanomedeUser({
+    username: 'testlogin',
+    password: 'Password1234!'
+});
+users.login(me)
+    .then(function():void {
+        trace("I am now logged in");
+    })
+    .error(function(err:ApiError):void {
+        trace("Loggin failed");
+        if (err.apiCode == ApiError.INVALID) {
+            trace("Login failed");
+            trace(err.data.message);
+        }
+    });
+```
 
 #### Profile
 

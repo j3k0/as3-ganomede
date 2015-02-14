@@ -2,9 +2,14 @@ package fovea.ganomede
 {
     public class ApiError extends Error
     {
+        // Codes
         public static const HTTP_ERROR:String = "HTTP";
         public static const IO_ERROR:String = "IO";
         public static const SECURITY_ERROR:String = "SECURITY";
+
+        // Api Codes
+        public static const INVALID:String = "StormpathResourceError400";
+        public static const ALREADY_EXISTS:String = "StormpathResourceError2001";
 
         public function ApiError(code:String, status:int = 0, data:Object = null)
         {
@@ -26,6 +31,24 @@ package fovea.ganomede
 
         private var _data:Object = null;
         public function get data():Object { return _data; }
+
+        public function get apiMessage():String {
+            if (_data && _data.message)
+                return _data.message;
+            else
+                return super.message();
+        }
+
+        public function get apiCode():String {
+            if (_data && _data.code)
+                return _data.code;
+            else if (status) {
+                return _code + _status;
+            }
+            else {
+                return _code;
+            }
+        }
     }
 }
 // vim: sw=4:ts=4:et:

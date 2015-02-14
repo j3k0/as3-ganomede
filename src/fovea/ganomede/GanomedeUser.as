@@ -19,7 +19,7 @@ package fovea.ganomede
             }
         }
 
-        public function authenticated():Boolean {
+        public function get authenticated():Boolean {
             return this.token ? true : false;
         }
 
