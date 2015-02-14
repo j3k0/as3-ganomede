@@ -24,16 +24,15 @@ package fovea.ganomede
             return new ApiClient(this.url + "/" + type);
         }
 
-        public function ajax(method:String, path:String, options:Object = null):Promise {
+        public function ajax(method:String, path:String, options:Object = undefined):Promise {
+
+            if (!options)
+                options = {};
 
             var deferred:Deferred = new Deferred();
 
-            if (!options) {
-                options = {};
-            }
-            if (options.cache) {
+            if (options.cache)
                 options.cacheID = method + ":" + path;
-            }
 
             // Prepare the request
             var urlRequest:URLRequest= new URLRequest(this.url + path);
@@ -62,9 +61,10 @@ package fovea.ganomede
                             status: status,
                             data: data
                         };
-                        if (options.cacheID) {
+                        if (options.parse)
+                            obj.data = options.parse(data);
+                        if (options.cacheID)
                             _cache[options.cacheID] = obj;
-                        }
                         deferred.resolve(obj);
                         return;
                     }
@@ -119,16 +119,18 @@ package fovea.ganomede
             return _cache[method + ":" + path];
         }
 
-        public function cachedAjax(method:String, path:String):Promise {
+        public function cachedAjax(method:String, path:String, options:Object = undefined):Promise {
+            if (!options)
+                options = {};
             var obj:Object = cached(method, path);
             if (obj) {
                 var deferred:Deferred = new Deferred();
                 deferred.resolve(obj);
-                ajax(method, path, { cache: true });
+                ajax(method, path, { cache: true, parse: options.parse });
                 return deferred;
             }
             else {
-                return ajax(method, path, { cache: true });
+                return ajax(method, path, { cache: true, parse: options.parse });
             }
         }
 
