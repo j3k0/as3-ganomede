@@ -2,6 +2,7 @@ package
 {
     import cli.Application;
     import flash.utils.setTimeout;
+    import tests.TestRun;
 
 	public class Main extends Application
 	{
@@ -13,8 +14,12 @@ package
 
         override protected function execute():void
         {
-            trace("  here I am");
-            setTimeout(function():void { exit(0); }, 1000);
+            var testRun:TestRun = new TestRun();
+            testRun.run()
+                .always(function():void {
+                    exit(0);
+                });
         }
+
 	}
 }
