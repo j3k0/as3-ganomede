@@ -24,3 +24,4 @@ package fovea.ganomede
         public function get data():Object { return _data; }
     }
 }
+// vim: sw=4:ts=4:et:

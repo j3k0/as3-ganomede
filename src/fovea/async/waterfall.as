@@ -1,17 +1,17 @@
-package fovea.async 
+package fovea.async
 {
     import flash.utils.setTimeout;
 
-	/**
+    /**
      * Calls all functions in the array.
      *
      * Each function is expected to return a Promise.
      *
-	 * Returns a new Promise which will resolve once all the functions are resolved.
-	 * 
-	 * If any of the supplied function reject then the returned Promise will also reject.
-	 */
-	public function waterfall(fn:Array) : Promise
+     * Returns a new Promise which will resolve once all the functions are resolved.
+     *
+     * If any of the supplied function reject then the returned Promise will also reject.
+     */
+    public function waterfall(fn:Array) : Promise
     {
         var deferred:Deferred = new Deferred();
 
@@ -34,3 +34,4 @@ package fovea.async
         return deferred;
     }
 }
+// vim: sw=4:ts=4:et:

@@ -4,13 +4,13 @@ package
     import flash.utils.setTimeout;
     import tests.TestRun;
 
-	public class Main extends Application
-	{
-		override protected function usage():void
-		{
-			super.usage();
-			trace("  <file name>");
-		}
+    public class Main extends Application
+    {
+        override protected function usage():void
+        {
+            super.usage();
+            trace("  <file name>");
+        }
 
         override protected function execute():void
         {
@@ -21,5 +21,6 @@ package
                 });
         }
 
-	}
+    }
 }
+// vim: sw=4:ts=4:et:
