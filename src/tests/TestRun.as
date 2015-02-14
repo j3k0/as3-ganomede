@@ -10,7 +10,12 @@ package tests
         }
 
         public function run():Promise {
-            return waterfall([testClient, testService, testRegitry, testInitialize]);
+            return waterfall([
+                testClient,
+                testService,
+                testRegitry,
+                testRegitryGetServicesAsync,
+                testInitialize]);
         }
 
         private function test(t:Function, promise:Deferred):void {
@@ -72,6 +77,24 @@ package tests
                         Assert.isTrue(registry.initialized);
                         Assert.instanceOf(registry.services, Array);
                         Assert.instanceOf(registry.services[0], GanomedeService);
+                    }, deferred);
+                })
+                .error(deferred.reject);
+
+            return deferred;
+        }
+
+        public function testRegitryGetServicesAsync():Promise {
+            trace("testRegitryGetServicesAsync");
+            var deferred:Deferred = new Deferred();
+            var client:GanomedeClient = new GanomedeClient("http://zalka.fovea.cc:48080");
+            var registry:GanomedeRegistry = client.registry;
+
+            registry.getServicesAsync().
+                then(function(services:Array):void {
+                    test(function():void {
+                        Assert.instanceOf(services, Array);
+                        Assert.instanceOf(services[0], GanomedeService);
                     }, deferred);
                 })
                 .error(deferred.reject);

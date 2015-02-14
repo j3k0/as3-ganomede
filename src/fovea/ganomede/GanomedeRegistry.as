@@ -1,6 +1,7 @@
 package fovea.ganomede
 {
     import fovea.ganomede.ApiClient;
+    import fovea.async.Deferred;
     import fovea.async.Promise;
     import fovea.async.when;
 
@@ -22,15 +23,38 @@ package fovea.ganomede
         //
         // Call initialize again if you want to try time again.
         public function initialize():Promise {
-            return when(getServices().then(function(result:Object):void {
-                _initialized = true;
-                _services = result.data as Array;
-            }));
+            return when(
+                getServices()
+                    .then(storeServices)
+                    .then(function():void {
+                        _initialized = true;
+                    })
+            );
         }
 
         // Load and cache the list of services from server
         public function getServices():Promise {
-            return cachedAjax("GET", "/services", { parse: parseServices });
+            return cachedAjax("GET", "/services", { parse: parseServices })
+                .then(storeServices);
+        }
+
+        // Update the stored list of services
+        private function storeServices(result:Object):void {
+            if (result.data && result.data.length) {
+                _services = result.data as Array;
+            }
+        }
+
+        // Load and cache the list of services from server
+        public function getServicesAsync():Promise {
+            var deferred:Deferred = new Deferred();
+            ajax("GET", "/services", { parse: parseServices, cache: true })
+                .then(storeServices)
+                .then(function():void {
+                    deferred.resolve(services);
+                })
+                .error(deferred.reject);
+            return deferred;
         }
 
         // Allocate GanomedeService instance from request data
