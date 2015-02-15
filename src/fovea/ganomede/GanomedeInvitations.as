@@ -69,29 +69,29 @@ package fovea.ganomede
             var deferred:Deferred = new Deferred();
             if (_invitationsClient.token) {
                 _invitationsClient.listInvitations()
-                    .then(function(result:Object):void {
-                        var newArray:Array = result.data as Array;
-                        if (newArray) {
-                            var changed:Boolean = false;
-                            var i:int;
-                            var keys:Array = [];
-                            for (i = 0; i < newArray.length; ++i)
-                                keys.push(newArray[i].id);
-                            _collection.keep(keys);
-                            for (i = 0; i < newArray.length; ++i) {
-                                newArray[i].index = i;
-                                if (mergeInvitation(newArray[i]))
-                                    changed = true;
-                            }
-                            if (changed)
-                                dispatchEvent(new Event(GanomedeEvents.CHANGE));
-                            deferred.resolve();
+                .then(function(result:Object):void {
+                    var newArray:Array = result.data as Array;
+                    if (newArray) {
+                        var changed:Boolean = false;
+                        var i:int;
+                        var keys:Array = [];
+                        for (i = 0; i < newArray.length; ++i)
+                            keys.push(newArray[i].id);
+                        _collection.keep(keys);
+                        for (i = 0; i < newArray.length; ++i) {
+                            newArray[i].index = i;
+                            if (mergeInvitation(newArray[i]))
+                                changed = true;
                         }
-                        else {
-                            deferred.reject(new ApiError(ApiError.IO_ERROR));
-                        }
-                    })
-                    .error(deferred.reject);
+                        if (changed)
+                            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                        deferred.resolve();
+                    }
+                    else {
+                        deferred.reject(new ApiError(ApiError.IO_ERROR));
+                    }
+                })
+                .error(deferred.reject);
             }
             else {
                 trace("Can't load invitations if not authenticated");
