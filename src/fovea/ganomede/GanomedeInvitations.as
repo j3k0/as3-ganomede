@@ -47,6 +47,7 @@ package fovea.ganomede
             if (newAuthToken != oldAuthToken) {
                 _invitationsClient = new GanomedeInvitationsClient(_client.url, newAuthToken);
                 _collection.flushall();
+                refreshArray();
             }
         }
 
@@ -64,36 +65,56 @@ package fovea.ganomede
                 });
         }
 
-        private var _isRefreshing:Boolean = false;
-        private function refreshArray():void {
-            if (_isRefreshing) return;
+        public function refreshArray():Promise {
+            var deferred:Deferred = new Deferred();
             if (_invitationsClient.token) {
-                _isRefreshing = true;
                 _invitationsClient.listInvitations()
                     .then(function(result:Object):void {
                         var newArray:Array = result.data as Array;
                         if (newArray) {
-                            for (var i:int = 0; i < newArray.length; ++i) {
+                            var changed:Boolean = false;
+                            var i:int;
+                            var keys:Array = [];
+                            for (i = 0; i < newArray.length; ++i)
+                                keys.push(newArray[i].id);
+                            _collection.keep(keys);
+                            for (i = 0; i < newArray.length; ++i) {
                                 newArray[i].index = i;
-                                mergeInvitation(newArray[i]);
+                                if (mergeInvitation(newArray[i]))
+                                    changed = true;
                             }
-                            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                            if (changed)
+                                dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                            deferred.resolve();
+                        }
+                        else {
+                            deferred.reject(new ApiError(ApiError.IO_ERROR));
                         }
                     })
-                    .always(function():void {
-                        _isRefreshing = false;
-                    });
+                    .error(deferred.reject);
             }
+            else {
+                trace("Can't load invitations if not authenticated");
+                deferred.reject(new ApiError(ApiError.CLIENT_ERROR));
+            }
+            return deferred;
         }
 
-        private function mergeInvitation(json:Object):void {
+        private function mergeInvitation(json:Object):Boolean {
             var id:String = json.id;
             if (_collection.exists(id)) {
                 var item:GanomedeInvitation = _collection.get(id);
-                item.fromJSON(json);
+                if (!item.equals(json)) {
+                    item.fromJSON(json);
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
             else {
-                _collection.set(id, json);
+                _collection.set(id, new GanomedeInvitation(json));
+                return true;
             }
         }
     }

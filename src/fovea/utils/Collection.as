@@ -33,6 +33,16 @@ package fovea.utils
             return _storage[key] != undefined;
         }
 
+        public function keep(keys:Array):void {
+            var keepKeys:Object = {};
+            for (var i:int = 0; i < keys.length; ++i)
+                keepKeys[keys[i]] = true;
+            for (var key:String in _storage) {
+                if (!keepKeys[key])
+                    del(key);
+            }
+        }
+
         public function flushall():void {
             var oldStorage:Object = {};
             _storage = {};

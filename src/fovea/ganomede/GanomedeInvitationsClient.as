@@ -11,6 +11,7 @@ package fovea.ganomede
 
         public function GanomedeInvitationsClient(baseUrl:String, token:String) {
             super(baseUrl + "/" + TYPE + "/auth/" + token);
+            _token = token;
         }
 
         public function addInvitation(invitation:GanomedeInvitation):Promise {

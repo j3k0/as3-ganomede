@@ -23,7 +23,8 @@ package tests
                 testUserLogin,
                 testUserLoginFailed,
                 testUserProfile,
-                testInvitations
+                testInvitations,
+                testInvitationsRefresh
             ])
             .error(function(err:Error):void {
                 trace(err);
@@ -292,6 +293,44 @@ package tests
             }).error(deferred.reject);
 
             return deferred;
+        }
+
+        public function testInvitationsRefresh():Promise {
+            trace("testInvitationsRefresh");
+            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
+            var invitations:GanomedeInvitations = client.invitations;
+
+            function login():Promise {
+                trace("testInvitationsRefresh.login");
+                var me:GanomedeUser = new GanomedeUser({
+                    username: 'testuser',
+                    password: 'Changeme1'
+                });
+                return client.users.login(me);
+            }
+
+            function createInvitation():Promise {
+                trace("testInvitationsRefresh.create");
+                var i:GanomedeInvitation = new GanomedeInvitation({
+                    type: "triominos/v1",
+                    to: "joe",
+                    gameId: "dummy"
+                });
+                return invitations.add(i);
+            }
+
+            function refreshInvitations():Promise {
+                trace("testInvitationsRefresh.refresh");
+                // invitations.addEventListener(GanomedeEvents.CHANGE, changed);
+                return invitations.refreshArray();
+            }
+
+            return waterfall([
+                invitations.initialize,
+                login,
+                createInvitation,
+                refreshInvitations
+            ]);
         }
     }
 }

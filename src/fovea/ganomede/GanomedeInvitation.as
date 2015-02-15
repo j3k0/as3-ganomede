@@ -14,6 +14,16 @@ package fovea.ganomede
             }
         }
 
+        public function equals(obj:Object):Boolean {
+            if (obj.id != id) return true;
+            if (obj.gameId != gameId) return true;
+            if (obj.type != type) return true;
+            if (obj.to != to) return true;
+            if (obj.from != from) return true;
+            if (obj.index != index) return true;
+            return false;
+        }
+
         public function fromJSON(obj:Object):void {
             if (obj.id) id = obj.id;
             if (obj.gameId) gameId = obj.gameId;
