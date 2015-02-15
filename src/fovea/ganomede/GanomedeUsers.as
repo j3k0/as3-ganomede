@@ -36,7 +36,7 @@ package fovea.ganomede
         }
 
         private function dispatchLoginEvent(result:Object):void {
-            _client.dispatchEvent(new Event(GanomedeEvents.LOGIN));
+            dispatchEvent(new Event(GanomedeEvents.LOGIN));
         }
 
         public function signUp(user:GanomedeUser):Promise {

@@ -28,9 +28,20 @@ package fovea.ganomede
         }
 
         public function listInvitations():Promise {
-            var deferred:Deferred = new Deferred();
-            deferred.reject(new ApiError("Not implemented")); // TODO
-            return deferred;
+            return ajax("GET", "/invitations", {
+                parse: parseArray
+            });
+        }
+
+        private function parseArray(obj:Object):Object {
+            var array:Array = obj as Array;
+            if (array == null) {
+                return obj;
+            }
+            for (var i:int = 0; i < array.length; ++i) {
+                array[i] = new GanomedeInvitation(array[i]);
+            }
+            return array;
         }
     }
 }

@@ -52,10 +52,9 @@ package tests
 
             client.ajax("GET", "/registry/v1/services")
                 .then(function(result:Object):void {
-                    test(function():void {
-                        Assert.isTrue(result.status == 200);
-                        Assert.instanceOf(result.data, Array);
-                    }, deferred);
+                    Assert.isTrue(result.status == 200);
+                    Assert.instanceOf(result.data, Array);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -70,10 +69,9 @@ package tests
 
             service.ajax("GET", "/services")
                 .then(function(result:Object):void {
-                    test(function():void {
-                        Assert.isTrue(result.status == 200);
-                        Assert.instanceOf(result.data, Array);
-                    }, deferred);
+                    Assert.isTrue(result.status == 200);
+                    Assert.instanceOf(result.data, Array);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -88,11 +86,10 @@ package tests
 
             registry.initialize().
                 then(function():void {
-                    test(function():void {
-                        Assert.isTrue(registry.initialized);
-                        Assert.instanceOf(registry.services, Array);
-                        Assert.instanceOf(registry.services[0], GanomedeService);
-                    }, deferred);
+                    Assert.isTrue(registry.initialized);
+                    Assert.instanceOf(registry.services, Array);
+                    Assert.instanceOf(registry.services[0], GanomedeService);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -107,10 +104,9 @@ package tests
 
             registry.getServicesAsync().
                 then(function(services:Array):void {
-                    test(function():void {
-                        Assert.instanceOf(services, Array);
-                        Assert.instanceOf(services[0], GanomedeService);
-                    }, deferred);
+                    Assert.instanceOf(services, Array);
+                    Assert.instanceOf(services[0], GanomedeService);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -124,10 +120,9 @@ package tests
 
             client.initialize()
                 .then(function():void {
-                    test(function():void {
-                        Assert.isTrue(client.initialized);
-                        Assert.isTrue(client.registry.initialized);
-                    }, deferred);
+                    Assert.isTrue(client.initialized);
+                    Assert.isTrue(client.registry.initialized);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -155,13 +150,12 @@ package tests
                     }, deferred);
                 })
                 .error(function(err:ApiError):void {
-                    test(function():void {
-                        // If signup fails because the user already exists, we're good.
-                        Assert.instanceOf(err, ApiError);
-                        Assert.isTrue(err.code == "HTTP");
-                        Assert.isTrue(err.status == 409, "User already exists");
-                        Assert.isTrue(err.data.code == ApiError.ALREADY_EXISTS);
-                    }, deferred);
+                    // If signup fails because the user already exists, we're good.
+                    Assert.instanceOf(err, ApiError);
+                    Assert.isTrue(err.code == "HTTP");
+                    Assert.isTrue(err.status == 409, "User already exists");
+                    Assert.isTrue(err.data.code == ApiError.ALREADY_EXISTS);
+                    deferred.resolve();
                 });
 
             return deferred;
@@ -179,11 +173,10 @@ package tests
             });
             users.login(me)
                 .then(function():void {
-                    test(function():void {
-                        Assert.isTrue(users.me == me, "me should be the current user");
-                        Assert.isTrue(me.token, "me should have a token");
-                        Assert.isTrue(me.authenticated);
-                    }, deferred);
+                    Assert.isTrue(users.me == me, "me should be the current user");
+                    Assert.isTrue(me.token, "me should have a token");
+                    Assert.isTrue(me.authenticated);
+                    deferred.resolve();
                 })
                 .error(deferred.reject);
 
@@ -204,13 +197,12 @@ package tests
                 .then(function():void {
                     users.fetch(me)
                         .then(function(user:GanomedeUser):void {
-                            test(function():void {
-                                Assert.isTrue(user == me);
-                                Assert.isTrue(user.username == "testuser"); // username fixed
-                                Assert.isTrue(user.email == "testuser@fovea.cc");
-                                Assert.isTrue(user.givenName == "Test");
-                                Assert.isTrue(user.surname == "Ganomede Login");
-                            }, deferred);
+                            Assert.isTrue(user == me);
+                            Assert.isTrue(user.username == "testuser"); // username fixed
+                            Assert.isTrue(user.email == "testuser@fovea.cc");
+                            Assert.isTrue(user.givenName == "Test");
+                            Assert.isTrue(user.surname == "Ganomede Login");
+                            deferred.resolve();
                         })
                         .error(deferred.reject);
                 })
@@ -231,12 +223,11 @@ package tests
             users.login(me)
                 .then(deferred.reject)
                 .error(function(err:ApiError):void {
-                    test(function():void {
-                        Assert.isTrue(users.me == me, "me should be the current user");
-                        Assert.isTrue(!me.authenticated, "me should not be authenticated");
-                        Assert.isTrue(err.status == 400, "should fail with status 400");
-                        Assert.isTrue(err.apiCode == ApiError.INVALID, "should fail with apiCode INVALID");
-                    }, deferred);
+                    Assert.isTrue(users.me == me, "me should be the current user");
+                    Assert.isTrue(!me.authenticated, "me should not be authenticated");
+                    Assert.isTrue(err.status == 400, "should fail with status 400");
+                    Assert.isTrue(err.apiCode == ApiError.INVALID, "should fail with apiCode INVALID");
+                    deferred.resolve();
                 });
 
             return deferred;
@@ -248,7 +239,57 @@ package tests
             var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL);
             var invitations:GanomedeInvitations = client.invitations;
 
-            deferred.resolve();
+            invitations.initialize().then(function():void {
+                Assert.isTrue(invitations.array.length == 0);
+
+                function testNoAuth():Promise {
+                    trace("testInvitations.noAuth");
+                    var i:GanomedeInvitation = new GanomedeInvitation({
+                        from: null,
+                        to: "joe",
+                        gameId: "dummy"
+                    });
+                    return invitations.add(i).invert();
+                }
+
+                function login():Promise {
+                    trace("testInvitations.login");
+                    var me:GanomedeUser = new GanomedeUser({
+                        username: 'testuser@fovea.cc', // note: it's possible to use email as username
+                        password: 'Changeme1'
+                    });
+                    return client.users.login(me);
+                }
+
+                function testWrongFrom():Promise {
+                    trace("testInvitations.wrongFrom");
+                    var i:GanomedeInvitation = new GanomedeInvitation({
+                        from: "notme",
+                        to: "joe",
+                        gameId: "dummy"
+                    });
+                    return invitations.add(i).invert();
+                }
+
+                function testOK():Promise {
+                    trace("testInvitations.ok");
+                    var i:GanomedeInvitation = new GanomedeInvitation({
+                        type: "triominos/v1",
+                        to: "joe",
+                        gameId: "dummy"
+                    });
+                    return invitations.add(i)
+                    .then(function():void {
+                        Assert.isTrue(invitations.array.length == 1, "should now have 1 invitation");
+                        Assert.isTrue(invitations.array[0].to == "joe", "should be to joe");
+                        Assert.isTrue(invitations.array[0].from == "testuser", "should be from me");
+                    });
+                }
+
+                waterfall([testNoAuth, login, testWrongFrom, testOK])
+                .then(deferred.resolve)
+                .error(deferred.reject);
+            }).error(deferred.reject);
 
             return deferred;
         }

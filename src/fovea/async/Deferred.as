@@ -162,6 +162,13 @@ package fovea.async
                 _finalCallback = null;
             }
         }
+
+        public function invert() : Promise
+        {
+            var deferred:Deferred = new Deferred();
+            then(deferred.reject).error(deferred.resolve);
+            return deferred;
+        }
     }
 }
 // vim: sw=4:ts=4:et:

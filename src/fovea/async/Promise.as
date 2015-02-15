@@ -51,6 +51,11 @@ package fovea.async
          * is used to destroy or free the client.
          */
         function always(callback : Function) : void;
+
+        /**
+         * Invert the 'then' and 'error' callback. Useful when you expect something to fail.
+         */
+        function invert() : Promise;
     }
 }
 // vim: sw=4:ts=4:et:

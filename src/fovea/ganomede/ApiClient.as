@@ -145,6 +145,14 @@ package fovea.ganomede
             }
         }
 
+        // Return a rejected promise with an ApiError
+        protected function error(code:String, status:int = 0, data:Object = null):Promise {
+            var p:Deferred = new Deferred();
+            var e:ApiError = new ApiError(code, status, data);
+            p.reject(e);
+            return p;
+        }
+
         // The JSON data.
         private static function jsonData(urlLoader:URLLoader):Object {
             var json:Object = null;
