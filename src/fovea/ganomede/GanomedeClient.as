@@ -18,9 +18,9 @@ package fovea.ganomede
 
         public function GanomedeClient(url:String) {
             super(url);
-            _registry = new GanomedeRegistry(url + "/registry/v1");
-            _users = new GanomedeUsers(url + "/users/v1");
-            _invitations = new GanomedeInvitations(this, url + "/invitations/v1");
+            _registry = new GanomedeRegistry(this, url + "/registry/v1");
+            _users = new GanomedeUsers(this);
+            _invitations = new GanomedeInvitations(this);
         }
 
         public function initialize():Promise {
@@ -29,6 +29,9 @@ package fovea.ganomede
                     _initialized = true;
                 });
         }
+
+        // Shortcut
+        public function get me():GanomedeUser { return _users.me; }
     }
 }
 // vim: sw=4:ts=4:et:

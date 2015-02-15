@@ -13,8 +13,11 @@ package fovea.ganomede
         private var _services:Array = [];
         public function get services():Array { return _services; }
 
-        public function GanomedeRegistry(url:String) {
+        private var _client:GanomedeClient = null;
+
+        public function GanomedeRegistry(client:GanomedeClient, url:String) {
             super(url);
+            this._client = client;
         }
 
         // Load the list of services

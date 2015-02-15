@@ -9,10 +9,11 @@ package fovea.ganomede
     import flash.events.IOErrorEvent;
     import flash.events.HTTPStatusEvent;
     import flash.events.IEventDispatcher;
+    import flash.events.EventDispatcher;
     import fovea.async.Deferred;
     import fovea.async.Promise;
 
-    public class ApiClient
+    public class ApiClient extends EventDispatcher
     {
         public var url:String;
         private var _cache:Object = {}; // cache requests result

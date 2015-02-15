@@ -6,6 +6,7 @@ package fovea.ganomede
         public static const HTTP_ERROR:String = "HTTP";
         public static const IO_ERROR:String = "IO";
         public static const SECURITY_ERROR:String = "SECURITY";
+        public static const CLIENT_ERROR:String = "CLIENT";
 
         // Api Codes
         public static const INVALID:String = "StormpathResourceError400";

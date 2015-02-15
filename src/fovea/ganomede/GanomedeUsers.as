@@ -3,18 +3,24 @@ package fovea.ganomede
     import fovea.async.*;
     import fovea.async.Promise;
     import fovea.async.when;
+    import flash.events.Event;
 
     public class GanomedeUsers extends ApiClient
     {
+        public static const TYPE:String = "users/v1";
+
         private var _initialized:Boolean = false;
         public function get initialized():Boolean { return _initialized; }
+
+        private var _client:GanomedeClient = null;
 
         // current authenticated user
         private var _me:GanomedeUser = new GanomedeUser();
         public function get me():GanomedeUser { return _me; }
 
-        public function GanomedeUsers(url:String) {
-            super(url);
+        public function GanomedeUsers(client:GanomedeClient) {
+            super(client.url + "/" + TYPE);
+            this._client = client;
         }
 
         public function initialize():Promise {
@@ -23,7 +29,14 @@ package fovea.ganomede
             return deferred
                 .then(function():void {
                     _initialized = true;
+                    if (me.authenticated) {
+                        dispatchLoginEvent(null);
+                    }
                 });
+        }
+
+        private function dispatchLoginEvent(result:Object):void {
+            _client.dispatchEvent(new Event(GanomedeEvents.LOGIN));
         }
 
         public function signUp(user:GanomedeUser):Promise {
@@ -31,7 +44,8 @@ package fovea.ganomede
             return ajax("POST", "/accounts", {
                 data: user.toJSON(),
                 parse: parseMe
-            });
+            })
+            .then(dispatchLoginEvent);
         }
 
         public function login(user:GanomedeUser):Promise {
@@ -42,7 +56,8 @@ package fovea.ganomede
                     password: user.password
                 },
                 parse: parseMe
-            });
+            })
+            .then(dispatchLoginEvent);
         }
 
         public function fetch(user:GanomedeUser):Promise {
