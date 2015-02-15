@@ -61,12 +61,20 @@ package fovea.ganomede
                 });
         }
 
+        private var _isRefreshing:Boolean = false;
         private function refreshArray():void {
+            if (_isRefreshing) return;
             if (_invitationsClient.token) {
+                _isRefreshing = true;
                 _invitationsClient.listInvitations()
                     .then(function(result:Object):void {
-                        if (result.data as Array)
+                        if (result.data as Array) {
                             _array = result.data;
+                            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                        }
+                    })
+                    .always(function():void {
+                        _isRefreshing = false;
                     });
             }
         }
