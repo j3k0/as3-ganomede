@@ -1,12 +1,15 @@
 package fovea.utils
 {
-    public class Lodis {
+    import flash.events.EventDispatcher;
+    import flash.events.Event;
+
+    public class Lodis extends EventDispatcher {
 
         private var _storage:IStorage;
 
         public function Lodis(storage:IStorage = null) {
             _storage = storage;
-            if (!_storage) _storage = {};
+            if (!_storage) _storage = new MemoryStorage();
         }
 
         private function pack(value:Object):String {
@@ -32,11 +35,13 @@ package fovea.utils
 
         public function DEL(key:String):Boolean {
             _storage.removeItem(key);
+            dispatchEvent(new Event("DEL:" + key));
             return true;
         }
 
         public function SET(key:String, value:String):Boolean {
             _storage.setItem(key, value);
+            dispatchEvent(new Event("SET:" + key));
             return true;
         }
 
@@ -45,7 +50,7 @@ package fovea.utils
         }
 
         public function EXISTS(key:String):Boolean {
-            return GET(key) != undefined;
+            return GET(key) != null;
         }
 
         public function DBSIZE():int {
@@ -75,9 +80,9 @@ package fovea.utils
         public function INCRBY(key:String, quantity:int = 1):int {
             if (EXISTS(key)) {
                 var value:Number = parseInt(GET(key));
-                if (value != NaN) {
+                if (!isNaN(value)) {
                     value = value + quantity;
-                    SET(key, value);
+                    SET(key, "" + value);
                     return value;
                 }
             }

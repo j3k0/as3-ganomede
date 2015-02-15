@@ -28,9 +28,9 @@ package fovea.ganomede
         }
 
         public function listInvitations():Promise {
-            return ajax("GET", "/invitations", {
+            return ajax("GET", "/invitations"); /*, {
                 parse: parseArray
-            });
+            });*/
         }
 
         private function parseArray(obj:Object):Object {

@@ -1,6 +1,6 @@
 package fovea.utils
 {
-    public class MemoryStorage implements Storage
+    public class MemoryStorage implements IStorage
     {
         private var _storage = {};
         public function setItem(key:String, value:String):void {

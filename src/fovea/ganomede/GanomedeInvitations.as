@@ -2,6 +2,7 @@ package fovea.ganomede
 {
     import fovea.async.*;
     import flash.events.Event;
+    import fovea.utils.Collection;
 
     public class GanomedeInvitations extends ApiClient
     {
@@ -11,8 +12,10 @@ package fovea.ganomede
         private var _client:GanomedeClient;
         private var _invitationsClient:GanomedeInvitationsClient;
 
-        private var _array:Array = [];
-        public function get array():Array { return _array; }
+        private var _collection:Collection = new Collection();
+        public function get array():Array {
+            return _collection.asArray().sortOn("index", Array.NUMERIC);
+        }
 
         public function GanomedeInvitations(client:GanomedeClient) {
             super(client.url + "/" + GanomedeInvitationsClient.TYPE);
@@ -43,7 +46,7 @@ package fovea.ganomede
 
             if (newAuthToken != oldAuthToken) {
                 _invitationsClient = new GanomedeInvitationsClient(_client.url, newAuthToken);
-                _array = [];
+                _collection.flushall();
             }
         }
 
@@ -56,7 +59,7 @@ package fovea.ganomede
 
             return _invitationsClient.addInvitation(invitation)
                 .then(function():void {
-                    _array.unshift(invitation);
+                    mergeInvitation(invitation.toJSON());
                     dispatchEvent(new Event(GanomedeEvents.CHANGE));
                 });
         }
@@ -68,14 +71,29 @@ package fovea.ganomede
                 _isRefreshing = true;
                 _invitationsClient.listInvitations()
                     .then(function(result:Object):void {
-                        if (result.data as Array) {
-                            _array = result.data;
+                        var newArray:Array = result.data as Array;
+                        if (newArray) {
+                            for (var i:int = 0; i < newArray.length; ++i) {
+                                newArray[i].index = i;
+                                mergeInvitation(newArray[i]);
+                            }
                             dispatchEvent(new Event(GanomedeEvents.CHANGE));
                         }
                     })
                     .always(function():void {
                         _isRefreshing = false;
                     });
+            }
+        }
+
+        private function mergeInvitation(json:Object):void {
+            var id:String = json.id;
+            if (_collection.exists(id)) {
+                var item:GanomedeInvitation = _collection.get(id);
+                item.fromJSON(json);
+            }
+            else {
+                _collection.set(id, json);
             }
         }
     }
