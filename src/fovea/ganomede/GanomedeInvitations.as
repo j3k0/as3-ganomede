@@ -65,31 +65,37 @@ package fovea.ganomede
                 });
         }
 
+        public function cancel(invitation:GanomedeInvitation):Promise {
+            return deleteInvitation(invitation, "cancel");
+        }
+        public function accept(invitation:GanomedeInvitation):Promise {
+            return deleteInvitation(invitation, "accept");
+        }
+        public function refuse(invitation:GanomedeInvitation):Promise {
+            return deleteInvitation(invitation, "refuse");
+        }
+
+        private function deleteInvitation(invitation:GanomedeInvitation, reason:String):Promise {
+            var deferred:Deferred = new Deferred();
+            _invitationsClient.deleteInvitation(invitation, reason)
+            .then(function():void {
+                _collection.del(invitation.id);
+                dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                deferred.resolve();
+            })
+            .error(deferred.reject);
+            return deferred;
+        }
+
         public function refreshArray():Promise {
             var deferred:Deferred = new Deferred();
             if (_invitationsClient.token) {
                 _invitationsClient.listInvitations()
                 .then(function(result:Object):void {
-                    var newArray:Array = result.data as Array;
-                    if (newArray) {
-                        var changed:Boolean = false;
-                        var i:int;
-                        var keys:Array = [];
-                        for (i = 0; i < newArray.length; ++i)
-                            keys.push(newArray[i].id);
-                        _collection.keep(keys);
-                        for (i = 0; i < newArray.length; ++i) {
-                            newArray[i].index = i;
-                            if (mergeInvitation(newArray[i]))
-                                changed = true;
-                        }
-                        if (changed)
-                            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                    if (processListInvitations(result))
                         deferred.resolve();
-                    }
-                    else {
+                    else
                         deferred.reject(new ApiError(ApiError.IO_ERROR));
-                    }
                 })
                 .error(deferred.reject);
             }
@@ -98,6 +104,29 @@ package fovea.ganomede
                 deferred.reject(new ApiError(ApiError.CLIENT_ERROR));
             }
             return deferred;
+        }
+
+        private function processListInvitations(result:Object):Boolean {
+            var newArray:Array = result.data as Array;
+            if (newArray) {
+                var changed:Boolean = false;
+                var i:int;
+                var keys:Array = [];
+                for (i = 0; i < newArray.length; ++i)
+                    keys.push(newArray[i].id);
+                _collection.keep(keys);
+                for (i = 0; i < newArray.length; ++i) {
+                    newArray[i].index = i;
+                    if (mergeInvitation(newArray[i]))
+                        changed = true;
+                }
+                if (changed)
+                    dispatchEvent(new Event(GanomedeEvents.CHANGE));
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         private function mergeInvitation(json:Object):Boolean {

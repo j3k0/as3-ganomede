@@ -22,16 +22,14 @@ package fovea.ganomede
                     to: invitation.to
                 }
             }).then(function(result:Object):void {
-                if (result.id) {
-                    invitation.id = result.id;
+                if (result.data.id) {
+                    invitation.id = result.data.id;
                 }
             });
         }
 
         public function listInvitations():Promise {
-            return ajax("GET", "/invitations"); /*, {
-                parse: parseArray
-            });*/
+            return ajax("GET", "/invitations");
         }
 
         private function parseArray(obj:Object):Object {
@@ -43,6 +41,24 @@ package fovea.ganomede
                 array[i] = new GanomedeInvitation(array[i]);
             }
             return array;
+        }
+
+        public function deleteInvitation(invite:GanomedeInvitation, reason:String):Promise {
+            var deferred:Deferred = new Deferred();
+            ajax("DELETE", "/invitations/" + invite.id, {
+                data: {
+                    reason: reason
+                }
+            })
+            .then(function(result:Object):void {
+                trace("result:" + JSON.stringify(result));
+                if (!result.data || result.data.ok == true)
+                    deferred.resolve();
+                else
+                    deferred.reject(new ApiError(ApiError.HTTP_ERROR, result.status, result.data));
+            })
+            .error(deferred.reject);
+            return deferred;
         }
     }
 }

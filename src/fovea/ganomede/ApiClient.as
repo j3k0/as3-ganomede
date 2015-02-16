@@ -15,6 +15,8 @@ package fovea.ganomede
 
     public class ApiClient extends EventDispatcher
     {
+        public static var verbose:Boolean = false;
+
         public var url:String;
         private var _cache:Object = {}; // cache requests result
 
@@ -33,15 +35,23 @@ package fovea.ganomede
 
             var deferred:Deferred = new Deferred();
 
-            if (options.cache)
+            var requestID:String = Math.floor(Math.random() * 0xffff).toString(16);
+            options.requestID = requestID;
+            if (verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url + path);
+
+            if (options.cache) {
                 options.cacheID = method + ":" + path;
+                if (verbose) trace("AJAX[" + requestID + "]: will cache");
+            }
 
             // Prepare the request
             var urlRequest:URLRequest= new URLRequest(this.url + path);
             urlRequest.method = method.toUpperCase();
 
-            if (options.data)
+            if (options.data) {
                 urlRequest.data = JSON.stringify(options.data);
+                if (verbose) trace("AJAX[" + requestID + "] data=" + urlRequest.data);
+            }
 
             var hdr:URLRequestHeader = new URLRequestHeader("Content-type", "application/json");
             urlRequest.requestHeaders.push(hdr);
@@ -62,6 +72,8 @@ package fovea.ganomede
 
             function done():void {
                 removeListeners(dispatcher);
+                if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + JSON.stringify(data));
+
                 if (status >= 200 && status <= 299) {
                     var obj:Object = {
                         status: status,
@@ -157,10 +169,11 @@ package fovea.ganomede
         private static function jsonData(urlLoader:URLLoader):Object {
             var json:Object = null;
             try {
-                json = JSON.parse(String(urlLoader.data));
+                if (urlLoader.data)
+                    json = JSON.parse(String(urlLoader.data));
             }
             catch (e:Error) {
-                trace("JSON parsing Error.");
+                trace("[AJAX] JSON parsing Error.");
             }
             return json;
         }

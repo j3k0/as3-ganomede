@@ -10,6 +10,7 @@ package tests
         public static const GANOMEDE_URL:String = "http://192.168.59.103:80";
 
         public function TestRun() {
+            ApiClient.verbose = true;
         }
 
         public function run():Promise {
@@ -272,22 +273,37 @@ package tests
                     return invitations.add(i).invert();
                 }
 
+                var invite:GanomedeInvitation;
+                var l0:int;
+
                 function testOK():Promise {
                     trace("testInvitations.ok");
-                    var i:GanomedeInvitation = new GanomedeInvitation({
+                    invite = new GanomedeInvitation({
                         type: "triominos/v1",
                         to: "joe",
                         gameId: "dummy"
                     });
-                    return invitations.add(i)
+                    l0 = invitations.array.length;
+                    return invitations.add(invite)
                     .then(function():void {
-                        Assert.isTrue(invitations.array.length == 1, "should now have 1 invitation");
+                        Assert.isTrue(invite.id != null, "invitation should now have an ID");
+                        Assert.isTrue(invitations.array.length == l0 + 1, "should now have l0+1 invitation");
                         Assert.isTrue(invitations.array[0].to == "joe", "should be to joe");
                         Assert.isTrue(invitations.array[0].from == "testuser", "should be from me");
                     });
                 }
 
-                waterfall([testNoAuth, login, testWrongFrom, testOK])
+                function cleanup():Promise {
+                    trace("testInvitations.cleanup");
+                    return invitations.cancel(invite)
+                    .then(function():void {
+                        Assert.isTrue(invitations.array.length == l0, "should now have l0 invitation");
+                    });
+                }
+
+                waterfall([
+                    testNoAuth, login, testWrongFrom, testOK, cleanup
+                ])
                 .then(deferred.resolve)
                 .error(deferred.reject);
             }).error(deferred.reject);
@@ -303,20 +319,21 @@ package tests
             function login():Promise {
                 trace("testInvitationsRefresh.login");
                 var me:GanomedeUser = new GanomedeUser({
-                    username: 'testuser',
-                    password: 'Changeme1'
+                    username: 'testuser2',
+                    password: 'Password1234!'
                 });
                 return client.users.login(me);
             }
 
+            var invite:GanomedeInvitation;
             function createInvitation():Promise {
                 trace("testInvitationsRefresh.create");
-                var i:GanomedeInvitation = new GanomedeInvitation({
+                invite = new GanomedeInvitation({
                     type: "triominos/v1",
                     to: "joe",
                     gameId: "dummy"
                 });
-                return invitations.add(i);
+                return invitations.add(invite);
             }
 
             function refreshInvitations():Promise {
@@ -325,11 +342,30 @@ package tests
                 return invitations.refreshArray();
             }
 
+            function cleanupWithAccept():Promise {
+                return invitations.accept(invite)
+                .error(function(error:ApiError):void {
+                    Assert.isTrue(error.status == 400);
+                    Assert.isTrue(error.data.code == "InvalidContent")
+                }).invert();
+            }
+
+            function cleanupWithCancel():Promise {
+                return invitations.accept(invite)
+                .error(function(error:ApiError):void {
+                    Assert.isTrue(error.status == 400);
+                    Assert.isTrue(error.data.code == "InvalidContent")
+                })
+                .invert();
+            }
+
             return waterfall([
                 invitations.initialize,
                 login,
                 createInvitation,
-                refreshInvitations
+                refreshInvitations,
+                cleanupWithAccept,
+                cleanupWithCancel
             ]);
         }
     }
