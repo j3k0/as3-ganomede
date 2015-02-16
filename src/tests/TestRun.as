@@ -10,7 +10,7 @@ package tests
         public static const GANOMEDE_URL:String = "http://192.168.59.103:80";
 
         public function TestRun() {
-            ApiClient.verbose = true;
+            // ApiClient.verbose = true;
         }
 
         public function run():Promise {
@@ -288,8 +288,8 @@ package tests
                     .then(function():void {
                         Assert.isTrue(invite.id != null, "invitation should now have an ID");
                         Assert.isTrue(invitations.array.length == l0 + 1, "should now have l0+1 invitation");
-                        Assert.isTrue(invitations.array[0].to == "joe", "should be to joe");
-                        Assert.isTrue(invitations.array[0].from == "testuser", "should be from me");
+                        Assert.isTrue(invitations.array[l0].to == "joe", "should be to joe");
+                        Assert.isTrue(invitations.array[l0].from == "testuser", "should be from me");
                     });
                 }
 

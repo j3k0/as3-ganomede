@@ -51,7 +51,6 @@ package fovea.ganomede
                 }
             })
             .then(function(result:Object):void {
-                trace("result:" + JSON.stringify(result));
                 if (!result.data || result.data.ok == true)
                     deferred.resolve();
                 else

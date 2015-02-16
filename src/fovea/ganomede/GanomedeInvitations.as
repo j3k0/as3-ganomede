@@ -53,7 +53,7 @@ package fovea.ganomede
 
         public function add(invitation:GanomedeInvitation):Promise {
             if (!_client.me.authenticated) {
-                trace("cant add invitation: not authenticated");
+                if (verbose) trace("cant add invitation: not authenticated");
                 return error(ApiError.CLIENT_ERROR);
             }
             invitation.from = _client.me.username;
@@ -100,7 +100,7 @@ package fovea.ganomede
                 .error(deferred.reject);
             }
             else {
-                trace("Can't load invitations if not authenticated");
+                if (verbose) trace("Can't load invitations if not authenticated");
                 deferred.reject(new ApiError(ApiError.CLIENT_ERROR));
             }
             return deferred;
