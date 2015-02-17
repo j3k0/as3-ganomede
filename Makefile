@@ -3,6 +3,10 @@ help:
 	@echo make build ... Compiles the app
 	@echo make clean ... Cleanup binaries
 
+js:
+	@mkdir -p bin
+	dhaxe -js bin/ganomede.js -cp src test/TestMain.hx
+
 build:
 	@mkdir -p bin
 	amxmlc -output bin/Main.swf src/Main.as -compiler.source-path src/

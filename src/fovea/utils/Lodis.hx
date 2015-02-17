@@ -1,27 +1,32 @@
-package fovea.utils
-{
-    import flash.events.EventDispatcher;
-    import flash.events.Event;
+package fovea.utils;
 
-    public class Lodis extends EventDispatcher {
+    import openfl.events.EventDispatcher;
+    import openfl.events.Event;
+    import openfl.errors.Error;
+    import openfl.utils.Object;
+    import haxe.Json;
+
+    class Lodis extends EventDispatcher {
 
         private var _storage:IStorage;
 
         public function Lodis(storage:IStorage = null) {
             _storage = storage;
-            if (!_storage) _storage = new MemoryStorage();
+            if (_storage == null) {
+                _storage = new MemoryStorage();
+            }
         }
 
         private function pack(value:Object):String {
-            return JSON.stringify(value);
+            return Json.stringify(value);
         }
 
         private function unpack(value:String):Object {
-            return JSON.parse(value);
+            return Json.parse(value);
         }
 
         // Extension
-        public function OSET(key:String, value:Object):void {
+        public function OSET(key:String, value:Object):Void {
             SET(key, pack(value));
         }
         public function OGET(key:String):Object {
@@ -33,13 +38,13 @@ package fovea.utils
             }
         }
 
-        public function DEL(key:String):Boolean {
+        public function DEL(key:String):Bool {
             _storage.removeItem(key);
             dispatchEvent(new Event("DEL:" + key));
             return true;
         }
 
-        public function SET(key:String, value:String):Boolean {
+        public function SET(key:String, value:String):Bool {
             _storage.setItem(key, value);
             dispatchEvent(new Event("SET:" + key));
             return true;
@@ -49,15 +54,15 @@ package fovea.utils
             return _storage.getItem(key);
         }
 
-        public function EXISTS(key:String):Boolean {
+        public function EXISTS(key:String):Bool {
             return GET(key) != null;
         }
 
-        public function DBSIZE():int {
+        public function DBSIZE():Int {
             return _storage.length;
         }
 
-        public function APPEND(key:String, value:String):Boolean {
+        public function APPEND(key:String, value:String):Bool {
             if (EXISTS(key)) {
                 SET(key, GET(key) + value);
                 return true;
@@ -65,35 +70,35 @@ package fovea.utils
             return false;
         }
 
-        public function DECR(key:String):int {
+        public function DECR(key:String):Int {
             return INCRBY(key, -1);
         }
 
-        public function INCR(key:String):int {
+        public function INCR(key:String):Int {
             return INCRBY(key, 1);
         }
 
-        public function DECRBY(key:String, quantity:int = 1):int {
+        public function DECRBY(key:String, quantity:Int = 1):Int {
             return INCRBY(key, -quantity);
         }
 
-        public function INCRBY(key:String, quantity:int = 1):int {
+        public function INCRBY(key:String, quantity:Int = 1):Int {
             if (EXISTS(key)) {
-                var value:Number = parseInt(GET(key));
-                if (!isNaN(value)) {
+                var value:Null<Int> = Std.parseInt(GET(key));
+                if (value != null) {
                     value = value + quantity;
                     SET(key, "" + value);
                     return value;
                 }
             }
-            return 0;
+            return quantity;
         }
 
-        public function FLUSHALL():void {
-            _storage.clear()
+        public function FLUSHALL():Void {
+            _storage.clear();
         }
 
-        public function FLUSHDB():void { FLUSHALL(); }
+        public function FLUSHDB():Void { FLUSHALL(); }
 
         public function GETSET(key:String, value:String):String {
             var old_value:String = null;
@@ -103,30 +108,30 @@ package fovea.utils
             return old_value;
         }
 
-        public function RENAME(key:String, new_key:String):Boolean {
+        public function RENAME(key:String, new_key:String):Bool {
             var value:String = GET(key);
             DEL(key);
             return SET(new_key, value);
         }
 
-        public function RENAMENX(key:String, new_key:String):Boolean {
+        public function RENAMENX(key:String, new_key:String):Bool {
             if (!EXISTS(new_key))
                 return RENAME(key, new_key);
             return false;
         }
 
-        public function SETNX(key:String, value:String):Boolean {
+        public function SETNX(key:String, value:String):Bool {
             if (!EXISTS(key))
                 return SET(key, value);
             return false;
         }
 
-        public function STRLEN(key:String):int {
+        public function STRLEN(key:String):Int {
             if (EXISTS(key))
                 return GET(key).length;
             else
                 return 0;
         }
     }
-}
+
 // vim: sw=4:ts=4:et:

@@ -1,0 +1,3 @@
+[submodule "lib/openfl"]
+	path = lib/openfl
+	url = https://github.com/openfl/openfl.git
