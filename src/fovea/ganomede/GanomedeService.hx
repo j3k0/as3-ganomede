@@ -1,24 +1,25 @@
-package fovea.ganomede
+package fovea.ganomede;
+
+import fovea.ganomede.ApiClient;
+import openfl.utils.Object;
+
+class GanomedeService
 {
-    import fovea.ganomede.ApiClient;
+    public var type:String;
+    public var version:String;
+    public var description:String;
+    public var host:String;
+    public var port:Int;
+    public var pingMs:Int;
 
-    public class GanomedeService
-    {
-        public var type:String;
-        public var version:String;
-        public var description:String;
-        public var host:String;
-        public var port:int;
-        public var pingMs:int;
-
-        public function GanomedeService(obj:Object) {
-            type = obj.type;
-            version = obj.version;
-            description = obj.description;
-            host = obj.host;
-            port = obj.port;
-            pingMs = obj.pingMs;
-        }
+    public function new(obj:Object) {
+        type = obj.type;
+        version = obj.version;
+        description = obj.description;
+        host = obj.host;
+        port = obj.port;
+        pingMs = obj.pingMs;
     }
 }
+
 // vim: sw=4:ts=4:et:

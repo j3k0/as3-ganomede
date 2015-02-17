@@ -1,37 +1,37 @@
-package fovea.ganomede
+package fovea.ganomede;
+
+import fovea.async.*;
+
+class GanomedeClient extends ApiClient
 {
-    import fovea.async.*;
+    public var initialized(get,null):Bool = false;
+    public function get_initialized():Bool { return initialized; }
 
-    public class GanomedeClient extends ApiClient
-    {
-        private var _initialized:Boolean = false;
-        public function get initialized():Boolean { return _initialized; }
+    public var registry(get,null):GanomedeRegistry;
+    public function get_registry():GanomedeRegistry { return registry; }
 
-        private var _registry:GanomedeRegistry;
-        public function get registry():GanomedeRegistry { return _registry; }
+    private var users(get,null):GanomedeUsers;
+    public function get_users():GanomedeUsers { return users; }
 
-        private var _users:GanomedeUsers;
-        public function get users():GanomedeUsers { return _users; }
+    private var invitations(get,null):GanomedeInvitations;
+    public function get_invitations():GanomedeInvitations { return invitations; }
 
-        private var _invitations:GanomedeInvitations;
-        public function get invitations():GanomedeInvitations { return _invitations; }
-
-        public function GanomedeClient(url:String) {
-            super(url);
-            _registry = new GanomedeRegistry(this, url + "/registry/v1");
-            _users = new GanomedeUsers(this);
-            _invitations = new GanomedeInvitations(this);
-        }
-
-        public function initialize():Promise {
-            return when(registry.initialize(), users.initialize(), invitations.initialize())
-                .then(function():void {
-                    _initialized = true;
-                });
-        }
-
-        // Shortcut
-        public function get me():GanomedeUser { return _users.me; }
+    public function GanomedeClient(url:String) {
+        super(url);
+        registry = new GanomedeRegistry(this, url + "/registry/v1");
+        users = new GanomedeUsers(this);
+        invitations = new GanomedeInvitations(this);
     }
+
+    public function initialize():Promise {
+        return Parallel.run([registry.initialize, users.initialize, invitations.initialize])
+            .then(function():Void {
+                initialized = true;
+            });
+    }
+
+    // Shortcut
+    public function get_me():GanomedeUser { return users.me; }
 }
+
 // vim: sw=4:ts=4:et:
