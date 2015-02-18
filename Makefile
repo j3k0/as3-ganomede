@@ -7,11 +7,11 @@ help:
 
 swc:
 	@mkdir -p bin
-	./haxe -swf bin/ganomede.swc -dce no -cp src ${HAXE_MAIN}
+	./haxe -swf bin/ganomede.swc -dce no -lib openfl -cp src ${HAXE_MAIN}
 
 js:
 	@mkdir -p bin
-	./haxe -js bin/ganomede.js -dce no -cp src ${HAXE_MAIN}
+	./haxe -js bin/ganomede.js -dce no -lib openfl -cp src ${HAXE_MAIN}
 
 build: swc
 	@mkdir -p bin
