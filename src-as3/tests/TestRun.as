@@ -182,7 +182,6 @@ package tests
             });
             users.login(me)
                 .then(function():void {
-                    trace(me.token);
                     Assert.isTrue(users.me == me,
                         "testUserLogin me should be the current user");
                     Assert.isTrue(me.token != null,
