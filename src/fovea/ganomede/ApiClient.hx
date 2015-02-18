@@ -1,9 +1,9 @@
 package fovea.ganomede;
 
-import flash.net.URLLoader;
-import flash.net.URLRequest;
-import flash.net.URLRequestHeader;
-import flash.net.URLRequestMethod;
+import openfl.net.URLLoader;
+import openfl.net.URLRequest;
+import openfl.net.URLRequestHeader;
+import openfl.net.URLRequestMethod;
 import fovea.async.Deferred;
 import fovea.async.Promise;
 import haxe.Json;
