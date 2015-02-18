@@ -1,0 +1,3 @@
+#!/bin/bash
+dhaxe="docker run --name dhaxe --rm -v "$(pwd)":/tmp/haxe -w /tmp/haxe imsky/haxe haxe"
+$dhaxe "$@"
