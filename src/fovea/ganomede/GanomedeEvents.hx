@@ -1,9 +1,9 @@
-package fovea.ganomede
-{
-    public class GanomedeEvents {
-        public static const LOGIN:String = "ganomede.login";
-        public static const LOGOUT:String = "ganomede.logout";
-        public static const CHANGE:String = "ganomede.change";
-    }
+package fovea.ganomede;
+
+class GanomedeEvents {
+    public static inline var LOGIN:String = "ganomede.login";
+    public static inline var LOGOUT:String = "ganomede.logout";
+    public static inline var CHANGE:String = "ganomede.change";
 }
+
 // vim: sw=4:ts=4:et:

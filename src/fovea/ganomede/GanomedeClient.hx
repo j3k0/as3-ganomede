@@ -4,19 +4,14 @@ import fovea.async.*;
 
 class GanomedeClient extends ApiClient
 {
-    public var initialized(get,null):Bool = false;
-    public function get_initialized():Bool { return initialized; }
-
-    public var registry(get,null):GanomedeRegistry;
-    public function get_registry():GanomedeRegistry { return registry; }
-
-    private var users(get,null):GanomedeUsers;
-    public function get_users():GanomedeUsers { return users; }
+    public var initialized(default,null):Bool = false;
+    public var registry(default,null):GanomedeRegistry;
+    public var users(default,null):GanomedeUsers;
 
     private var invitations(get,null):GanomedeInvitations;
     public function get_invitations():GanomedeInvitations { return invitations; }
 
-    public function GanomedeClient(url:String) {
+    public function new(url:String) {
         super(url);
         registry = new GanomedeRegistry(this, url + "/registry/v1");
         users = new GanomedeUsers(this);
@@ -25,12 +20,13 @@ class GanomedeClient extends ApiClient
 
     public function initialize():Promise {
         return Parallel.run([registry.initialize, users.initialize, invitations.initialize])
-            .then(function():Void {
+            .then(function(outcome:Dynamic):Void {
                 initialized = true;
             });
     }
 
     // Shortcut
+    public var me(get,never):GanomedeUser;
     public function get_me():GanomedeUser { return users.me; }
 }
 

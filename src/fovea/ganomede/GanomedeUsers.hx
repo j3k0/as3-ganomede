@@ -14,7 +14,7 @@ class GanomedeUsers extends ApiClient
     private var client:GanomedeClient = null;
 
     // current authenticated user
-    private var me(get,null):GanomedeUser = new GanomedeUser();
+    public var me(get,null):GanomedeUser = new GanomedeUser();
     public function get_me():GanomedeUser { return me; }
 
     public function new(client:GanomedeClient) {
@@ -25,8 +25,7 @@ class GanomedeUsers extends ApiClient
     public function initialize():Promise {
         var deferred:Deferred = new Deferred();
         deferred.resolve();
-        return deferred
-            .then(function():Void {
+        return deferred.then(function(obj:Object):Void {
                 initialized = true;
                 if (me.authenticated) {
                     dispatchLoginEvent(null);
@@ -67,7 +66,7 @@ class GanomedeUsers extends ApiClient
             ajax("GET", "/auth/" + me.token + "/me", {
                 parse: parseMe
             })
-            .then(function():Void {
+            .then(function(outcome:Object):Void {
                 deferred.resolve(user);
             })
             .error(deferred.reject);

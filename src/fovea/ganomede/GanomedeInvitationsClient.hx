@@ -7,12 +7,11 @@ class GanomedeInvitationsClient extends ApiClient
 {
     public static inline var TYPE:String = "invitations/v1";
 
-    private var token(get,null):String = null;
-    public function get_token():String { return token; }
+    public var token(default,null):String = null;
 
     public function new(baseUrl:String, token:String) {
         super(baseUrl + "/" + TYPE + "/auth/" + token);
-        tihs.token = token;
+        this.token = token;
     }
 
     public function addInvitation(invitation:GanomedeInvitation):Promise {

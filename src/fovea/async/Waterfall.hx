@@ -12,7 +12,7 @@ import haxe.Timer.delay;
  * If any of the supplied function reject then the returned Promise will also reject.
  */
 class Waterfall {
-    public function run(fn:Array<Void->Promise>) : Promise
+    public static function run(fn:Array<Void->Promise>) : Promise
     {
         var deferred:Deferred = new Deferred();
 

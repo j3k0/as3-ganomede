@@ -13,7 +13,7 @@ import haxe.Timer.delay;
  */
 class Parallel
 {
-    public function run(fn:Array<Void->Promise>) : Promise
+    public static function run(fn:Array<Void->Promise>) : Promise
     {
         var deferred:Deferred = new Deferred();
 

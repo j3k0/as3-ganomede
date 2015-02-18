@@ -7,23 +7,25 @@ import openfl.utils.Object;
 
 class GanomedeInvitations extends ApiClient
 {
-    public var initialized(get,null):Bool = false;
-    public function get_initialized():Bool { return initialized; }
+    public var initialized(default,null):Bool = false;
 
     private var client:GanomedeClient;
-    private var invitationsClient:GanomedeInvitationsClient;
+    private var invitationsClient:GanomedeInvitationsClient = null;
 
-    public var collection(get,null) = new Collection<GanomedeInvitation>();
-    public function get_array():Array<GanomedeInvitation> {
-        return collection.asArray()
-            .sort(function(a:GanomedeInvitation, b:GanomedeInvitation):Int {
-                return a.index - b.index;
-            });
+    public var collection(default,never) = new Collection<GanomedeInvitation>();
+
+    public var array(get,never):Array<GanomedeInvitation>;
+    public function get_array() {
+        var array = collection.asArray();
+        array.sort(function(a:GanomedeInvitation, b:GanomedeInvitation):Int {
+            return a.index - b.index;
+        });
+        return array;
     }
 
     public function new(client:GanomedeClient) {
         super(client.url + "/" + GanomedeInvitationsClient.TYPE);
-        client = client;
+        this.client = client;
         invitationsClient = new GanomedeInvitationsClient(client.url, null);
     }
 
@@ -35,7 +37,7 @@ class GanomedeInvitations extends ApiClient
 
         deferred.resolve();
         return deferred
-            .then(function():Void {
+            .then(function(outcome:Object):Void {
                 initialized = true;
             });
     }
@@ -43,10 +45,14 @@ class GanomedeInvitations extends ApiClient
     public function onLoginLogout(event:Event):Void {
 
         var oldAuthToken:String = null;
-        if (invitationsClient) oldAuthToken = invitationsClient.token;
+        if (invitationsClient != null) {
+            oldAuthToken = invitationsClient.token;
+        }
 
         var newAuthToken:String = null;
-        if (client.me) newAuthToken = client.me.token;
+        if (client.me != null) {
+            newAuthToken = client.me.token;
+        }
 
         if (newAuthToken != oldAuthToken) {
             invitationsClient = new GanomedeInvitationsClient(client.url, newAuthToken);
@@ -57,13 +63,13 @@ class GanomedeInvitations extends ApiClient
 
     public function add(invitation:GanomedeInvitation):Promise {
         if (!client.me.authenticated) {
-            if (verbose) trace("cant add invitation: not authenticated");
+            if (ApiClient.verbose) trace("cant add invitation: not authenticated");
             return error(ApiError.CLIENT_ERROR);
         }
         invitation.from = client.me.username;
 
         return invitationsClient.addInvitation(invitation)
-            .then(function():Void {
+            .then(function(outcome:Dynamic):Void {
                 mergeInvitation(invitation.toJSON());
                 dispatchEvent(new Event(GanomedeEvents.CHANGE));
             });
@@ -82,7 +88,7 @@ class GanomedeInvitations extends ApiClient
     private function deleteInvitation(invitation:GanomedeInvitation, reason:String):Promise {
         var deferred:Deferred = new Deferred();
         invitationsClient.deleteInvitation(invitation, reason)
-        .then(function():Void {
+        .then(function(outcome:Dynamic):Void {
             collection.del(invitation.id);
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
             deferred.resolve();
@@ -93,7 +99,7 @@ class GanomedeInvitations extends ApiClient
 
     public function refreshArray():Promise {
         var deferred:Deferred = new Deferred();
-        if (invitationsClient.token) {
+        if (invitationsClient.token != null) {
             invitationsClient.listInvitations()
             .then(function(result:Object):Void {
                 if (processListInvitations(result))
@@ -104,17 +110,17 @@ class GanomedeInvitations extends ApiClient
             .error(deferred.reject);
         }
         else {
-            if (verbose) trace("Can't load invitations if not authenticated");
+            if (ApiClient.verbose) trace("Can't load invitations if not authenticated");
             deferred.reject(new ApiError(ApiError.CLIENT_ERROR));
         }
         return deferred;
     }
 
     private function processListInvitations(result:Object):Bool {
-        var newArray:Array<Object> = cast(result.data,Array<Object>);
-        if (newArray) {
+        try {
+            var newArray:Array<Object> = cast(result.data,Array<Object>);
             var changed:Bool = false;
-            var keys:Array = [];
+            var keys:Array<String> = [];
             for (invitation in newArray)
                 keys.push(invitation.id);
             collection.keep(keys);
@@ -128,7 +134,7 @@ class GanomedeInvitations extends ApiClient
                 dispatchEvent(new Event(GanomedeEvents.CHANGE));
             return true;
         }
-        else {
+        catch (error:String) {
             return false;
         }
     }

@@ -72,7 +72,7 @@ class ApiClient extends EventDispatcher
         var status:Int = 0;
         var data:Object = null;
 
-        var removeListeners:IEventDispatcher->Void;
+        var removeListeners:IEventDispatcher->Void = null;
 
         function done():Void {
             removeListeners(dispatcher);
