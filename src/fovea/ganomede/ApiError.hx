@@ -25,31 +25,28 @@ class ApiError extends Error
         this.code = pcode;
         this.status = pstatus;
         this.data = pdata;
+
+        // API Message
+        if (data != null && data.message)
+            apiMessage = data.message;
+        else
+            apiMessage = message;
+
+        // API Code
+        if (data != null && data.code)
+            apiCode = data.code;
+        else if (status != 0)
+            apiCode = code + status;
+        else
+            apiCode = code;
     }
 
     public var code(default,null):String = null;
     public var status(default,null):Int = 0;
     public var data(default,null):Object = null;
 
-    public var apiMessage(get,never):String;
-    public function get_apiMessage():String {
-        if (data != null && data.message)
-            return data.message;
-        else
-            return message();
-    }
-
-    public var apiCode(get,never):String;
-    public function get_apiCode():String {
-        if (data != null && data.code)
-            return data.code;
-        else if (status != 0) {
-            return code + status;
-        }
-        else {
-            return code;
-        }
-    }
+    public var apiMessage(default,null):String = null;
+    public var apiCode(default,null):String = null;
 }
 
 // vim: sw=4:ts=4:et:

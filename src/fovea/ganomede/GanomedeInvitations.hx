@@ -49,8 +49,8 @@ class GanomedeInvitations extends ApiClient
         }
 
         var newAuthToken:String = null;
-        if (client.me != null) {
-            newAuthToken = client.me.token;
+        if (client.users.me != null) {
+            newAuthToken = client.users.me.token;
         }
 
         if (newAuthToken != oldAuthToken) {
@@ -61,11 +61,11 @@ class GanomedeInvitations extends ApiClient
     }
 
     public function add(invitation:GanomedeInvitation):Promise {
-        if (!client.me.isAuthenticated()) {
+        if (!client.users.me.isAuthenticated()) {
             if (ApiClient.verbose) trace("cant add invitation: not authenticated");
             return error(ApiError.CLIENT_ERROR);
         }
-        invitation.from = client.me.username;
+        invitation.from = client.users.me.username;
 
         return invitationsClient.addInvitation(invitation)
             .then(function(outcome:Dynamic):Void {

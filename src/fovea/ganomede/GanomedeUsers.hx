@@ -8,14 +8,10 @@ class GanomedeUsers extends ApiClient
 {
     public static inline var TYPE:String = "users/v1";
 
-    public var initialized(get,null):Bool = false;
-    public function get_initialized():Bool { return initialized; }
-
+    public var initialized(default,null):Bool = false;
     private var client:GanomedeClient = null;
-
     // current authenticated user
-    public var me(get,null):GanomedeUser = new GanomedeUser();
-    public function get_me():GanomedeUser { return me; }
+    public var me(default,null):GanomedeUser = new GanomedeUser();
 
     public function new(client:GanomedeClient) {
         super(client.url + "/" + TYPE);

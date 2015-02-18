@@ -22,10 +22,6 @@ class GanomedeClient extends ApiClient
                 initialized = true;
             });
     }
-
-    // Shortcut
-    public var me(get,never):GanomedeUser;
-    public function get_me():GanomedeUser { return users.me; }
 }
 
 // vim: sw=4:ts=4:et:

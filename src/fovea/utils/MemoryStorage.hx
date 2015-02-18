@@ -4,8 +4,7 @@ import haxe.ds.StringMap;
 
 class MemoryStorage implements IStorage
 {
-    public var length(get,null):Int;
-    public function get_length():Int {
+    public function length():Int {
         var i:Int = 0;
         var it = map.keys();
         while (it.hasNext()) { i += 1; it.next(); }

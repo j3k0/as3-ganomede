@@ -59,7 +59,7 @@ package fovea.utils;
         }
 
         public function DBSIZE():Int {
-            return _storage.length;
+            return _storage.length();
         }
 
         public function APPEND(key:String, value:String):Bool {

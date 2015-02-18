@@ -14,13 +14,13 @@ package tests
         }
 
         public function run():Promise {
-            return Waterfall.run([
-                /*testClient,
+            return Parallel.run([
+                testClient,
                 testService,
                 testRegitry,
                 testRegitryGetServicesAsync,
                 testInitialize,
-                testUserSignUp,*/
+                testUserSignUp,
                 testUserLogin,
                 testUserLoginFailed,
                 testUserProfile,
@@ -241,7 +241,6 @@ package tests
                         "testUserLoginFailed me should not be authenticated");
                     Assert.isTrue(err.status == 400,
                         "testUserLoginFailed should fail with status 400");
-                    trace(err.apiCode);
                     Assert.isTrue(err.apiCode == ApiError.INVALID,
                         "testUserLoginFailed should fail with apiCode INVALID");
                     deferred.resolve();
