@@ -15,10 +15,10 @@ js:
 
 build: swc
 	@mkdir -p bin
-	amxmlc -output bin/Main.swf src-as3/Main.as -compiler.source-path src-as3/ -compiler.library-path bin/ganomede.swc
+	./amxmlc -output bin/Main.swf src-as3/Main.as -compiler.source-path src-as3/ -compiler.library-path bin/ganomede.swc
 
 run: build
-	adl src/Main-app.xml bin
+	./adl src/Main-app.xml bin
 
 clean:
 	rm -fr bin

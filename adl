@@ -1,0 +1,5 @@
+#!/bin/bash
+if [ "x$dadl" = "x" ]; then
+	dadl="docker run --name dadl --rm -v "$(pwd)":/src jeko/airbuild adl"
+fi
+$dadl "$@"

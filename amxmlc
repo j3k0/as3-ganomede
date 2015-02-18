@@ -1,0 +1,5 @@
+#!/bin/bash
+if [ "x$damxmlc" = "x" ]; then
+	damxmlc="docker run --name damxmlc --rm -v "$(pwd)":/src jeko/airbuild amxmlc"
+fi
+$damxmlc "$@"

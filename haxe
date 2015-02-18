@@ -1,3 +1,5 @@
 #!/bin/bash
-dhaxe="docker run --name dhaxe --rm -v "$(pwd)":/tmp/haxe -w /tmp/haxe jeko/haxe-openfl haxe"
+if [ "x$dhaxe" = "x" ]; then
+	dhaxe="docker run --name dhaxe --rm -v "$(pwd)":/tmp/haxe -w /tmp/haxe jeko/haxe-openfl haxe"
+fi
 $dhaxe "$@"
