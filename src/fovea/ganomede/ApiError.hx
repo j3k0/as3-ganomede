@@ -27,24 +27,21 @@ class ApiError extends Error
         this.data = pdata;
     }
 
-    public var code(get,null):String = null;
-    public function get_code():String { return code; }
+    public var code(default,null):String = null;
+    public var status(default,null):Int = 0;
+    public var data(default,null):Object = null;
 
-    public var status(get,null):Int = 0;
-    public function get_status():Int { return status; }
-
-    private var data(get,null):Object = null;
-    public function get_data():Object { return data; }
-
+    public var apiMessage(get,never):String;
     public function get_apiMessage():String {
-        if (data && data.message)
+        if (data != null && data.message)
             return data.message;
         else
             return message();
     }
 
+    public var apiCode(get,never):String;
     public function get_apiCode():String {
-        if (data && data.code)
+        if (data != null && data.code)
             return data.code;
         else if (status != 0) {
             return code + status;

@@ -1,18 +1,18 @@
 package fovea.utils;
 
-import haxe.ds.ObjectMap;
-
+import haxe.ds.StringMap;
 import openfl.events.EventDispatcher;
 import openfl.events.Event;
 
 @:generic
 class Collection<T> extends EventDispatcher {
 
-    private var map = new ObjectMap<String,T>();
+    private var map = new StringMap<T>();
 
     public function asArray():Array<T> {
         var ret = new Array<T>();
-        for (key in map.keys())
+        var keys = map.keys();
+        for (key in keys)
             ret.push(map.get(key));
         return ret;
     }
@@ -38,7 +38,7 @@ class Collection<T> extends EventDispatcher {
     }
 
     public function keep(keys:Array<String>):Void {
-        var keepKeys = new ObjectMap<String,Bool>();
+        var keepKeys = new StringMap<Bool>();
         for (i in keys)
             keepKeys.set(i, true);
         for (key in map.keys()) {
@@ -49,7 +49,7 @@ class Collection<T> extends EventDispatcher {
 
     public function flushall():Void {
         var oldMap = map;
-        map = new ObjectMap<String,T>();
+        map = new StringMap<T>();
         for (key in oldMap.keys())
             dispatchEvent(new Event("del:" + key));
         dispatchEvent(new Event("del"));

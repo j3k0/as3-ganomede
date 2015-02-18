@@ -5,11 +5,8 @@ import openfl.utils.Object;
 
 class GanomedeRegistry extends ApiClient
 {
-    private var initialized(get,null):Bool = false;
-    public function get_initialized():Bool { return initialized; }
-
-    private var services(get,null) = new Array<GanomedeService>();
-    public function get_services():Array<GanomedeService> { return services; }
+    public var initialized(default,null):Bool = false;
+    public var services(default,null) = new Array<GanomedeService>();
 
     private var client:GanomedeClient = null;
 

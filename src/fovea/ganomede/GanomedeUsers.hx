@@ -27,7 +27,7 @@ class GanomedeUsers extends ApiClient
         deferred.resolve();
         return deferred.then(function(obj:Object):Void {
                 initialized = true;
-                if (me.authenticated) {
+                if (me.isAuthenticated()) {
                     dispatchLoginEvent(null);
                 }
             });

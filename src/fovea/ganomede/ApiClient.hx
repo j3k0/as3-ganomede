@@ -2,18 +2,19 @@ package fovea.ganomede;
 
 import flash.net.URLLoader;
 import flash.net.URLRequest;
-import flash.net.URLRequestMethod;
 import flash.net.URLRequestHeader;
-import openfl.events.Event;
-import openfl.events.SecurityErrorEvent;
-import openfl.events.IOErrorEvent;
-import openfl.events.HTTPStatusEvent;
-import openfl.events.IEventDispatcher;
-import openfl.events.EventDispatcher;
-import openfl.errors.Error;
-import haxe.Json;
+import flash.net.URLRequestMethod;
 import fovea.async.Deferred;
 import fovea.async.Promise;
+import haxe.Json;
+import haxe.ds.StringMap;
+import openfl.errors.Error;
+import openfl.events.Event;
+import openfl.events.EventDispatcher;
+import openfl.events.HTTPStatusEvent;
+import openfl.events.IEventDispatcher;
+import openfl.events.IOErrorEvent;
+import openfl.events.SecurityErrorEvent;
 import openfl.utils.Object;
 
 class ApiClient extends EventDispatcher
@@ -21,7 +22,9 @@ class ApiClient extends EventDispatcher
     public static var verbose:Bool = false;
 
     public var url:String;
-    private var _cache:Object = {}; // cache requests result
+
+    // cache requests result
+    private var cache = new StringMap<Object>();
 
     public function new(url:String) {
         super();
@@ -86,7 +89,7 @@ class ApiClient extends EventDispatcher
                 if (options.parse)
                     obj.data = options.parse(data);
                 if (options.cacheID)
-                    _cache[options.cacheID] = obj;
+                    cache.set(options.cacheID, obj);
                 deferred.resolve(obj);
                 return;
             }
@@ -143,14 +146,18 @@ class ApiClient extends EventDispatcher
     }
 
     public function cached(method:String, path:String):Object {
-        return _cache.get(method + ":" + path);
+        var key = method + ":" + path;
+        if (cache.exists(key))
+            return cache.get(method + ":" + path);
+        else
+            return null;
     }
 
     public function cachedAjax(method:String, path:String, options:Object = null):Promise {
         if (options == null)
             options = {};
         var obj:Object = cached(method, path);
-        if (obj) {
+        if (obj != null) {
             var deferred:Deferred = new Deferred();
             deferred.resolve(obj);
             ajax(method, path, { cache: true, parse: options.parse });

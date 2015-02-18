@@ -1,6 +1,6 @@
 package fovea.utils;
 
-import haxe.ds.ObjectMap;
+import haxe.ds.StringMap;
 
 class MemoryStorage implements IStorage
 {
@@ -12,10 +12,10 @@ class MemoryStorage implements IStorage
         return i;
     }
 
-    private var map:ObjectMap<String,String>;
+    private var map:StringMap<String>;
     
     public function new() {
-        map = new ObjectMap<String,String>();
+        map = new StringMap<String>();
     }
 
     public function setItem(key:String, value:String):Void {
@@ -28,7 +28,7 @@ class MemoryStorage implements IStorage
         return map.get(key);
     }
     public function clear():Void {
-        map = new ObjectMap<String,String>();
+        map = new StringMap<String>();
     }
 }
 

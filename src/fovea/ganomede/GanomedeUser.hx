@@ -8,11 +8,16 @@ class GanomedeUser {
     public var surname:String;
     public var email:String;
     public var password:String;
+
     public var token(default,set):String = null;
     public function set_token(value:String):String {
         token = value;
         if (token == "") token = null;
         return token;
+    }
+
+    public function isAuthenticated():Bool {
+        return !(token == null || token == "");
     }
 
     public function new(obj:Object = null) {
@@ -24,11 +29,6 @@ class GanomedeUser {
             password = obj.password;
             token = obj.token;
         }
-    }
-
-    public var authenticated(get,null):Bool;
-    function get_authenticated():Bool {
-        return this.token != null ? true : false;
     }
 
     public function fromJSON(obj:Object):Void {

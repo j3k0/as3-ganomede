@@ -14,8 +14,7 @@ class GanomedeInvitations extends ApiClient
 
     public var collection(default,never) = new Collection<GanomedeInvitation>();
 
-    public var array(get,never):Array<GanomedeInvitation>;
-    public function get_array() {
+    public function asArray() {
         var array = collection.asArray();
         array.sort(function(a:GanomedeInvitation, b:GanomedeInvitation):Int {
             return a.index - b.index;
@@ -62,7 +61,7 @@ class GanomedeInvitations extends ApiClient
     }
 
     public function add(invitation:GanomedeInvitation):Promise {
-        if (!client.me.authenticated) {
+        if (!client.me.isAuthenticated()) {
             if (ApiClient.verbose) trace("cant add invitation: not authenticated");
             return error(ApiError.CLIENT_ERROR);
         }

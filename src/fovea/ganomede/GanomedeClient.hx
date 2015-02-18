@@ -7,9 +7,7 @@ class GanomedeClient extends ApiClient
     public var initialized(default,null):Bool = false;
     public var registry(default,null):GanomedeRegistry;
     public var users(default,null):GanomedeUsers;
-
-    private var invitations(get,null):GanomedeInvitations;
-    public function get_invitations():GanomedeInvitations { return invitations; }
+    public var invitations(default,null):GanomedeInvitations;
 
     public function new(url:String) {
         super(url);
