@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 import fovea.async.*;
+import fovea.net.AjaxError;
 
 class GanomedeInvitationsClient extends ApiClient
 {
@@ -55,7 +56,7 @@ class GanomedeInvitationsClient extends ApiClient
             if (!result.data || result.data.ok == true)
                 deferred.resolve();
             else
-                deferred.reject(new ApiError(ApiError.HTTP_ERROR, result.status, result.data));
+                deferred.reject(new ApiError(AjaxError.HTTP_ERROR, result.status, result.data));
         })
         .error(deferred.reject);
         return deferred;

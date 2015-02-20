@@ -4,6 +4,8 @@ import fovea.async.*;
 import openfl.events.Event;
 import fovea.utils.Collection;
 import openfl.utils.Object;
+import fovea.net.Ajax;
+import fovea.net.AjaxError;
 
 class GanomedeInvitations extends ApiClient
 {
@@ -62,8 +64,8 @@ class GanomedeInvitations extends ApiClient
 
     public function add(invitation:GanomedeInvitation):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (ApiClient.verbose) trace("cant add invitation: not authenticated");
-            return error(ApiError.CLIENT_ERROR);
+            if (Ajax.verbose) trace("cant add invitation: not authenticated");
+            return error(AjaxError.CLIENT_ERROR);
         }
         invitation.from = client.users.me.username;
 
@@ -104,13 +106,13 @@ class GanomedeInvitations extends ApiClient
                 if (processListInvitations(result))
                     deferred.resolve();
                 else
-                    deferred.reject(new ApiError(ApiError.IO_ERROR));
+                    deferred.reject(new ApiError(AjaxError.IO_ERROR));
             })
             .error(deferred.reject);
         }
         else {
-            if (ApiClient.verbose) trace("Can't load invitations if not authenticated");
-            deferred.reject(new ApiError(ApiError.CLIENT_ERROR));
+            if (Ajax.verbose) trace("Can't load invitations if not authenticated");
+            deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
         }
         return deferred;
     }

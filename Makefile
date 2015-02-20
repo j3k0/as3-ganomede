@@ -11,7 +11,7 @@ swc:
 
 js:
 	@mkdir -p bin
-	./haxe -js bin/ganomede.js -dce no -lib openfl -cp src ${HAXE_MAIN}
+	./haxe -js bin/ganomede.js -dce no -lib openfl -cp lib/js-kit -cp src ${HAXE_MAIN}
 
 build: swc
 	@mkdir -p bin
