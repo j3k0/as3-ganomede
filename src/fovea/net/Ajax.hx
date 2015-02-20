@@ -1,7 +1,9 @@
 package fovea.net;
 
+import openfl.utils.Object;
 import fovea.async.Deferred;
 import fovea.async.Promise;
+import haxe.Json;
 
 #if flash
 
@@ -15,7 +17,6 @@ import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
-import haxe.Json;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
@@ -39,7 +40,6 @@ class Ajax extends EventDispatcher
 
         if (options == null)
             options = {};
-
         options.method = method;
         options.path = path;
 
@@ -159,15 +159,59 @@ class Ajax extends EventDispatcher
 #elseif js
 
 import js.node.http.ClientRequest;
+import js.node.Http.HttpClient;
+import js.node.Http.HttpReqOpt;
+import js.node.Http.HttpClientResp;
+import js.node.Http;
+
 //import lime.events.Event;
 //import lime.events.EventDispatcher;
 
-class Ajax extends ClientRequest
+class Ajax
 {
+    public static var verbose:Bool = false;
+
+    public var url:String;
+
+    public var protocol:String;
+    public var host:String;
+    public var port:Int;
+    public var path:String;
+
+    public function new(url:String) {
+
+        this.url = url;
+
+        // extract protocol from the url
+        this.protocol = url.split(":")[0];
+
+        // extract path from the url
+        this.path = "";
+        var array = url.split("/");
+        for (i in 3...array.length)
+            this.path += "/" + array[i];
+
+        // extract host and port
+        var hostPort = url.split("/")[2];
+        this.host = hostPort.split(":")[0];
+        this.port = 80;
+        if (this.host != hostPort) {
+            this.port = Std.parseInt(hostPort.split(":")[1]);
+        }
+    }
+
+    private function beforeAjax(options:Object):Void {}
+    private function afterAjax(options:Object, obj:Object):Void {}
+    private function ajaxError(code:String, status:Int = 0, data:Object = null):AjaxError {
+        return new AjaxError(code, status, data);
+    }
+
     public function ajax(method:String, path:String, options:Object = null):Promise {
 
         if (options == null)
             options = {};
+        options.method = method;
+        options.path = path;
 
         var deferred:Deferred = new Deferred();
 
@@ -175,101 +219,57 @@ class Ajax extends ClientRequest
         options.requestID = requestID;
         if (verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url + path);
 
-        if (options.cache) {
-            options.cacheID = method + ":" + path;
-            if (verbose) trace("AJAX[" + requestID + "]: will cache");
+        beforeAjax(options);
+
+        var data = "";
+        if (options.data) {
+            data = Json.stringify(options.data);
         }
+
+        var reqOptions:HttpReqOpt = {
+            host: this.host,
+            port: this.port,
+            path: this.path + "/" + path,
+            method: method,
+            headers: {
+                "Content-type": "application/json",
+                'Content-Length': data.length
+            }
+        };
 
         // Prepare the request
-        var urlRequest = new Http(this.url + path);
-        urlRequest.async = true;
+        var req = Http.request(reqOptions, function(res:HttpClientResp):Void {
+            var status = res.statusCode;
+            var data = "";
+            res.on("data", function(chunk:String):Void {
+                data += chunk;
+            });
+            res.on("end", function():Void {
+                if (status >= 200 && status <= 299) {
+                    var obj:Object = {
+                        status: status,
+                        data: data
+                    };
+                    if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + Json.stringify(data));
+                    afterAjax(options, obj);
+                    deferred.resolve(obj);
+                    return;
+                }
+                deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
+            });
+        });
+
+        req.on("error", function(error:Dynamic):Void {
+            deferred.reject(ajaxError(AjaxError.IO_ERROR, 0, error.message));
+        });
 
         if (options.data) {
-            var data = Json.stringify(options.data);
-            urlRequest.setPostData(data);
+            req.write(data);
             if (verbose) trace("AJAX[" + requestID + "] data=" + data);
         }
-
-        urlRequest.setHeader("Content-type", "application/json");
-        configureListeners(urlRequest, deferred, options);
-        urlRequest.request(method.toUpperCase() != "GET");
+        req.end();
 
         return deferred;
-    }
-
-    private function configureListeners(dispatcher:Http, deferred:Deferred, options:Object):Void {
-
-        var status:Int = 0;
-        var data:Object = null;
-
-        var removeListeners:Http->Void = null;
-
-        function done():Void {
-            removeListeners(dispatcher);
-            if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + Json.stringify(data));
-
-            if (status >= 200 && status <= 299) {
-                var obj:Object = {
-                    status: status,
-                    data: data
-                };
-                if (options.parse)
-                    obj.data = options.parse(data);
-                if (options.cacheID)
-                    cache.set(options.cacheID, obj);
-                deferred.resolve(obj);
-                return;
-            }
-            deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
-        }
-
-        function complete(event:Event):Void {
-            // trace("complete: " + event);
-            // var loader:URLLoader = cast(event.target, URLLoader);
-            data = jsonData(loader);
-            done();
-        }
-
-        function httpStatus(event:HTTPStatusEvent):Void {
-            // trace("httpStatus: " + event);
-            status = event.status;
-        }
-
-        /* dispatcher.addEventListener(Event.OPEN, function(event:Event):Void {
-            trace("openHandler: " + event); });
-        dispatcher.addEventListener(ProgressEvent.PROGRESS, function(event:ProgressEvent):Void {
-            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal); }); */
-
-        function securityError(event:SecurityErrorEvent):Void {
-            //trace("securityErrorHandler: " + event);
-            removeListeners(dispatcher);
-            deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
-        }
-
-        function ioError(event:IOErrorEvent):Void {
-            // trace("ioErrorHandler: " + event);
-            var loader:URLLoader = cast(event.target, URLLoader);
-            data = jsonData(loader);
-            if (data) {
-                done();
-            }
-            else {
-                removeListeners(dispatcher);
-                deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
-            }
-        }
-
-        dispatcher.addEventListener(Event.COMPLETE, complete);
-        dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityError);
-        dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioError);
-        dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatus);
-
-        removeListeners = function(dispatcher:IEventDispatcher):Void {
-            dispatcher.removeEventListener(Event.COMPLETE, complete);
-            dispatcher.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, securityError);
-            dispatcher.removeEventListener(IOErrorEvent.IO_ERROR, ioError);
-            dispatcher.removeEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatus);
-        }
     }
 }
 
