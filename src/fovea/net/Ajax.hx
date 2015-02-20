@@ -16,11 +16,11 @@ import openfl.events.IEventDispatcher;
 import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
 import openfl.events.Event;
-import openfl.events.EventDispatcher;
+import fovea.events.Events;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
-class Ajax extends EventDispatcher
+class Ajax extends Events
 {
     public static var verbose:Bool = false;
     public var url:String;
@@ -163,11 +163,12 @@ import js.node.Http.HttpClient;
 import js.node.Http.HttpReqOpt;
 import js.node.Http.HttpClientResp;
 import js.node.Http;
+import fovea.events.Events;
 
 //import lime.events.Event;
 //import lime.events.EventDispatcher;
 
-class Ajax
+class Ajax extends Events
 {
     public static var verbose:Bool = false;
 

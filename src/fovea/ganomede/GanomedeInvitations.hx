@@ -1,11 +1,11 @@
 package fovea.ganomede;
 
 import fovea.async.*;
-import openfl.events.Event;
 import fovea.utils.Collection;
 import openfl.utils.Object;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
+import fovea.events.Event;
 
 class GanomedeInvitations extends ApiClient
 {
