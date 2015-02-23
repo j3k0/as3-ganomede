@@ -1,4 +1,4 @@
-var haxe = require("../bin/ganomede");
+var haxe = require("./bin/ganomede");
 
 haxe.fovea.ganomede.utils = haxe.fovea.utils;
 haxe.fovea.ganomede.net = haxe.fovea.net;

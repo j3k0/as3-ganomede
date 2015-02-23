@@ -1,0 +1,30 @@
+{
+  "name": "ganomede",
+  "version": "0.1.0",
+  "description": "Ganomede client library",
+  "main": "index.js",
+  "bin": {
+    "ganomede": "ganomede.js"
+  },
+  "scripts": {
+    "test": "node src-js/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j3k0/as3-ganomede.git"
+  },
+  "keywords": [
+    "game",
+    "server",
+    "client",
+    "as3",
+    "actionscript",
+    "node"
+  ],
+  "author": "Jean-Christophe Hoelt <hoelt@fovea.cc>",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/j3k0/as3-ganomede/issues"
+  },
+  "homepage": "https://github.com/j3k0/as3-ganomede"
+}
