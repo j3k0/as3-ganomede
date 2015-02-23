@@ -1,6 +1,134 @@
-# AS3-Ganomede
+# Ganomede
 
-This is a client-side library in AS3 to interact with a Ganomede server.
+This is a multi-language client-side library to interact with a Ganomede server.
+
+For now, it supports:
+
+ * Javascript with NodeJS
+ * Actionscript 3 (AIR and Flash Player)
+
+# Author
+Jean-Christophe Hoelt <hoelt@fovea.cc>
+
+# License
+GPL v3
+
+# Javascript Documentation
+
+## API
+
+### Initialization
+
+First thing, you have to create a ganomede client and initialize it.
+
+```js
+var ganomede = require("ganomede");
+var client = new ganomede.GanomedeClient("http://ganomede.server.com:12000");
+client.initialize()
+    .then(function() {
+        console.log("Initialization OK");
+    })
+    .error(function(err) {
+        trace("Initialization ERROR");
+    });
+```
+
+### Registry
+
+The `registry` module allows you to retrieve informations about running services.
+
+```js
+var registry = client.registry;
+for (var i = 0; i < registry.services.length; ++i) {
+    var service = registry.services[i];
+    console.log(" - " + service.type + " version " + service.version);
+}
+```
+
+The code above will display the list of services as retrieves at initialization or at the last call to
+`getServices`. If you really want the most up-to-date, non-cached list of running services, you can:
+
+```js
+registry.getServicesAsync()
+    .then(function() {
+        for (var i = 0; i < registry.services.length; ++i) {
+            var service = registry.services[i];
+            console.log(" - " + service.type + " version " + service.version);
+        }
+    });
+```
+
+### Users management
+
+The `users` module allows you to manage user session (registration, login, profile (registration, login, profile).
+
+To retrieve the client's `GanomedeUsers` instance:
+
+```js
+var users = client.users;
+```
+
+#### Sign up
+
+Create a new `GanomedeUser` and sign him up.
+
+```js
+var me = new ganomede.GanomedeUser({
+    username: 'testsignup',
+    givenName: 'Test',
+    surname: 'Ganomede Signup',
+    email: 'testsignup@fovea.cc',
+    password: 'Password1234!'
+});
+users.signUp(me)
+    .then(function() {
+        console.log("I am now authenticated");
+    })
+    .error(function(err) {
+        console.log("Registration failed");
+        if (err.apiCode == ganomede.ApiError.ALREADY_EXISTS)
+            console.log("User already exists");
+    });
+```
+
+#### Login
+
+Create a new `GanomedeUser` with a username and password, login:
+
+```js
+var me = new ganomede.GanomedeUser({
+    username: 'testlogin',
+    password: 'Password1234!'
+});
+users.login(me)
+    .then(function() {
+        console.log("I am now logged in");
+    })
+    .error(function(err):void {
+        console.log("Loggin failed");
+        if (err.apiCode == ganomede.ApiError.INVALID) {
+            console.log("Login failed");
+            console.log(err.data.message);
+        }
+    });
+```
+
+#### Profile
+
+```js
+users.fetch(users.me)
+    .then(function(user) {
+        trace(user.email);
+        trace(user.givenName);
+        trace(user.surname);
+    });
+```
+
+### Invitations
+
+## Contribute
+
+# AS3 Documentation
 
 ## Getting started
 
@@ -11,7 +139,7 @@ To get help about compiling and running the project.
 make
 ```
 
-## Documentation
+## API Documentation
 
 ### Initialization
 
@@ -118,9 +246,3 @@ users.fetch(users.me)
         trace(user.surname);
     });
 ```
-
-## Author
-Jean-Christophe Hoelt <hoelt@fovea.cc>
-
-## License
-GPL v3
