@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import fovea.async.*;
 
+@:expose
 class GanomedeClient extends ApiClient
 {
     public var initialized(default,null):Bool = false;

@@ -8,6 +8,7 @@ package fovea.events;
 #else
 #end
 
+@:expose
 class Events
 #if flash
     extends EventDispatcher
@@ -24,12 +25,14 @@ class Events
     public function off(event:String, callback:Event->Void):Void { removeEventListener(event, callback); }
     public function addListener(event:String, callback:Dynamic):Void { on(event, callback); }
     public function removeListeners(event:String, callback:Dynamic):Void { off(event, callback); }
+    public function emit(event:String, arg:Event):Void { dispatchEvent(new Event(event)); }
 
 #elseif js
 
     public function addEventListener(event:String, callback:Event->Void):Void { on(event, callback); }
     public function off(event:String, callback:Event->Void):Void { removeListener(event, callback); }
     public function removeEventListener(event:String, callback:Event->Void):Void { removeListener(event, callback); }
+    public function dispatchEvent(event:Event):Void { emit(event.type, event); }
 
 #else
 

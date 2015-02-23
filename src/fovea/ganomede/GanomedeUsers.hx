@@ -1,10 +1,11 @@
 package fovea.ganomede;
 
 import fovea.async.*;
-import openfl.events.Event;
+import fovea.events.Event;
 import openfl.utils.Object;
 import fovea.net.AjaxError;
 
+@:expose
 class GanomedeUsers extends ApiClient
 {
     public static inline var TYPE:String = "users/v1";

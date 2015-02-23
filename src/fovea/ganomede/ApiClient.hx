@@ -6,6 +6,7 @@ import haxe.ds.StringMap;
 import openfl.utils.Object;
 import fovea.net.*;
 
+@:expose
 class ApiClient extends Ajax
 {
     // cache requests result

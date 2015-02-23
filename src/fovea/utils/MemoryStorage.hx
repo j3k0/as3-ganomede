@@ -2,6 +2,7 @@ package fovea.utils;
 
 import haxe.ds.StringMap;
 
+@:expose
 class MemoryStorage implements IStorage
 {
     public function length():Int {

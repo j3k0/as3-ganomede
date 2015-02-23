@@ -1,5 +1,6 @@
 package fovea.ganomede;
 
+@:expose
 class GanomedeEvents {
     public static inline var LOGIN:String = "ganomede.login";
     public static inline var LOGOUT:String = "ganomede.logout";

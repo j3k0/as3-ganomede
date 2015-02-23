@@ -1,5 +1,6 @@
 package fovea.utils;
 
+@:expose
 interface IStorage
 {
     function setItem(key:String, value:String):Void;

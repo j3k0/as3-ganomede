@@ -7,6 +7,7 @@ import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.events.Event;
 
+@:expose
 class GanomedeInvitations extends ApiClient
 {
     public var initialized(default,null):Bool = false;

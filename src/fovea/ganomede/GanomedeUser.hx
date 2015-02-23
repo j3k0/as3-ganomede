@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 
+@:expose
 class GanomedeUser {
     public var username:String;
     public var givenName:String;

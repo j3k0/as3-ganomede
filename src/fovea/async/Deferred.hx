@@ -14,6 +14,7 @@ import openfl.errors.Error;
  *
  * @author Jonny Reeves.
  */
+@:expose
 class Deferred implements Promise
 {
     private static inline var PENDING:Int = 0;

@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 
+@:expose
 class GanomedeInvitation {
     public var id:String;
     public var gameId:String;

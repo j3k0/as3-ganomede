@@ -6,6 +6,7 @@ package fovea.utils;
     import openfl.utils.Object;
     import haxe.Json;
 
+    @:expose
     class Lodis extends EventDispatcher {
 
         private var _storage:IStorage;

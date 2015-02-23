@@ -3,6 +3,7 @@ package fovea.net;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
+@:expose
 class AjaxError extends Error
 {
     // Codes
@@ -10,6 +11,9 @@ class AjaxError extends Error
     public static inline var IO_ERROR:String = "IO";
     public static inline var SECURITY_ERROR:String = "SECURITY";
     public static inline var CLIENT_ERROR:String = "CLIENT";
+
+    // IO Error statuses
+    public static inline var IO_ERROR_JSON = 1;
 
     public function new(pcode:String, pstatus:Int = 0, pdata:Object = null)
     {

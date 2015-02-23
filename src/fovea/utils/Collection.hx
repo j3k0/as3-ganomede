@@ -1,11 +1,10 @@
 package fovea.utils;
 
 import haxe.ds.StringMap;
-import openfl.events.EventDispatcher;
-import openfl.events.Event;
+import fovea.events.*;
 
-@:generic
-class Collection<T> extends EventDispatcher {
+@:expose @:generic
+class Collection<T> extends Events {
 
     private var map = new StringMap<T>();
 

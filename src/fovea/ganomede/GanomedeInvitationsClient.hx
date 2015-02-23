@@ -4,6 +4,7 @@ import openfl.utils.Object;
 import fovea.async.*;
 import fovea.net.AjaxError;
 
+@:expose
 class GanomedeInvitationsClient extends ApiClient
 {
     public static inline var TYPE:String = "invitations/v1";

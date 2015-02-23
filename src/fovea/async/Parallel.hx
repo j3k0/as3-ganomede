@@ -12,6 +12,7 @@ import haxe.Timer.delay;
  * If any of the supplied function reject then the returned Promise will also reject.
  */
 
+@:expose
 class Parallel
 {
     public static function run(fn:Array<Void->Promise>) : Promise

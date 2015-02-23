@@ -149,7 +149,7 @@ class Ajax extends Events
             if (urlLoader.data)
                 json = Json.parse(urlLoader.data.toString());
         }
-        catch (e:Error) {
+        catch (e:Dynamic) {
             trace("[AJAX] JSON parsing Error.");
         }
         return json;
@@ -168,6 +168,7 @@ import fovea.events.Events;
 //import lime.events.Event;
 //import lime.events.EventDispatcher;
 
+@:expose
 class Ajax extends Events
 {
     public static var verbose:Bool = false;
@@ -246,12 +247,27 @@ class Ajax extends Events
                 data += chunk;
             });
             res.on("end", function():Void {
+                if (verbose) trace("AJAX[" + requestID + "] processing request");
                 if (status >= 200 && status <= 299) {
+                    var json:Dynamic = null;
+                    try {
+                        if (data != "")
+                            json = cast(Json.parse(data));
+                    }
+                    catch (err:Dynamic) {
+                        trace("[AJAX " + options.requestID + "] JSON parse error (" + data + ")");
+                        if (err.stack)
+                            trace("[AJAX " + options.requestID + "] " + err.stack);
+                        else
+                            trace("[AJAX " + options.requestID + "] " + err);
+                        deferred.reject(ajaxError(AjaxError.IO_ERROR, AjaxError.IO_ERROR_JSON, data));
+                        return;
+                    }
                     var obj:Object = {
                         status: status,
-                        data: data
+                        data: json
                     };
-                    if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + Json.stringify(data));
+                    if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + data);
                     afterAjax(options, obj);
                     deferred.resolve(obj);
                     return;

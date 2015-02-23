@@ -3,6 +3,7 @@ package fovea.ganomede;
 import fovea.ganomede.ApiClient;
 import openfl.utils.Object;
 
+@:expose
 class GanomedeService
 {
     public var type:String;

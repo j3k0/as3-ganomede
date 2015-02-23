@@ -21,6 +21,7 @@ import openfl.errors.Error;
     *
     * @author Jonny Reeves.
     */
+@:expose
 interface Promise
 {
     /**

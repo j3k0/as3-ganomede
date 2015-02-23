@@ -3,6 +3,7 @@ package fovea.ganomede;
 import openfl.utils.Object;
 import fovea.net.AjaxError;
 
+@:expose
 class ApiError extends AjaxError
 {
     // Api Codes

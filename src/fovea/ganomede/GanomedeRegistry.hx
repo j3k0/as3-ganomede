@@ -3,6 +3,7 @@ package fovea.ganomede;
 import fovea.async.*;
 import openfl.utils.Object;
 
+@:expose
 class GanomedeRegistry extends ApiClient
 {
     public var initialized(default,null):Bool = false;
