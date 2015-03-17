@@ -67,9 +67,9 @@ class GanomedeNotifications extends ApiClient
             .then(function(outcome:Object):Void {
                 initialized = true;
                 poll();
+                // in case polling stops working...
                 var timer = new haxe.Timer(60000);
                 timer.run = poll;
-                // in case polling stops working...
             });
     }
 

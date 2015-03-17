@@ -56,6 +56,11 @@ class GanomedeUsers extends ApiClient
         .then(dispatchLoginEvent);
     }
 
+    public function logout() {
+        me = new GanomedeUser();
+        dispatchEvent(new Event(GanomedeEvents.LOGOUT));
+    }
+
     public function fetch(user:GanomedeUser):Promise {
         var deferred:Deferred = new Deferred();
         if ((user.username == me.username) ||

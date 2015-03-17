@@ -90,8 +90,22 @@ function invitations(done) {
     });
 }
 
+function notifications(done) {
+    client.notifications.on("test/v1", function(event) {
+        // if (event
+        done();
+    });
+}
+
+function logout(done) {
+    console.log("logout");
+    client.users.logout();
+    done();
+}
+
 function done() {
     console.log("All good! We're done.");
+    setTimeout(process.exit.bind(process, 0), 1000);
 }
 
 ganomede.net.Ajax.verbose = true;
@@ -100,5 +114,6 @@ initialize(
     login.bind(null,
     profile.bind(null,
     invitations.bind(null,
-    done))));
+    logout.bind(null,
+    done)))));
 

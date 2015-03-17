@@ -310,7 +310,7 @@ registry.getServicesAsync()
 
 ### Users management
 
-The `users` module allows you to manage user session (registration, login, profile (registration, login, profile).
+The `users` module allows you to manage user session (registration, login, profile).
 
 To retrieve the client's `GanomedeUsers` instance:
 
