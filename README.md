@@ -118,15 +118,142 @@ users.login(me)
 ```js
 users.fetch(users.me)
     .then(function(user) {
-        trace(user.email);
-        trace(user.givenName);
-        trace(user.surname);
+        console.log(user.email);
+        console.log(user.givenName);
+        console.log(user.surname);
     });
 ```
 
 ### Invitations
 
+The `invitations` module allows you to manage the users invitations (send, accept, reject, cancel).
+
+To retrieve the client's `GanomedeInvitations` instance:
+
+```js
+var invitations = client.invitations;
+```
+
+Note: the array of invitations is gonna be this of the logged in user.
+
+#### class GanomedeInvitation
+
+fields:
+```js
+    var id:String;
+    var gameId:String;
+    var type:String;
+    var to:String;
+    var from:String;
+    var index:Int;
+```
+
+methods:
+* constructor(obj)
+* toJSON()
+* fromJSON(obj)
+
+#### List invitations
+
+```js
+var array = client.invitations.asArray();
+```
+
+Returns and array of `GanomedeInvitation`, the module handles keeping this list up to date.
+
+If you wanna make sure to request the list from the server:
+```js
+client.invitations.refreshArray()
+.then(function() {
+    // client.invitations.asArray has been updated
+});
+```
+
+#### Create an invitation
+
+```js
+var invitation = new ganomede.GanomedeInvitation({
+    type: "triominos/v1",
+    to: "joe",
+    gameId: "dummy"
+});
+
+client.invitations.add(invitation)
+.then(function() {
+    console.log("invitation success");
+})
+.error(function invitationError(err) {
+    console.error("invitation error");
+    console.dir(err);
+    process.exit(1);
+});
+```
+
+#### Cancel an invitations
+
+Retrieve the `invitation` to cancel from the array of invitations. Then:
+```js
+client.invitations.cancel(invitation)
+.then(function() {
+    console.log("invitation cancelled");
+})
+.error(function cancelError(err) {
+    console.error("invitation cancel error");
+});
+```
+
+#### Accept or refuse an invitation
+
+Like `cancel`, but the methods are called `accept` and `refuse`.
+
+#### Listen to updates
+
+Whenever there's a change in the list of invitations, the "ganomede.change" event is triggered by the invitations module.
+
+```js
+client.invitations.on("ganomede.change", function() {
+    // list of invitations has been updated
+});
+```
+
+**Untested** but may work...?
+
+### Notifications
+
+```js
+var notifications = client.notifications;
+```
+
+#### Send a notification
+
+```js
+var notification = new ganomede.GanomedeNotification({
+    to:   "username",
+    from: "invitations/v1",
+    type: "received",
+    data: {
+        from: "otheruser",
+        gameId: "123"
+    }
+});
+notifications.apiSecret = "1234567890";
+notifications.send(notifications)
+.then(...)
+.error(...);
+```
+
+#### Listen to notifications
+
+```js
+notifications.on("invitations/v1", function(event) {
+    if (event.notification.type === "received") {
+        console.log("invitation received from " + event.notification.data.from);
+    }
+});
+```
+
 ## Contribute
+
 
 # AS3 Documentation
 
