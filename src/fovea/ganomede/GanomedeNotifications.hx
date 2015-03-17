@@ -22,7 +22,11 @@ class GanomedeNotifications extends ApiClient
         notificationsClient = new GanomedeNotificationsClient(client.url, null);
     }
 
-    public function onPollSuccess(result:Object):Void {
+    public function listenTo(emiter:String, callback:Event->Void):Void {
+        this.on(emiter, callback);
+    }
+
+    private function onPollSuccess(result:Object):Void {
         try {
             // result.state;
             var notifications:Array<Object> = cast(result.data, Array<Object>);
@@ -39,7 +43,7 @@ class GanomedeNotifications extends ApiClient
         }
         poll();
     }
-    public function onPollError(error:Error):Void {
+    private function onPollError(error:Error):Void {
         poll();
     }
     public function poll():Void {

@@ -91,9 +91,30 @@ function invitations(done) {
 }
 
 function notifications(done) {
-    client.notifications.on("test/v1", function(event) {
-        // if (event
+    client.notifications.listenTo("test/v1", function(event) {
+        console.log("notification success");
+        if (event.notification.data.iamtrue !== true
+            || event.notification.type !== "success"
+            || event.notification.from !== "test/v1") {
+            console.error("notification error");
+            process.exit(1);
+        }
         done();
+    });
+    var n = new ganomede.GanomedeNotification({
+        from: "test/v1",
+        to: "testuser",
+        type: "success",
+        data: {
+            iamtrue: true
+        }
+    });
+    client.notifications.apiSecret = process.env.API_SECRET;
+    client.notifications.send(n)
+    .error(function(err) {
+        console.error("notifications error (sending notif)");
+        console.dir(err);
+        process.exit(1);
     });
 }
 
@@ -114,6 +135,11 @@ initialize(
     login.bind(null,
     profile.bind(null,
     invitations.bind(null,
+    notifications.bind(null,
     logout.bind(null,
-    done)))));
+    done))))));
 
+setTimeout(function() {
+    console.error("test timeout");
+    process.exit(1);
+}, 60000);

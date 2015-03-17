@@ -245,7 +245,7 @@ notifications.send(notifications)
 #### Listen to notifications
 
 ```js
-notifications.on("invitations/v1", function(event) {
+notifications.listenTo("invitations/v1", function(event) {
     if (event.notification.type === "received") {
         console.log("invitation received from " + event.notification.data.from);
     }
