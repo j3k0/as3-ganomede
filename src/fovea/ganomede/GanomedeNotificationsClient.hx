@@ -19,9 +19,16 @@ class GanomedeNotificationsClient extends ApiClient
 
     public var polling:Bool = false;
 
-    public function poll():Promise {
+    public function poll(after:Int):Promise {
         polling = true;
-        return ajax("GET", "/messages", { parse: this.parseArray })
+        var uri:String = "/messages";
+        if (after >= 0) {
+            uri += "?after=" + after;
+        }
+
+        return ajax("GET", uri, {
+            parse: this.parseArray
+        })
         .then(function(outcome:Dynamic):Void {
             polling = false;
         })

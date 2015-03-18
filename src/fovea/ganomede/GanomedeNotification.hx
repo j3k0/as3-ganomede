@@ -4,6 +4,7 @@ import openfl.utils.Object;
 
 @:expose
 class GanomedeNotification {
+    public var id:Int;
     public var type:String;
     public var from:String;
     public var to:String;
@@ -16,6 +17,7 @@ class GanomedeNotification {
     }
 
     public function equals(obj:Object):Bool {
+        if (obj.id != id) return false;
         if (obj.type != type) return false;
         if (obj.to != to) return false;
         if (obj.from != from) return false;
@@ -23,6 +25,7 @@ class GanomedeNotification {
     }
 
     public function fromJSON(obj:Object):Void {
+        if (obj.id) id = obj.id;
         if (obj.type) type = obj.type;
         if (obj.to) to = obj.to;
         if (obj.from) from = obj.from;
@@ -31,6 +34,7 @@ class GanomedeNotification {
 
     public function toJSON():Object {
         return {
+            id:id,
             type:type,
             to:to,
             from:from,

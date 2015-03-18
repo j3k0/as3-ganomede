@@ -91,7 +91,12 @@ function invitations(done) {
 }
 
 function notifications(done) {
+    var rnd = Math.random();
     client.notifications.listenTo("test/v1", function(event) {
+        if (event.notification.data.rnd !== rnd) {
+            // old message
+            return;
+        }
         console.log("notification success");
         if (event.notification.data.iamtrue !== true
             || event.notification.type !== "success"
@@ -106,7 +111,8 @@ function notifications(done) {
         to: "testuser",
         type: "success",
         data: {
-            iamtrue: true
+            iamtrue: true,
+            rnd:rnd
         }
     });
     client.notifications.apiSecret = process.env.API_SECRET;

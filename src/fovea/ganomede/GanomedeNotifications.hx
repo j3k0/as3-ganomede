@@ -25,6 +25,8 @@ class GanomedeNotifications extends ApiClient
     public function listenTo(emiter:String, callback:Event->Void):Void {
         this.on(emiter, callback);
     }
+       
+    private var lastId:Int = -1;
 
     private function onPollSuccess(result:Object):Void {
         try {
@@ -36,10 +38,14 @@ class GanomedeNotifications extends ApiClient
             }
             for (i in 0...notifications.length) {
                 var n:GanomedeNotification = notifications[i];
-                dispatchNotification(n);
+                if (n.id > lastId)
+                    lastId = n.id;
+                if (!result.silent)
+                    dispatchNotification(n);
             }
         }
         catch (error:String) {
+            trace("[GanomedeNotifications] ERROR " + error);
         }
         poll();
     }
@@ -49,11 +55,19 @@ class GanomedeNotifications extends ApiClient
     public function poll():Void {
         if (notificationsClient.token != null && notificationsClient.token == client.users.me.token) {
             if (!notificationsClient.polling) {
-                notificationsClient.poll()
+                notificationsClient.poll(lastId)
                     .then(onPollSuccess)
                     .error(onPollError);
             }
         }
+    }
+    public function silentPoll():Void {
+        notificationsClient.poll(lastId)
+            .then(function(result:Object) {
+                result.silent = true;
+                onPollError(result);
+            })
+            .error(onPollError);
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
@@ -70,7 +84,7 @@ class GanomedeNotifications extends ApiClient
         return deferred
             .then(function(outcome:Object):Void {
                 initialized = true;
-                poll();
+                silentPoll();
                 // in case polling stops working...
                 var timer = new haxe.Timer(60000);
                 timer.run = poll;
