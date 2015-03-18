@@ -37,7 +37,7 @@ class GanomedeNotifications extends ApiClient
                 return;
             }
             for (i in 0...notifications.length) {
-                var n:GanomedeNotification = notifications[i];
+                var n:GanomedeNotification = notifications[notifications.length - i - 1];
                 if (n.id > lastId)
                     lastId = n.id;
                 if (!result.silent)
