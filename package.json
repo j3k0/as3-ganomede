@@ -1,11 +1,8 @@
 {
   "name": "ganomede",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ganomede client library",
   "main": "index.js",
-  "bin": {
-    "ganomede": "ganomede.js"
-  },
   "scripts": {
     "test": "node src-js/test.js"
   },
