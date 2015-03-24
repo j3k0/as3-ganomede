@@ -5,6 +5,10 @@ help:
 	@echo make build ... Compiles the app
 	@echo make clean ... Cleanup binaries
 
+bin/ganomede.swc:
+	@mkdir -p bin
+	./haxe -swf bin/ganomede.swc -dce no -lib openfl -cp src ${HAXE_MAIN}
+
 swc:
 	@mkdir -p bin
 	./haxe -swf bin/ganomede.swc -dce no -lib openfl -cp src ${HAXE_MAIN}
