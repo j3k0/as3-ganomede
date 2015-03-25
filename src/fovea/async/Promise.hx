@@ -44,7 +44,7 @@ interface Promise
         * Register a callback which will be executed after all other callbacks have been invoked.  Typically this 
         * is used to destroy or free the client.
         */
-    function always(callback : Void->Void) : Void;
+    function always(callback : Void->Void) : Promise;
 
     /**
         * Invert the 'then' and 'error' callback. Useful when you expect something to fail.

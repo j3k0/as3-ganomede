@@ -115,7 +115,7 @@ class Deferred implements Promise
         return this;
     }
 
-    public function always(callback:Void->Void) : Void
+    public function always(callback:Void->Void) : Promise
     {
         if (_state == PENDING) {
             _finalCallback = callback;
@@ -123,6 +123,7 @@ class Deferred implements Promise
         else {
             callback();
         }
+        return this;
     }
 
     private function clearListeners() : Void
