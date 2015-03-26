@@ -103,6 +103,7 @@ class Ajax extends Events
         function httpStatus(event:HTTPStatusEvent):Void {
             // trace("httpStatus: " + event);
             status = event.status;
+            if (verbose) trace("AJAX[" + options.requestID + "] status[" + status + "]");
         }
 
         /* dispatcher.addEventListener(Event.OPEN, function(event:Event):Void {
@@ -143,14 +144,17 @@ class Ajax extends Events
     }
 
     // The JSON data.
-    private static function jsonData(urlLoader:URLLoader):Object {
+    private function jsonData(urlLoader:URLLoader):Object {
         var json:Object = null;
         try {
-            if (urlLoader.data)
+            if (urlLoader.data) {
                 json = Json.parse(urlLoader.data.toString());
+            }
         }
         catch (e:Dynamic) {
-            trace("[AJAX] JSON parsing Error.");
+            if (verbose) {
+                trace("[AJAX] JSON parsing Error (" + Std.string(e) + ")");
+            }
         }
         return json;
     }
