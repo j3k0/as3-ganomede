@@ -79,18 +79,19 @@ class Ajax extends Events
 
         function done():Void {
             removeListeners(dispatcher);
-            if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + Json.stringify(data));
-
             if (status >= 200 && status <= 299) {
+                if (verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + Json.stringify(data));
                 var obj:Object = {
                     status: status,
                     data: data
                 };
                 afterAjax(options, obj);
                 deferred.resolve(obj);
-                return;
             }
-            deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
+            else {
+                if (verbose) trace("AJAX[" + options.requestID + "] error[" + status + "]: " + Json.stringify(data));
+                deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
+            }
         }
 
         function complete(event:Event):Void {
