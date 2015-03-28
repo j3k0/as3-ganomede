@@ -30,6 +30,7 @@ class GanomedeNotificationsClient extends ApiClient
             parse: this.parseArray
         })
         .then(function(outcome:Dynamic):Void {
+            outcome.token = this.token;
             polling = false;
         })
         .error(function(error:Error):Void {

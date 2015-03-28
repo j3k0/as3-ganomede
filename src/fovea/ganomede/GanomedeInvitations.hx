@@ -36,6 +36,7 @@ class GanomedeInvitations extends ApiClient
 
         client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
         client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
+        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
 
         deferred.resolve();
         return deferred
