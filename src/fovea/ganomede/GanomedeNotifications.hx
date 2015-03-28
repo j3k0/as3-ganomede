@@ -50,7 +50,7 @@ class GanomedeNotifications extends ApiClient
         poll();
     }
     private function onPollError(error:Error):Void {
-        poll();
+        haxe.Timer.delay(poll, 1000);
     }
     public function poll():Void {
         if (notificationsClient.token != null && notificationsClient.token == client.users.me.token) {
@@ -65,9 +65,11 @@ class GanomedeNotifications extends ApiClient
         notificationsClient.poll(lastId)
             .then(function(result:Object) {
                 result.silent = true;
-                onPollError(result);
+                onPollSuccess(result);
             })
-            .error(onPollError);
+            .error(function(err:Error):Void {
+                haxe.Timer.delay(silentPoll, 1000);
+            });
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
@@ -79,11 +81,13 @@ class GanomedeNotifications extends ApiClient
 
         client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
         client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
+        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
 
         deferred.resolve();
         return deferred
             .then(function(outcome:Object):Void {
                 initialized = true;
+
                 silentPoll();
                 // in case polling stops working...
                 var timer = new haxe.Timer(60000);

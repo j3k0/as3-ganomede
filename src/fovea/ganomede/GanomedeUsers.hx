@@ -82,7 +82,12 @@ class GanomedeUsers extends ApiClient
     }
 
     private function parseMe(obj:Object):Object {
+        var oldToken:String = me.token;
+        var oldUsername:String = me.username;
         me.fromJSON(obj);
+        if (me.token != oldToken || me.username != oldUsername) {
+            dispatchEvent(new Event(GanomedeEvents.AUTH));
+        }
         return me;
     }
 }

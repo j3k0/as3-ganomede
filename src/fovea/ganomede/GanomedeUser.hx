@@ -47,7 +47,8 @@ class GanomedeUser {
             givenName: givenName,
             surname: surname,
             email: email,
-            password: password
+            password: password,
+            token: token
         };
     }
 }
