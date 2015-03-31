@@ -13,6 +13,7 @@ class GanomedeGames extends ApiClient
     public var initialized(default,null):Bool = false;
 
     private var client:GanomedeClient;
+    private var type:String;
     private var coordinatorClient:GanomedeCoordinatorClient = null;
 
     public var collection(default,never) = new Collection<GanomedeGame>();
@@ -25,9 +26,10 @@ class GanomedeGames extends ApiClient
         return array;
     }
 
-    public function new(client:GanomedeClient) {
+    public function new(client:GanomedeClient, type:String) {
         super(client.url);
         // + "/" + GanomedeCoordinatorClient.TYPE);
+        this.type = type;
         this.client = client;
         coordinatorClient = new GanomedeCoordinatorClient(client.url, null);
     }
@@ -37,6 +39,7 @@ class GanomedeGames extends ApiClient
 
         client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
         client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
+        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
 
         deferred.resolve();
         return deferred
@@ -65,6 +68,8 @@ class GanomedeGames extends ApiClient
     }
 
     public function add(game:GanomedeGame):Promise {
+        var token = coordinatorClient.token;
+
         if (!client.users.me.isAuthenticated()) {
             if (Ajax.verbose) trace("cant add game: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
@@ -72,15 +77,20 @@ class GanomedeGames extends ApiClient
 
         return coordinatorClient.addGame(game)
             .then(function(outcome:Dynamic):Void {
+                if (token != coordinatorClient.token)
+                    return;
                 mergeGame(game.toJSON());
                 dispatchEvent(new Event(GanomedeEvents.CHANGE));
             });
     }
 
     public function activate(game:GanomedeGame):Promise {
+        var token = coordinatorClient.token;
         var deferred:Deferred = new Deferred();
         coordinatorClient.activateGame(game)
         .then(function(outcome:Dynamic):Void {
+            if (token != coordinatorClient.token)
+                return;
             mergeGame(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
             deferred.resolve();
@@ -92,8 +102,11 @@ class GanomedeGames extends ApiClient
     public function refreshArray():Promise {
         var deferred:Deferred = new Deferred();
         if (coordinatorClient.token != null) {
-            coordinatorClient.activeGames()
+            var token = coordinatorClient.token;
+            coordinatorClient.activeGames(type)
             .then(function(result:Object):Void {
+                if (token != coordinatorClient.token)
+                    return;
                 if (processListGames(result))
                     deferred.resolve();
                 else

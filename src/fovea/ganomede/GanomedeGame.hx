@@ -1,6 +1,7 @@
 package fovea.ganomede;
 
 import openfl.utils.Object;
+import haxe.Json;
 
 @:expose
 class GanomedeGame {
@@ -17,10 +18,14 @@ class GanomedeGame {
         }
     }
 
+    public function equals(obj:Object):Bool {
+        return haxe.Json.stringify(toJSON()) == haxe.Json.stringify(obj);
+    }
+
     public function fromJSON(obj:Object):Void {
         if (obj.id) id = obj.id;
         if (obj.type) type = obj.type;
-        if (obj.players) type = obj.players;
+        if (obj.players) players = obj.players;
         if (obj.waiting) waiting = obj.waiting;
         if (obj.status) status = obj.status;
         if (obj.url) url = obj.url;

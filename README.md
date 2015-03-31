@@ -21,9 +21,20 @@ GPL v3
 
 First thing, you have to create a ganomede client and initialize it.
 
+You can selected individually which subsystem you'd like to enable. By default all are disabled.
+
 ```js
 var ganomede = require("ganomede");
-var client = new ganomede.GanomedeClient("http://ganomede.server.com:12000");
+var client = new ganomede.GanomedeClient("http://ganomede.server.com:12000", {
+    registry: { enabled: true },
+    users: { enabled: true },
+    notifications: { enabled: true },
+    invitations: { enabled: true },
+    games: {
+        enabled: true,
+        type: "mygame/v1"
+    }
+});
 client.initialize()
     .then(function() {
         console.log("Initialization OK");

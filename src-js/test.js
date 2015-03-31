@@ -9,7 +9,16 @@ if (!serverUrl) {
 }
 
 function initialize(done) {
-    client = new ganomede.GanomedeClient(serverUrl);
+    client = new ganomede.GanomedeClient(serverUrl, {
+        registry: { enabled: true },
+        users: { enabled: true },
+        notifications: { enabled: true },
+        invitations: { enabled: true },
+        games: {
+            enabled: true,
+            type: "triominos/v1"
+        }
+    });
     client.initialize()
     .then(function initializeSuccess(res) {
         console.log("initialize success");
@@ -124,6 +133,36 @@ function notifications(done) {
     });
 }
 
+function createGame(done) {
+    var a0 = client.games.asArray();
+    if (a0.length != 0) {
+        console.error("no active games at startup");
+        process.exit(1);
+    }
+    var g = new ganomede.GanomedeGame({
+        type: client.options.games.type,
+        players: [ "testuser", "testuser2" ]
+    });
+    client.games.add(g)
+    .then(function(res) {
+        var a1 = client.games.asArray();
+        if (a1.length != 0) {
+            console.error("still no active games");
+            process.exit(1);
+        }
+        if (!g.id || !g.url) {
+            console.log("game id and url should have been generated");
+            process.exit(1);
+        }
+        done();
+    })
+    .error(function(err) {
+        console.error("games error (addGame)");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
 function logout(done) {
     console.log("logout");
     client.users.logout();
@@ -142,8 +181,9 @@ initialize(
     profile.bind(null,
     invitations.bind(null,
     notifications.bind(null,
+    createGame.bind(null,
     logout.bind(null,
-    done))))));
+    done)))))));
 
 setTimeout(function() {
     console.error("test timeout");
