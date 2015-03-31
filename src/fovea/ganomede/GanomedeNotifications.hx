@@ -33,10 +33,10 @@ class GanomedeNotifications extends ApiClient
             // result.state;
             if (Ajax.verbose) trace("[GanomedeNotifications] results for " + result.token);
             var notifications:Array<Object> = cast(result.data, Array<Object>);
-            if (notifications == null || result.token != notificationsClient.token) {
-                if (Ajax.verbose && result.token != notificationsClient.token)
+            if (notifications == null || result.token != notificationsClient.token || result.clientId != notificationsClient.clientId) {
+                if (Ajax.verbose && notifications != null )
                     trace("skip");
-                poll();
+                haxe.Timer.delay(poll, 100);
                 return;
             }
             for (i in 0...notifications.length) {

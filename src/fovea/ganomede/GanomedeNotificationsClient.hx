@@ -10,11 +10,13 @@ class GanomedeNotificationsClient extends ApiClient
 {
     public static inline var TYPE:String = "notifications/v1";
 
+    public var clientId(default,null):String = null;
     public var token(default,null):String = null;
 
     public function new(baseUrl:String, token:String) {
         super(baseUrl + "/" + TYPE + "/auth/" + token);
         this.token = token;
+        this.clientId = "" + Math.random();
     }
 
     public var polling:Bool = false;
@@ -31,6 +33,7 @@ class GanomedeNotificationsClient extends ApiClient
         })
         .then(function(outcome:Dynamic):Void {
             outcome.token = this.token;
+            outcome.clientId = this.clientId;
             polling = false;
         })
         .error(function(error:Error):Void {

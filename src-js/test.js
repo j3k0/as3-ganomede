@@ -28,6 +28,7 @@ function initialize(done) {
     .error(function initializeError(err) {
         console.error("initialize error");
         console.dir(err);
+        console.dir(err.getStackTrace());
         process.exit(1);
     });
 }
@@ -70,6 +71,16 @@ function profile(done) {
     });
 }
 
+function refreshInvitations(done) {
+    client.invitations.refreshArray()
+    .then(done)
+    .error(function(err) {
+        console.error("invitations error (refresh)");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
 function invitations(done) {
 
     console.log("invitations");
@@ -100,10 +111,12 @@ function invitations(done) {
 }
 
 function notifications(done) {
-    var rnd = Math.random();
+    console.log("notification");
+    var rnd = "" + Math.random();
     client.notifications.listenTo("test/v1", function(event) {
         if (event.notification.data.rnd !== rnd) {
             // old message
+            console.log("old notification");
             return;
         }
         console.log("notification success");
@@ -125,6 +138,7 @@ function notifications(done) {
         }
     });
     client.notifications.apiSecret = process.env.API_SECRET;
+    console.log("send notification");
     client.notifications.send(n)
     .error(function(err) {
         console.error("notifications error (sending notif)");
@@ -133,7 +147,44 @@ function notifications(done) {
     });
 }
 
-function createGame(done) {
+function refreshGames(done) {
+    client.games.refreshArray()
+    .then(done)
+    .error(function(err) {
+        console.error("games error (refresh)");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
+function leaveAllGames(done) {
+    var games = client.games.asArray();
+    console.log("leaveAllGames (" + games.length + ")");
+    var numDone = 0;
+    var oneDone = function() {
+        numDone += 1;
+        if (numDone == games.length)
+            done();
+        if (numDone > games.length) {
+            console.error("games error (done callback called too many times)");
+            process.exit(1);
+        }
+    };
+    for (var i = 0; i < games.length; ++i) {
+        client.games.leave(games[i])
+        .then(oneDone)
+        .error(function(err) {
+            console.error("games error (leave)");
+            console.dir(err);
+            process.exit(1);
+        });
+    }
+    if (games.length == 0) {
+        done();
+    }
+}
+
+function createGame2P(done) {
     var a0 = client.games.asArray();
     if (a0.length != 0) {
         console.error("no active games at startup");
@@ -163,6 +214,37 @@ function createGame(done) {
     });
 }
 
+function createGame1P(done) {
+    var a0 = client.games.asArray();
+    if (a0.length != 0) {
+        console.error("no active games at startup");
+        process.exit(1);
+    }
+    var g = new ganomede.GanomedeGame({
+        type: client.options.games.type,
+        players: [ "testuser" ]
+    });
+    client.games.add(g)
+    .then(function(res) {
+        var a1 = client.games.asArray();
+        if (a1.length != 1) {
+            console.error("there should be 1 active games");
+            console.dir(a1);
+            process.exit(1);
+        }
+        if (!g.id || !g.url) {
+            console.log("game id and url should have been generated");
+            process.exit(1);
+        }
+        done();
+    })
+    .error(function(err) {
+        console.error("games error (addGame)");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
 function logout(done) {
     console.log("logout");
     client.users.logout();
@@ -174,16 +256,22 @@ function done() {
     setTimeout(process.exit.bind(process, 0), 1000);
 }
 
-ganomede.net.Ajax.verbose = true;
+//ganomede.net.Ajax.verbose = true;
 
 initialize(
     login.bind(null,
     profile.bind(null,
+    refreshInvitations.bind(null,
     invitations.bind(null,
     notifications.bind(null,
-    createGame.bind(null,
+    refreshGames.bind(null,
+    leaveAllGames.bind(null,
+    createGame2P.bind(null,
+    createGame1P.bind(null,
+    leaveAllGames.bind(null,
     logout.bind(null,
-    done)))))));
+    done
+))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

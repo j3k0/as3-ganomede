@@ -84,10 +84,25 @@ class GanomedeGames extends ApiClient
             });
     }
 
-    public function activate(game:GanomedeGame):Promise {
+    public function join(game:GanomedeGame):Promise {
         var token = coordinatorClient.token;
         var deferred:Deferred = new Deferred();
-        coordinatorClient.activateGame(game)
+        coordinatorClient.joinGame(game)
+        .then(function(outcome:Dynamic):Void {
+            if (token != coordinatorClient.token)
+                return;
+            mergeGame(game.toJSON());
+            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            deferred.resolve();
+        })
+        .error(deferred.reject);
+        return deferred;
+    }
+
+    public function leave(game:GanomedeGame):Promise {
+        var token = coordinatorClient.token;
+        var deferred:Deferred = new Deferred();
+        coordinatorClient.leaveGame(game)
         .then(function(outcome:Dynamic):Void {
             if (token != coordinatorClient.token)
                 return;

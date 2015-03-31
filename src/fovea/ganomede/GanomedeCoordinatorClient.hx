@@ -37,8 +37,17 @@ class GanomedeCoordinatorClient extends ApiClient
         return ajax("GET", type + "/active-games");
     }
 
-    public function activateGame(game:GanomedeGame):Promise {
-        return ajax("POST", "/games/" + game.id + "/activation")
+    public function leaveGame(game:GanomedeGame):Promise {
+        return ajax("POST", "/games/" + game.id + "/leave")
+        .then(function(result:Object):Void {
+            if (result.data.id) {
+                game.fromJSON(result.data);
+            }
+        });
+    }
+
+    public function joinGame(game:GanomedeGame):Promise {
+        return ajax("POST", "/games/" + game.id + "/join")
         .then(function(result:Object):Void {
             if (result.data.id) {
                 game.fromJSON(result.data);
