@@ -113,11 +113,16 @@ function invitations(done) {
 function notifications(done) {
     console.log("notification");
     var rnd = "" + Math.random();
+    var nCalls = 0;
     client.notifications.listenTo("test/v1", function(event) {
         if (event.notification.data.rnd !== rnd) {
             // old message
-            console.log("old notification");
             return;
+        }
+        nCalls += 1;
+        if (nCalls > 1) {
+            console.error("notification error (called too many times)");
+            process.exit(1);
         }
         console.log("notification success");
         if (event.notification.data.iamtrue !== true
@@ -264,6 +269,7 @@ initialize(
     refreshInvitations.bind(null,
     invitations.bind(null,
     notifications.bind(null,
+    notifications.bind(null,
     refreshGames.bind(null,
     leaveAllGames.bind(null,
     createGame2P.bind(null,
@@ -271,7 +277,7 @@ initialize(
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-))))))))))));
+)))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

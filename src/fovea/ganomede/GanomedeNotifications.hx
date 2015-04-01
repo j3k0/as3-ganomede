@@ -1,25 +1,24 @@
 package fovea.ganomede;
 
 import fovea.async.*;
-import fovea.utils.Collection;
-import openfl.utils.Object;
+import fovea.events.Event;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
-import fovea.events.Event;
+import fovea.utils.Collection;
 import openfl.errors.Error;
+import openfl.utils.Object;
 
 @:expose
-class GanomedeNotifications extends ApiClient
+class GanomedeNotifications extends UserClient
 {
-    public var initialized(default,null):Bool = false;
-
-    private var client:GanomedeClient;
-    private var notificationsClient:GanomedeNotificationsClient = null;
-
     public function new(client:GanomedeClient) {
-        super(client.url + "/" + GanomedeNotificationsClient.TYPE);
-        this.client = client;
-        notificationsClient = new GanomedeNotificationsClient(client.url, null);
+        super(client, notificationsClientFactory, GanomedeNotificationsClient.TYPE);
+        addEventListener("change:initialize", onInitialize);
+        addEventListener("reset", onReset);
+    }
+
+    public function notificationsClientFactory(url:String, token:String):AuthenticatedClient {
+        return new GanomedeNotificationsClient(url, token);
     }
 
     public function listenTo(emiter:String, callback:Event->Void):Void {
@@ -27,13 +26,13 @@ class GanomedeNotifications extends ApiClient
     }
        
     private var lastId:Int = -1;
-
     private function onPollSuccess(result:Object):Void {
         try {
             // result.state;
+            var notifClient:GanomedeNotificationsClient = cast ajaxClient;
             if (Ajax.verbose) trace("[GanomedeNotifications] results for " + result.token);
             var notifications:Array<Object> = cast(result.data, Array<Object>);
-            if (notifications == null || result.token != notificationsClient.token || result.clientId != notificationsClient.clientId) {
+            if (notifications == null || result.token != notifClient.token || result.clientId != notifClient.clientId) {
                 if (Ajax.verbose && notifications != null )
                     trace("skip");
                 haxe.Timer.delay(poll, 100);
@@ -57,20 +56,22 @@ class GanomedeNotifications extends ApiClient
     }
     public function poll():Void {
         if (Ajax.verbose) trace("[GanomedeNotifications] poll?");
-        if (notificationsClient.token != null && notificationsClient.token == client.users.me.token) {
-            if (!notificationsClient.polling) {
+        var notifClient:GanomedeNotificationsClient = cast ajaxClient;
+        if (notifClient.token != null && notifClient.token == client.users.me.token) {
+            if (!notifClient.polling) {
                 if (Ajax.verbose) trace("[GanomedeNotifications] poll!");
-                notificationsClient.poll(lastId)
+                notifClient.poll(lastId)
                     .then(onPollSuccess)
                     .error(onPollError);
             }
         }
     }
     public function silentPoll():Void {
+        var notifClient:GanomedeNotificationsClient = cast ajaxClient;
         if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll?");
-        if (notificationsClient.token != null && notificationsClient.token == client.users.me.token) {
+        if (ajaxClient.token != null && ajaxClient.token == client.users.me.token) {
             if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll!");
-            notificationsClient.poll(lastId)
+            notifClient.poll(lastId)
                 .then(function(result:Object) {
                     result.silent = true;
                     onPollSuccess(result);
@@ -84,47 +85,20 @@ class GanomedeNotifications extends ApiClient
         }
     }
 
+    private function onInitialize(event:Event):Void {
+        silentPoll();
+        // in case polling stops working...
+        var timer = new haxe.Timer(60000);
+        timer.run = poll;
+    }
+
+    private function onReset(event:Event):Void {
+        lastId = -1;
+        silentPoll();
+    }
+
     private function dispatchNotification(n:GanomedeNotification):Void {
         dispatchEvent(new GanomedeNotificationEvent(n));
-    }
-
-    public function initialize():Promise {
-        var deferred:Deferred = new Deferred();
-
-        client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
-
-        deferred.resolve();
-        return deferred
-            .then(function(outcome:Object):Void {
-                initialized = true;
-
-                silentPoll();
-                // in case polling stops working...
-                var timer = new haxe.Timer(60000);
-                timer.run = poll;
-            });
-    }
-
-    public function onLoginLogout(event:Event):Void {
-
-        var oldAuthToken:String = null;
-        if (notificationsClient != null) {
-            oldAuthToken = notificationsClient.token;
-        }
-
-        var newAuthToken:String = null;
-        if (client.users.me != null) {
-            newAuthToken = client.users.me.token;
-        }
-
-        if (newAuthToken != oldAuthToken) {
-            if (Ajax.verbose) trace("[GanomedeNotifications] reset");
-            notificationsClient = new GanomedeNotificationsClient(client.url, newAuthToken);
-            lastId = -1;
-            silentPoll();
-        }
     }
 
     public var apiSecret:String = "";
