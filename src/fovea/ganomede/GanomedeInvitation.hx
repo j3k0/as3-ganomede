@@ -5,7 +5,6 @@ import fovea.utils.Model;
 
 @:expose
 class GanomedeInvitation extends Model {
-    public var id:String;
     public var gameId:String;
     public var type:String;
     public var to:String;

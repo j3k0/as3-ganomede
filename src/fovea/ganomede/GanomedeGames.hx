@@ -6,6 +6,7 @@ import openfl.utils.Object;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.events.Event;
+import fovea.events.Events;
 
 @:expose
 class GanomedeGames extends UserClient
@@ -51,8 +52,8 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).addGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.merge(game.toJSON());
-            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            collection.mergeModel(game.toJSON());
+            dispatchEvent(new Event(Events.CHANGE));
         });
     }
 
@@ -61,8 +62,8 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).joinGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.merge(game.toJSON());
-            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            collection.mergeModel(game.toJSON());
+            dispatchEvent(new Event(Events.CHANGE));
         });
     }
 
@@ -71,8 +72,8 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).leaveGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.merge(game.toJSON());
-            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            collection.mergeModel(game.toJSON());
+            dispatchEvent(new Event(Events.CHANGE));
         });
     }
 
@@ -83,7 +84,7 @@ class GanomedeGames extends UserClient
                 return cast(authClient, GanomedeCoordinatorClient).activeGames(type);
             })
             .then(function(result:Object):Void {
-                if (processListGames(result))
+                if (collection.mergeArray(result))
                     deferred.resolve();
                 else
                     deferred.reject(new ApiError(AjaxError.IO_ERROR));
@@ -96,58 +97,6 @@ class GanomedeGames extends UserClient
         }
         return deferred;
     }
-
-    private function processListGames(result:Object):Bool {
-        try {
-            var newArray:Array<Object> = cast(result.data,Array<Object>);
-            var changed:Bool = false;
-            var keys:Array<String> = [];
-            for (game in newArray)
-                keys.push(game.id);
-            collection.keep(keys);
-            var i:Int;
-            for (i in 0...newArray.length) {
-                newArray[i].index = i;
-                if (collection.merge(newArray[i]))
-                    changed = true;
-            }
-            if (changed)
-                dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            return true;
-        }
-        catch (error:String) {
-            return false;
-        }
-    }
-
-    /*
-    private function mergeGame(json:Object):Bool {
-        var id:String = json.id;
-        if (collection.exists(id)) {
-            var item:GanomedeGame = collection.get(id);
-            if (!item.equals(json)) {
-                item.fromJSON(json);
-                // the collection should only contain active
-                if (json.status != "active") {
-                    collection.del(id);
-                }
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            if (json.status == "active") {
-                collection.set(id, new GanomedeGame(json));
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    */
 }
 
 // vim: sw=4:ts=4:et:

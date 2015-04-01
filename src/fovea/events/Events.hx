@@ -10,6 +10,7 @@ package fovea.events;
 
 @:expose
 class Events
+
 #if flash
     extends EventDispatcher
 #elseif js
@@ -18,6 +19,8 @@ class Events
 {
     public function run() {
     }
+
+    public static inline var CHANGE:String = "change";
 
 #if flash
 

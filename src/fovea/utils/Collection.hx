@@ -1,7 +1,8 @@
 package fovea.utils;
 
 import haxe.ds.StringMap;
-import fovea.events.*;
+import fovea.events.Event;
+import fovea.events.Events;
 import openfl.utils.Object;
 
 @:expose @:generic
@@ -70,7 +71,7 @@ class Collection<T:Model> extends Events {
         }
     }
 
-    public function merge(json:Object):Bool {
+    public function mergeModel(json:Object):Bool {
         var id:String = json.id;
         if (exists(id)) {
             var item:T = get(id);
@@ -94,6 +95,29 @@ class Collection<T:Model> extends Events {
             else {
                 return false;
             }
+        }
+    }
+
+    public function mergeArray(result:Object):Bool {
+        try {
+            var newArray:Array<Object> = cast(result.data, Array<Object>);
+            var changed:Bool = false;
+            var keys:Array<String> = [];
+            for (model in newArray)
+                keys.push(model.id);
+            keep(keys);
+            var i:Int;
+            for (i in 0...newArray.length) {
+                newArray[i].index = i;
+                if (mergeModel(newArray[i]))
+                    changed = true;
+            }
+            if (changed)
+                dispatchEvent(new Event(Events.CHANGE));
+            return true;
+        }
+        catch (error:String) {
+            return false;
         }
     }
 }

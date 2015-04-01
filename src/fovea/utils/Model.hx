@@ -6,6 +6,8 @@ import openfl.utils.Object;
 @:expose
 class Model
 {
+    public var id:String;
+
     public function new(json:Object = null) {
         if (json) {
             fromJSON(json);
@@ -13,9 +15,12 @@ class Model
     }
 
     public function fromJSON(json:Object):Void {
+        id = json.id;
     }
     public function toJSON():Object {
-        return {};
+        return {
+            id:id
+        };
     }
     public function equals(obj:Object):Bool {
         return haxe.Json.stringify(toJSON()) == haxe.Json.stringify(obj);

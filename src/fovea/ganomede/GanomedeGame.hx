@@ -6,7 +6,6 @@ import fovea.utils.Model;
 
 @:expose
 class GanomedeGame extends Model {
-    public var id:String;
     public var type:String;
     public var players:Array<String>;
     public var waiting:Array<String>;

@@ -6,6 +6,7 @@ import openfl.utils.Object;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.events.Event;
+import fovea.events.Events;
 
 @:expose
 class GanomedeInvitations extends UserClient
@@ -48,8 +49,8 @@ class GanomedeInvitations extends UserClient
             return invitationsClient.addInvitation(invitation);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.merge(invitation.toJSON());
-            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            collection.mergeModel(invitation.toJSON());
+            dispatchEvent(new Event(Events.CHANGE));
         });
     }
 
@@ -71,7 +72,7 @@ class GanomedeInvitations extends UserClient
         })
         .then(function(outcome:Dynamic):Void {
             collection.del(invitation.id);
-            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+            dispatchEvent(new Event(Events.CHANGE));
             deferred.resolve();
         })
         .error(deferred.reject);
@@ -84,7 +85,7 @@ class GanomedeInvitations extends UserClient
         if (invitationsClient.token != null) {
             executeAuth(invitationsClient.listInvitations)
             .then(function(result:Object):Void {
-                if (processListInvitations(result))
+                if (collection.mergeArray(result))
                     deferred.resolve();
                 else
                     deferred.reject(new ApiError(AjaxError.IO_ERROR));
@@ -96,29 +97,6 @@ class GanomedeInvitations extends UserClient
             deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
         }
         return deferred;
-    }
-
-    private function processListInvitations(result:Object):Bool {
-        try {
-            var newArray:Array<Object> = cast(result.data,Array<Object>);
-            var changed:Bool = false;
-            var keys:Array<String> = [];
-            for (invitation in newArray)
-                keys.push(invitation.id);
-            collection.keep(keys);
-            var i:Int;
-            for (i in 0...newArray.length) {
-                newArray[i].index = i;
-                if (collection.merge(newArray[i]))
-                    changed = true;
-            }
-            if (changed)
-                dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            return true;
-        }
-        catch (error:String) {
-            return false;
-        }
     }
 }
 
