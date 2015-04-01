@@ -29,9 +29,9 @@ class GanomedeNotifications extends UserClient
     private function onPollSuccess(result:Object):Void {
         try {
             // result.state;
-            var notifClient:GanomedeNotificationsClient = cast ajaxClient;
-            if (Ajax.verbose) trace("[GanomedeNotifications] results for " + result.token);
+            var notifClient:GanomedeNotificationsClient = cast authClient;
             var notifications:Array<Object> = cast(result.data, Array<Object>);
+            if (Ajax.verbose) trace("[GanomedeNotifications] results for " + result.token);
             if (notifications == null || result.token != notifClient.token || result.clientId != notifClient.clientId) {
                 if (Ajax.verbose && notifications != null )
                     trace("skip");
@@ -49,36 +49,38 @@ class GanomedeNotifications extends UserClient
         catch (error:String) {
             if (Ajax.verbose) trace("[GanomedeNotifications] ERROR " + error);
         }
-        poll();
+        haxe.Timer.delay(poll, 100);
     }
     private function onPollError(error:Error):Void {
         haxe.Timer.delay(poll, 1000);
     }
     public function poll():Void {
         if (Ajax.verbose) trace("[GanomedeNotifications] poll?");
-        var notifClient:GanomedeNotificationsClient = cast ajaxClient;
-        if (notifClient.token != null && notifClient.token == client.users.me.token) {
-            if (!notifClient.polling) {
-                if (Ajax.verbose) trace("[GanomedeNotifications] poll!");
-                notifClient.poll(lastId)
-                    .then(onPollSuccess)
-                    .error(onPollError);
-            }
+        var notifClient:GanomedeNotificationsClient = cast authClient;
+        if (!notifClient.polling) {
+            if (Ajax.verbose) trace("[GanomedeNotifications] poll!");
+            executeAuth(function():Promise {
+                return notifClient.poll(lastId);
+            })
+            .then(onPollSuccess)
+            .error(onPollError);
         }
     }
     public function silentPoll():Void {
-        var notifClient:GanomedeNotificationsClient = cast ajaxClient;
+        var notifClient:GanomedeNotificationsClient = cast authClient;
         if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll?");
-        if (ajaxClient.token != null && ajaxClient.token == client.users.me.token) {
+        if (authClient.token != null && authClient.token == client.users.me.token) {
             if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll!");
-            notifClient.poll(lastId)
-                .then(function(result:Object) {
-                    result.silent = true;
-                    onPollSuccess(result);
-                })
-                .error(function(err:Error):Void {
-                    haxe.Timer.delay(silentPoll, 1000);
-                });
+            executeAuth(function():Promise {
+                return notifClient.poll(lastId);
+            })
+            .then(function(result:Object) {
+                result.silent = true;
+                onPollSuccess(result);
+            })
+            .error(function(err:Error):Void {
+                haxe.Timer.delay(silentPoll, 1000);
+            });
         }
         else {
             haxe.Timer.delay(silentPoll, 1000);

@@ -18,6 +18,12 @@ class GanomedeNotificationsClient extends AuthenticatedClient
     public var polling:Bool = false;
 
     public function poll(after:Int):Promise {
+        if (polling) {
+            var deferred:Deferred = new Deferred();
+            // never resolve, stop the invalid loop...
+            // deferred.reject(new Error("Already polling"));
+            return deferred;
+        }
         polling = true;
         var uri:String = UrlFormatter.format("/messages", {
             after: (after >= 0 ? after : null)
