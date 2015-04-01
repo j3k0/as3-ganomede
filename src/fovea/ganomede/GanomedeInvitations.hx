@@ -8,15 +8,9 @@ import fovea.net.AjaxError;
 import fovea.events.Event;
 
 @:expose
-class GanomedeInvitations extends ApiClient
+class GanomedeInvitations extends UserClient
 {
-    public var initialized(default,null):Bool = false;
-
-    private var client:GanomedeClient;
-    private var invitationsClient:GanomedeInvitationsClient = null;
-
     public var collection(default,never) = new Collection<GanomedeInvitation>();
-
     public function asArray() {
         var array = collection.asArray();
         array.sort(function(a:GanomedeInvitation, b:GanomedeInvitation):Int {
@@ -26,42 +20,17 @@ class GanomedeInvitations extends ApiClient
     }
 
     public function new(client:GanomedeClient) {
-        super(client.url + "/" + GanomedeInvitationsClient.TYPE);
-        this.client = client;
-        invitationsClient = new GanomedeInvitationsClient(client.url, null);
+        super(client, invitationsClientFactory, GanomedeInvitationsClient.TYPE);
+        addEventListener("reset", onReset);
     }
 
-    public function initialize():Promise {
-        var deferred:Deferred = new Deferred();
-
-        client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
-
-        deferred.resolve();
-        return deferred
-            .then(function(outcome:Object):Void {
-                initialized = true;
-            });
+    public function invitationsClientFactory(url:String, token:String):AuthenticatedClient {
+        return new GanomedeInvitationsClient(url, token);
     }
 
-    public function onLoginLogout(event:Event):Void {
-
-        var oldAuthToken:String = null;
-        if (invitationsClient != null) {
-            oldAuthToken = invitationsClient.token;
-        }
-
-        var newAuthToken:String = null;
-        if (client.users.me != null) {
-            newAuthToken = client.users.me.token;
-        }
-
-        if (newAuthToken != oldAuthToken) {
-            invitationsClient = new GanomedeInvitationsClient(client.url, newAuthToken);
-            collection.flushall();
-            refreshArray();
-        }
+    private function onReset(event:Event):Void {
+        collection.flushall();
+        refreshArray();
     }
 
     public function add(invitation:GanomedeInvitation):Promise {
@@ -71,11 +40,14 @@ class GanomedeInvitations extends ApiClient
         }
         invitation.from = client.users.me.username;
 
-        return invitationsClient.addInvitation(invitation)
-            .then(function(outcome:Dynamic):Void {
-                mergeInvitation(invitation.toJSON());
-                dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            });
+        return executeAuth(function():Promise {
+            var invitationsClient:GanomedeInvitationsClient = cast authClient;
+            return invitationsClient.addInvitation(invitation);
+        })
+        .then(function(outcome:Dynamic):Void {
+            mergeInvitation(invitation.toJSON());
+            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+        });
     }
 
     public function cancel(invitation:GanomedeInvitation):Promise {
@@ -90,7 +62,10 @@ class GanomedeInvitations extends ApiClient
 
     private function deleteInvitation(invitation:GanomedeInvitation, reason:String):Promise {
         var deferred:Deferred = new Deferred();
-        invitationsClient.deleteInvitation(invitation, reason)
+        executeAuth(function():Promise {
+            var invitationsClient:GanomedeInvitationsClient = cast authClient;
+            return invitationsClient.deleteInvitation(invitation, reason);
+        })
         .then(function(outcome:Dynamic):Void {
             collection.del(invitation.id);
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
@@ -102,8 +77,9 @@ class GanomedeInvitations extends ApiClient
 
     public function refreshArray():Promise {
         var deferred:Deferred = new Deferred();
+        var invitationsClient:GanomedeInvitationsClient = cast authClient;
         if (invitationsClient.token != null) {
-            invitationsClient.listInvitations()
+            executeAuth(invitationsClient.listInvitations)
             .then(function(result:Object):Void {
                 if (processListInvitations(result))
                     deferred.resolve();

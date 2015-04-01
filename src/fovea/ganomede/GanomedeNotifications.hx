@@ -69,7 +69,7 @@ class GanomedeNotifications extends UserClient
     public function silentPoll():Void {
         var notifClient:GanomedeNotificationsClient = cast authClient;
         if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll?");
-        if (authClient.token != null && authClient.token == client.users.me.token) {
+        if (isAuthOK()) {
             if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll!");
             executeAuth(function():Promise {
                 return notifClient.poll(lastId);
@@ -112,5 +112,4 @@ class GanomedeNotifications extends UserClient
         });
     }
 }
-
 // vim: sw=4:ts=4:et:

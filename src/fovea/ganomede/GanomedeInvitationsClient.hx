@@ -5,15 +5,12 @@ import fovea.async.*;
 import fovea.net.AjaxError;
 
 @:expose
-class GanomedeInvitationsClient extends ApiClient
+class GanomedeInvitationsClient extends AuthenticatedClient
 {
     public static inline var TYPE:String = "invitations/v1";
 
-    public var token(default,null):String = null;
-
     public function new(baseUrl:String, token:String) {
-        super(baseUrl + "/" + TYPE + "/auth/" + token);
-        this.token = token;
+        super(baseUrl, TYPE, token);
     }
 
     public function addInvitation(invitation:GanomedeInvitation):Promise {
@@ -34,7 +31,7 @@ class GanomedeInvitationsClient extends ApiClient
         return ajax("GET", "/invitations");
     }
 
-    private function parseArray(obj:Object):Object {
+    /* private function parseArray(obj:Object):Object {
         var array:Array<Object> = cast(obj, Array<Object>);
         if (array == null) {
             return obj;
@@ -44,7 +41,7 @@ class GanomedeInvitationsClient extends ApiClient
             array[i] = new GanomedeInvitation(array[i]);
         }
         return array;
-    }
+    } */
 
     public function deleteInvitation(invite:GanomedeInvitation, reason:String):Promise {
         var deferred:Deferred = new Deferred();
