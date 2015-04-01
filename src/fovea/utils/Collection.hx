@@ -5,22 +5,22 @@ import fovea.events.Event;
 import fovea.events.Events;
 import openfl.utils.Object;
 
-@:expose @:generic
-class Collection<T:Model> extends Events {
+@:expose
+class Collection extends Events {
 
-    private var map = new StringMap<T>();
-    public var keepStrategy:T->Bool = null;
-    public var modelFactory:Object->T = null;
+    private var map = new StringMap<Model>();
+    public var keepStrategy:Model->Bool = null;
+    public var modelFactory:Object->Model = null;
 
-    public function asArray():Array<T> {
-        var ret = new Array<T>();
+    public function asArray():Array<Model> {
+        var ret = new Array<Model>();
         var keys = map.keys();
         for (key in keys)
             ret.push(map.get(key));
         return ret;
     }
 
-    public function get(key:String):T {
+    public function get(key:String):Model {
         return map.get(key);
     }
 
@@ -30,7 +30,7 @@ class Collection<T:Model> extends Events {
         dispatchEvent(new Event("del"));
     }
 
-    public function set(key:String, value:T):Void {
+    public function set(key:String, value:Model):Void {
         map.set(key, value);
         dispatchEvent(new Event("set:" + key));
         dispatchEvent(new Event("set"));
@@ -52,17 +52,17 @@ class Collection<T:Model> extends Events {
 
     public function flushall():Void {
         var oldMap = map;
-        map = new StringMap<T>();
+        map = new StringMap<Model>();
         for (key in oldMap.keys())
             dispatchEvent(new Event("del:" + key));
         dispatchEvent(new Event("del"));
     }
 
-    public function shouldKeep(item:T):Bool {
+    public function shouldKeep(item:Model):Bool {
         return keepStrategy != null ? keepStrategy(item) : true;
     }
 
-    public function newModel(json:Object):T {
+    public function newModel(json:Object):Model {
         if (modelFactory != null) {
             return modelFactory(json);
         }
@@ -74,7 +74,7 @@ class Collection<T:Model> extends Events {
     public function mergeModel(json:Object):Bool {
         var id:String = json.id;
         if (exists(id)) {
-            var item:T = get(id);
+            var item:Model = get(id);
             if (!item.equals(json)) {
                 item.fromJSON(json);
                 if (!shouldKeep(item)) {
@@ -87,7 +87,7 @@ class Collection<T:Model> extends Events {
             }
         }
         else {
-            var item:T = newModel(json);
+            var item:Model = newModel(json);
             if (shouldKeep(item)) {
                 set(id, item);
                 return true;

@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import fovea.async.*;
 import fovea.utils.Collection;
+import fovea.utils.Model;
 import openfl.utils.Object;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
@@ -12,10 +13,10 @@ import fovea.events.Events;
 class GanomedeGames extends UserClient
 {
     private var type:String;
-    public var collection(default,never) = new Collection<GanomedeGame>();
+    public var collection(default,never) = new Collection();
     public function asArray() {
         var array = collection.asArray();
-        array.sort(function(a:GanomedeGame, b:GanomedeGame):Int {
+        array.sort(function(a:Model, b:Model):Int {
             return (a.id > b.id) ? 1 : -1;
         });
         return array;
@@ -23,10 +24,10 @@ class GanomedeGames extends UserClient
 
     public function new(client:GanomedeClient, type:String) {
         super(client, coordinatorClientFactory);
-        this.collection.keepStrategy = function(game:GanomedeGame):Bool {
-            return game.status == "active";
+        this.collection.keepStrategy = function(game:Model):Bool {
+            return cast(game,GanomedeGame).status == "active";
         };
-        this.collection.modelFactory = function(json:Object):GanomedeGame {
+        this.collection.modelFactory = function(json:Object):Model {
             return new GanomedeGame(json);
         };
         this.type = type;
@@ -78,27 +79,10 @@ class GanomedeGames extends UserClient
     }
 
     public function refreshArray():Promise {
-        var deferred:Deferred = new Deferred();
-        if (authClient.token != null) {
-            executeAuth(function():Promise {
-                return cast(authClient, GanomedeCoordinatorClient).activeGames(type);
-            })
-            .then(function(result:Object):Void {
-                if (collection.mergeArray(result))
-                    deferred.resolve();
-                else
-                    deferred.reject(new ApiError(AjaxError.IO_ERROR));
-            })
-            .error(deferred.reject);
-        }
-        else {
-            if (Ajax.verbose) trace("Can't load games if not authenticated");
-            deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
-        }
-        return deferred;
+        return refreshCollection(collection, function():Promise {
+            return cast(authClient, GanomedeCoordinatorClient).activeGames(type);
+        });
     }
 }
 
 // vim: sw=4:ts=4:et:
-
-

@@ -4,6 +4,9 @@ import fovea.events.Event;
 import fovea.async.Promise;
 import fovea.async.Deferred;
 import fovea.net.Ajax;
+import fovea.net.AjaxError;
+import fovea.utils.Collection;
+import fovea.utils.Model;
 import openfl.utils.Object;
 import openfl.errors.Error;
 
@@ -88,4 +91,22 @@ class UserClient extends ApiClient
         }
     }
 
+    public function refreshCollection(collection:Collection, ajaxCall:Void->Promise):Promise {
+        var deferred:Deferred = new Deferred();
+        if (authClient.token != null) {
+            executeAuth(ajaxCall)
+            .then(function(result:Object):Void {
+                if (collection.mergeArray(result))
+                    deferred.resolve();
+                else
+                    deferred.reject(new ApiError(AjaxError.IO_ERROR));
+            })
+            .error(deferred.reject);
+        }
+        else {
+            if (Ajax.verbose) trace("Can't load if not authenticated");
+            deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
+        }
+        return deferred;
+    }
 }

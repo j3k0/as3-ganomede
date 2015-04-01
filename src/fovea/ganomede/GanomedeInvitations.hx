@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import fovea.async.*;
 import fovea.utils.Collection;
+import fovea.utils.Model;
 import openfl.utils.Object;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
@@ -11,11 +12,11 @@ import fovea.events.Events;
 @:expose
 class GanomedeInvitations extends UserClient
 {
-    public var collection(default,never) = new Collection<GanomedeInvitation>();
+    public var collection(default,never) = new Collection();
     public function asArray() {
         var array = collection.asArray();
-        array.sort(function(a:GanomedeInvitation, b:GanomedeInvitation):Int {
-            return a.index - b.index;
+        array.sort(function(a:Model, b:Model):Int {
+            return cast(a, GanomedeInvitation).index - cast(b, GanomedeInvitation).index;
         });
         return array;
     }
@@ -80,23 +81,9 @@ class GanomedeInvitations extends UserClient
     }
 
     public function refreshArray():Promise {
-        var deferred:Deferred = new Deferred();
-        var invitationsClient:GanomedeInvitationsClient = cast authClient;
-        if (invitationsClient.token != null) {
-            executeAuth(invitationsClient.listInvitations)
-            .then(function(result:Object):Void {
-                if (collection.mergeArray(result))
-                    deferred.resolve();
-                else
-                    deferred.reject(new ApiError(AjaxError.IO_ERROR));
-            })
-            .error(deferred.reject);
-        }
-        else {
-            if (Ajax.verbose) trace("Can't load invitations if not authenticated");
-            deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
-        }
-        return deferred;
+        return refreshCollection(collection, function():Promise {
+            return cast(authClient, GanomedeInvitationsClient).listInvitations();
+        });
     }
 }
 
