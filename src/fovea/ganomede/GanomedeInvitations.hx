@@ -21,6 +21,9 @@ class GanomedeInvitations extends UserClient
 
     public function new(client:GanomedeClient) {
         super(client, invitationsClientFactory, GanomedeInvitationsClient.TYPE);
+        this.collection.modelFactory = function(json:Object):GanomedeInvitation {
+            return new GanomedeInvitation(json);
+        };
         addEventListener("reset", onReset);
     }
 
@@ -45,7 +48,7 @@ class GanomedeInvitations extends UserClient
             return invitationsClient.addInvitation(invitation);
         })
         .then(function(outcome:Dynamic):Void {
-            mergeInvitation(invitation.toJSON());
+            collection.merge(invitation.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
         });
     }
@@ -106,7 +109,7 @@ class GanomedeInvitations extends UserClient
             var i:Int;
             for (i in 0...newArray.length) {
                 newArray[i].index = i;
-                if (mergeInvitation(newArray[i]))
+                if (collection.merge(newArray[i]))
                     changed = true;
             }
             if (changed)
@@ -117,25 +120,6 @@ class GanomedeInvitations extends UserClient
             return false;
         }
     }
-
-    private function mergeInvitation(json:Object):Bool {
-        var id:String = json.id;
-        if (collection.exists(id)) {
-            var item:GanomedeInvitation = collection.get(id);
-            if (!item.equals(json)) {
-                item.fromJSON(json);
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            collection.set(id, new GanomedeInvitation(json));
-            return true;
-        }
-    }
 }
 
 // vim: sw=4:ts=4:et:
-

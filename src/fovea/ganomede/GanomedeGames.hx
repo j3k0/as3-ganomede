@@ -22,6 +22,12 @@ class GanomedeGames extends UserClient
 
     public function new(client:GanomedeClient, type:String) {
         super(client, coordinatorClientFactory);
+        this.collection.keepStrategy = function(game:GanomedeGame):Bool {
+            return game.status == "active";
+        };
+        this.collection.modelFactory = function(json:Object):GanomedeGame {
+            return new GanomedeGame(json);
+        };
         this.type = type;
         addEventListener("reset", onReset);
     }
@@ -45,7 +51,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).addGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            mergeGame(game.toJSON());
+            collection.merge(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
         });
     }
@@ -55,7 +61,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).joinGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            mergeGame(game.toJSON());
+            collection.merge(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
         });
     }
@@ -65,7 +71,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).leaveGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            mergeGame(game.toJSON());
+            collection.merge(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
         });
     }
@@ -102,7 +108,7 @@ class GanomedeGames extends UserClient
             var i:Int;
             for (i in 0...newArray.length) {
                 newArray[i].index = i;
-                if (mergeGame(newArray[i]))
+                if (collection.merge(newArray[i]))
                     changed = true;
             }
             if (changed)
@@ -114,6 +120,7 @@ class GanomedeGames extends UserClient
         }
     }
 
+    /*
     private function mergeGame(json:Object):Bool {
         var id:String = json.id;
         if (collection.exists(id)) {
@@ -140,6 +147,7 @@ class GanomedeGames extends UserClient
             }
         }
     }
+    */
 }
 
 // vim: sw=4:ts=4:et:

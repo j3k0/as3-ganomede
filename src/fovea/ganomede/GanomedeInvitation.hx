@@ -1,9 +1,10 @@
 package fovea.ganomede;
 
 import openfl.utils.Object;
+import fovea.utils.Model;
 
 @:expose
-class GanomedeInvitation {
+class GanomedeInvitation extends Model {
     public var id:String;
     public var gameId:String;
     public var type:String;
@@ -12,12 +13,10 @@ class GanomedeInvitation {
     public var index:Int = 0;
 
     public function new(obj:Object = null) {
-        if (obj) {
-            fromJSON(obj);
-        }
+        super(obj);
     }
 
-    public function equals(obj:Object):Bool {
+    /* public function equals(obj:Object):Bool {
         if (obj.id != id) return false;
         if (obj.gameId != gameId) return false;
         if (obj.type != type) return false;
@@ -25,9 +24,9 @@ class GanomedeInvitation {
         if (obj.from != from) return false;
         if (obj.index != index) return false;
         return true;
-    }
+    } */
 
-    public function fromJSON(obj:Object):Void {
+    public override function fromJSON(obj:Object):Void {
         if (obj.id) id = obj.id;
         if (obj.gameId) gameId = obj.gameId;
         if (obj.type) type = obj.type;
@@ -36,7 +35,7 @@ class GanomedeInvitation {
         if (obj.index) index = obj.index;
     }
 
-    public function toJSON():Object {
+    public override function toJSON():Object {
         return {
             id:id,
             gameId:gameId,

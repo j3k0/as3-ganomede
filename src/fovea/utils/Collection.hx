@@ -2,11 +2,14 @@ package fovea.utils;
 
 import haxe.ds.StringMap;
 import fovea.events.*;
+import openfl.utils.Object;
 
 @:expose @:generic
-class Collection<T> extends Events {
+class Collection<T:Model> extends Events {
 
     private var map = new StringMap<T>();
+    public var keepStrategy:T->Bool = null;
+    public var modelFactory:Object->T = null;
 
     public function asArray():Array<T> {
         var ret = new Array<T>();
@@ -53,6 +56,45 @@ class Collection<T> extends Events {
             dispatchEvent(new Event("del:" + key));
         dispatchEvent(new Event("del"));
     }
-}
 
+    public function shouldKeep(item:T):Bool {
+        return keepStrategy != null ? keepStrategy(item) : true;
+    }
+
+    public function newModel(json:Object):T {
+        if (modelFactory != null) {
+            return modelFactory(json);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function merge(json:Object):Bool {
+        var id:String = json.id;
+        if (exists(id)) {
+            var item:T = get(id);
+            if (!item.equals(json)) {
+                item.fromJSON(json);
+                if (!shouldKeep(item)) {
+                    del(id);
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            var item:T = newModel(json);
+            if (shouldKeep(item)) {
+                set(id, item);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+}
 // vim: sw=4:ts=4:et:

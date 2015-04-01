@@ -2,9 +2,10 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 import haxe.Json;
+import fovea.utils.Model;
 
 @:expose
-class GanomedeGame {
+class GanomedeGame extends Model {
     public var id:String;
     public var type:String;
     public var players:Array<String>;
@@ -13,16 +14,10 @@ class GanomedeGame {
     public var url:String;
 
     public function new(obj:Object = null) {
-        if (obj) {
-            fromJSON(obj);
-        }
+        super(obj);
     }
 
-    public function equals(obj:Object):Bool {
-        return haxe.Json.stringify(toJSON()) == haxe.Json.stringify(obj);
-    }
-
-    public function fromJSON(obj:Object):Void {
+    public override function fromJSON(obj:Object):Void {
         if (obj.id) id = obj.id;
         if (obj.type) type = obj.type;
         if (obj.players) players = obj.players;
@@ -31,7 +26,7 @@ class GanomedeGame {
         if (obj.url) url = obj.url;
     }
 
-    public function toJSON():Object {
+    public override function toJSON():Object {
         return {
             id:id,
             type:type,
