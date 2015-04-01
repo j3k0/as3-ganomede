@@ -11,6 +11,15 @@ class Collection extends Events {
     private var map = new StringMap<Model>();
     public var keepStrategy:Model->Bool = null;
     public var modelFactory:Object->Model = null;
+    private var merger:MergeStrategy;
+
+    public function new() {
+        merger = new MergeStrategyChain([
+            new MergeArray(this),
+            new MergeExisting(this),
+            new MergeNonExisting(this)
+        ]);
+    }
 
     public function asArray():Array<Model> {
         var ret = new Array<Model>();
@@ -71,54 +80,137 @@ class Collection extends Events {
         }
     }
 
-    public function mergeModel(json:Object):Bool {
-        var id:String = json.id;
-        if (exists(id)) {
-            var item:Model = get(id);
+    public function merge(json:Object):Bool {
+        if (merger.canMerge(json)) {
+            var changed:Bool = merger.merge(json);
+            if (changed)
+                dispatchEvent(new Event(Events.CHANGE));
+            return changed;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function canMerge(json:Object):Bool {
+        return merger.canMerge(json);
+    }
+}
+// vim: sw=4:ts=4:et:
+
+private class MergeStrategy {
+    public var canMerge:Object->Bool = null;
+    public var merge:Object->Bool = null;
+
+    public function new(canMerge:Object->Bool, merge:Object->Bool) {
+        this.canMerge = canMerge;
+        this.merge = merge;
+    }
+}
+
+// Apply the right merging strategy
+private class MergeStrategyChain extends MergeStrategy
+{
+    public function new(strategies:Array<MergeStrategy>) {
+        super(function(json:Object):Bool {
+            for (i in 0 ... strategies.length) {
+                if (strategies[i].canMerge(json))
+                    return true;
+            }
+            return false;
+        },
+        function(json:Object):Bool {
+            for (i in 0 ... strategies.length) {
+                if (strategies[i].canMerge(json))
+                    return strategies[i].merge(json);
+            }
+            return false;
+        });
+    }
+}
+
+// Merge an array in a collection
+private class MergeArray extends MergeStrategy {
+    public function new(collection:Collection) {
+        super(function(json:Object):Bool {
+            if (json == null || json.data == null) return false;
+            var newArray:Array<Object> = cast(json.data, Array<Object>);
+            if (newArray == null) return false;
+            for (i in 0...newArray.length)
+                if (!collection.canMerge(newArray[i]))
+                    return false;
+            return true;
+        },
+        function(json:Object):Bool {
+            //try {
+            //}
+            //catch (error:String) {
+            //    return false;
+            //}
+            var newArray:Array<Object> = cast(json.data, Array<Object>);
+            var changed:Bool = false;
+            var keys:Array<String> = [];
+            for (model in newArray)
+                keys.push(model.id);
+            collection.keep(keys);
+            var i:Int;
+            for (i in 0...newArray.length) {
+                newArray[i].index = i;
+                if (collection.merge(newArray[i]))
+                    changed = true;
+            }
+            return changed;
+        });
+    }
+}
+
+// Merge an existing model into the collection
+private class MergeExisting extends MergeStrategy {
+
+    public function new(collection:Collection) {
+
+        super(function (json:Object):Bool { // canMerge
+            // yes if there's an ID present in the collection
+            if (json == null || json.id == null) return false;
+            return collection.exists(json.id);
+        },
+
+        function (json:Object):Bool { // merge
+            var item:Model = collection.get(json.id);
             if (!item.equals(json)) {
                 item.fromJSON(json);
-                if (!shouldKeep(item)) {
-                    del(id);
+                if (!collection.shouldKeep(item)) {
+                    collection.del(json.id);
                 }
                 return true;
             }
             else {
                 return false;
             }
-        }
-        else {
-            var item:Model = newModel(json);
-            if (shouldKeep(item)) {
-                set(id, item);
+        });
+    }
+}
+
+// Merge in a new model in the collection
+private class MergeNonExisting extends MergeStrategy {
+
+    public function new(collection:Collection) {
+
+        super(function (json:Object):Bool { // canMerge
+            // yes if there's an ID, not in the collection
+            if (json == null || json.id == null) return false;
+            return !collection.exists(json.id);
+        },
+
+        function (json:Object):Bool { // merge
+            var item:Model = collection.newModel(json);
+            if (collection.shouldKeep(item)) {
+                collection.set(json.id, item);
                 return true;
             }
             else {
                 return false;
             }
-        }
-    }
-
-    public function mergeArray(result:Object):Bool {
-        try {
-            var newArray:Array<Object> = cast(result.data, Array<Object>);
-            var changed:Bool = false;
-            var keys:Array<String> = [];
-            for (model in newArray)
-                keys.push(model.id);
-            keep(keys);
-            var i:Int;
-            for (i in 0...newArray.length) {
-                newArray[i].index = i;
-                if (mergeModel(newArray[i]))
-                    changed = true;
-            }
-            if (changed)
-                dispatchEvent(new Event(Events.CHANGE));
-            return true;
-        }
-        catch (error:String) {
-            return false;
-        }
+        });
     }
 }
-// vim: sw=4:ts=4:et:

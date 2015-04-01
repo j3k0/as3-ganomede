@@ -24,14 +24,15 @@ class GanomedeGames extends UserClient
 
     public function new(client:GanomedeClient, type:String) {
         super(client, coordinatorClientFactory);
-        this.collection.keepStrategy = function(game:Model):Bool {
+        collection.keepStrategy = function(game:Model):Bool {
             return cast(game,GanomedeGame).status == "active";
         };
-        this.collection.modelFactory = function(json:Object):Model {
+        collection.modelFactory = function(json:Object):Model {
             return new GanomedeGame(json);
         };
         this.type = type;
         addEventListener("reset", onReset);
+        collection.addEventListener(Events.CHANGE, dispatchEvent);
     }
 
     private function coordinatorClientFactory(url:String, token:String):AuthenticatedClient {
@@ -53,8 +54,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).addGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.mergeModel(game.toJSON());
-            dispatchEvent(new Event(Events.CHANGE));
+            collection.merge(game.toJSON());
         });
     }
 
@@ -63,8 +63,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).joinGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.mergeModel(game.toJSON());
-            dispatchEvent(new Event(Events.CHANGE));
+            collection.merge(game.toJSON());
         });
     }
 
@@ -73,8 +72,7 @@ class GanomedeGames extends UserClient
             return cast(authClient, GanomedeCoordinatorClient).leaveGame(game);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.mergeModel(game.toJSON());
-            dispatchEvent(new Event(Events.CHANGE));
+            collection.merge(game.toJSON());
         });
     }
 

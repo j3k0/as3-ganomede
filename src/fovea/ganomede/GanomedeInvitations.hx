@@ -23,10 +23,11 @@ class GanomedeInvitations extends UserClient
 
     public function new(client:GanomedeClient) {
         super(client, invitationsClientFactory, GanomedeInvitationsClient.TYPE);
-        this.collection.modelFactory = function(json:Object):GanomedeInvitation {
+        collection.modelFactory = function(json:Object):GanomedeInvitation {
             return new GanomedeInvitation(json);
         };
         addEventListener("reset", onReset);
+        collection.addEventListener(Events.CHANGE, dispatchEvent);
     }
 
     public function invitationsClientFactory(url:String, token:String):AuthenticatedClient {
@@ -50,8 +51,7 @@ class GanomedeInvitations extends UserClient
             return invitationsClient.addInvitation(invitation);
         })
         .then(function(outcome:Dynamic):Void {
-            collection.mergeModel(invitation.toJSON());
-            dispatchEvent(new Event(Events.CHANGE));
+            collection.merge(invitation.toJSON());
         });
     }
 

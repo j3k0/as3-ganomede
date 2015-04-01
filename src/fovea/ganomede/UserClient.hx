@@ -96,10 +96,13 @@ class UserClient extends ApiClient
         if (authClient.token != null) {
             executeAuth(ajaxCall)
             .then(function(result:Object):Void {
-                if (collection.mergeArray(result))
+                if (collection.canMerge(result)) {
+                    collection.merge(result);
                     deferred.resolve();
-                else
+                }
+                else {
                     deferred.reject(new ApiError(AjaxError.IO_ERROR));
+                }
             })
             .error(deferred.reject);
         }
