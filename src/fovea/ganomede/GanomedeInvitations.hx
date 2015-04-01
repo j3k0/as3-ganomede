@@ -13,12 +13,15 @@ import fovea.events.Events;
 class GanomedeInvitations extends UserClient
 {
     public var collection(default,never) = new Collection();
-    public function asArray() {
+    public function asArray():Array<GanomedeInvitation> {
         var array = collection.asArray();
         array.sort(function(a:Model, b:Model):Int {
             return cast(a, GanomedeInvitation).index - cast(b, GanomedeInvitation).index;
         });
-        return array;
+        return cast array;
+    }
+    public function toJSON():Object {
+        return collection.toJSON();
     }
 
     public function new(client:GanomedeClient) {

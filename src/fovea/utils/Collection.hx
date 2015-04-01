@@ -32,6 +32,14 @@ class Collection extends Events {
         return ret;
     }
 
+    public function toJSON():Object {
+        var ret = [];
+        var keys = map.keys();
+        for (key in keys)
+            ret.push(map.get(key).toJSON());
+        return ret;
+    }
+
     public function get(key:String):Model {
         return map.get(key);
     }

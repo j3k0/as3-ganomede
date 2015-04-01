@@ -21,6 +21,9 @@ class GanomedeGames extends UserClient
         });
         return array;
     }
+    public function toJSON():Object {
+        return collection.toJSON();
+    }
 
     public function new(client:GanomedeClient, type:String) {
         super(client, coordinatorClientFactory);
