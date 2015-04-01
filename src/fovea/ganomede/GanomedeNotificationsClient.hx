@@ -2,43 +2,46 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 import openfl.errors.Error;
+
 import fovea.async.*;
-import fovea.net.AjaxError;
+import fovea.net.*;
 
 @:expose
-class GanomedeNotificationsClient extends ApiClient
+class GanomedeNotificationsClient extends AuthenticatedClient
 {
     public static inline var TYPE:String = "notifications/v1";
 
-    public var clientId(default,null):String = null;
-    public var token(default,null):String = null;
-
     public function new(baseUrl:String, token:String) {
-        super(baseUrl + "/" + TYPE + "/auth/" + token);
-        this.token = token;
-        this.clientId = "" + Math.random();
+        super(baseUrl, TYPE, token);
     }
 
     public var polling:Bool = false;
 
     public function poll(after:Int):Promise {
-        polling = true;
-        var uri:String = "/messages";
-        if (after >= 0) {
-            uri += "?after=" + after;
+        if (polling) {
+            var deferred:Deferred = new Deferred();
+            // never resolve, stop the invalid loop...
+            // deferred.reject(new Error("Already polling"));
+            return deferred;
         }
-
-        return ajax("GET", uri, {
-            parse: this.parseArray
-        })
-        .then(function(outcome:Dynamic):Void {
-            outcome.token = this.token;
-            outcome.clientId = this.clientId;
-            polling = false;
-        })
-        .error(function(error:Error):Void {
-            polling = false;
+        polling = true;
+        var uri:String = UrlFormatter.format("/messages", {
+            after: (after >= 0 ? after : null)
         });
+
+        return ajax("GET", uri, { parse: this.parseArray })
+        .then(pollSuccess)
+        .error(pollError);
+    }
+
+    public function pollSuccess(outcome:Dynamic):Void {
+        outcome.token = this.token;
+        outcome.clientId = this.clientId;
+        polling = false;
+    }
+
+    public function pollError(error:Error):Void {
+        polling = false;
     }
 
     private function parseArray(obj:Object):Object {
@@ -53,4 +56,5 @@ class GanomedeNotificationsClient extends ApiClient
         return array;
     }
 }
+
 // vim: sw=4:ts=4:et:
