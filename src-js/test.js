@@ -144,12 +144,14 @@ function notifications(done) {
     });
     client.notifications.apiSecret = process.env.API_SECRET;
     console.log("send notification");
-    client.notifications.send(n)
-    .error(function(err) {
-        console.error("notifications error (sending notif)");
-        console.dir(err);
-        process.exit(1);
-    });
+    setTimeout(function() {
+        client.notifications.send(n)
+        .error(function(err) {
+            console.error("notifications error (sending notif)");
+            console.dir(err);
+            process.exit(1);
+        });
+    }, 100);
 }
 
 function refreshGames(done) {
