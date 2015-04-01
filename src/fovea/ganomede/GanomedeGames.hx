@@ -8,16 +8,10 @@ import fovea.net.AjaxError;
 import fovea.events.Event;
 
 @:expose
-class GanomedeGames extends ApiClient
+class GanomedeGames extends UserClient
 {
-    public var initialized(default,null):Bool = false;
-
-    private var client:GanomedeClient;
     private var type:String;
-    private var coordinatorClient:GanomedeCoordinatorClient = null;
-
     public var collection(default,never) = new Collection<GanomedeGame>();
-
     public function asArray() {
         var array = collection.asArray();
         array.sort(function(a:GanomedeGame, b:GanomedeGame):Int {
@@ -27,101 +21,62 @@ class GanomedeGames extends ApiClient
     }
 
     public function new(client:GanomedeClient, type:String) {
-        super(client.url);
-        // + "/" + GanomedeCoordinatorClient.TYPE);
+        super(client, coordinatorClientFactory);
         this.type = type;
-        this.client = client;
-        coordinatorClient = new GanomedeCoordinatorClient(client.url, null);
+        addEventListener("reset", onReset);
     }
 
-    public function initialize():Promise {
-        var deferred:Deferred = new Deferred();
-
-        client.users.addEventListener(GanomedeEvents.LOGIN, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.LOGOUT, onLoginLogout);
-        client.users.addEventListener(GanomedeEvents.AUTH, onLoginLogout);
-
-        deferred.resolve();
-        return deferred
-            .then(function(outcome:Object):Void {
-                initialized = true;
-            });
+    private function coordinatorClientFactory(url:String, token:String):AuthenticatedClient {
+        return new GanomedeCoordinatorClient(url, token);
     }
 
-    public function onLoginLogout(event:Event):Void {
-
-        var oldAuthToken:String = null;
-        if (coordinatorClient != null) {
-            oldAuthToken = coordinatorClient.token;
-        }
-
-        var newAuthToken:String = null;
-        if (client.users.me != null) {
-            newAuthToken = client.users.me.token;
-        }
-
-        if (newAuthToken != oldAuthToken) {
-            coordinatorClient = new GanomedeCoordinatorClient(client.url, newAuthToken);
-            collection.flushall();
-            refreshArray();
-        }
+    public function onReset(event:Event):Void {
+        collection.flushall();
+        refreshArray();
     }
 
     public function add(game:GanomedeGame):Promise {
-        var token = coordinatorClient.token;
-
         if (!client.users.me.isAuthenticated()) {
             if (Ajax.verbose) trace("cant add game: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
 
-        return coordinatorClient.addGame(game)
-            .then(function(outcome:Dynamic):Void {
-                if (token != coordinatorClient.token)
-                    return;
-                mergeGame(game.toJSON());
-                dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            });
+        return executeAuth(function():Promise {
+            return cast(authClient, GanomedeCoordinatorClient).addGame(game);
+        })
+        .then(function(outcome:Dynamic):Void {
+            mergeGame(game.toJSON());
+            dispatchEvent(new Event(GanomedeEvents.CHANGE));
+        });
     }
 
     public function join(game:GanomedeGame):Promise {
-        var token = coordinatorClient.token;
-        var deferred:Deferred = new Deferred();
-        coordinatorClient.joinGame(game)
+        return executeAuth(function():Promise {
+            return cast(authClient, GanomedeCoordinatorClient).joinGame(game);
+        })
         .then(function(outcome:Dynamic):Void {
-            if (token != coordinatorClient.token)
-                return;
             mergeGame(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            deferred.resolve();
-        })
-        .error(deferred.reject);
-        return deferred;
+        });
     }
 
     public function leave(game:GanomedeGame):Promise {
-        var token = coordinatorClient.token;
-        var deferred:Deferred = new Deferred();
-        coordinatorClient.leaveGame(game)
+        return executeAuth(function():Promise {
+            return cast(authClient, GanomedeCoordinatorClient).leaveGame(game);
+        })
         .then(function(outcome:Dynamic):Void {
-            if (token != coordinatorClient.token)
-                return;
             mergeGame(game.toJSON());
             dispatchEvent(new Event(GanomedeEvents.CHANGE));
-            deferred.resolve();
-        })
-        .error(deferred.reject);
-        return deferred;
+        });
     }
 
     public function refreshArray():Promise {
         var deferred:Deferred = new Deferred();
-        if (coordinatorClient.token != null) {
-            var token = coordinatorClient.token;
-            coordinatorClient.activeGames(type)
+        if (authClient.token != null) {
+            executeAuth(function():Promise {
+                return cast(authClient, GanomedeCoordinatorClient).activeGames(type);
+            })
             .then(function(result:Object):Void {
-                if (token != coordinatorClient.token)
-                    return;
                 if (processListGames(result))
                     deferred.resolve();
                 else

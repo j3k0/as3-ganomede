@@ -5,15 +5,12 @@ import fovea.async.*;
 import fovea.net.AjaxError;
 
 @:expose
-class GanomedeCoordinatorClient extends ApiClient
+class GanomedeCoordinatorClient extends AuthenticatedClient
 {
     public static inline var TYPE:String = "coordinator/v1";
 
-    public var token(default,null):String = null;
-
     public function new(baseUrl:String, token:String) {
-        super(baseUrl + "/" + TYPE + "/auth/" + token);
-        this.token = token;
+        super(baseUrl, TYPE, token);
     }
 
     public function addGame(game:GanomedeGame):Promise {

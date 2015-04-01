@@ -17,8 +17,8 @@ class UserClient extends ApiClient
     public var authClient(default,null):AuthenticatedClient = null;
     private var clientFactory:String->String->AuthenticatedClient;
 
-    public function new(client:GanomedeClient, clientFactory:String->String->AuthenticatedClient, type:String) {
-        super(client.url + "/" + type);
+    public function new(client:GanomedeClient, clientFactory:String->String->AuthenticatedClient, type:String = null) {
+        super(client.url + (type != null ? "/" + type : ""));
         this.client = client;
         this.clientFactory = clientFactory;
         this.authClient = clientFactory(client.url, null);
