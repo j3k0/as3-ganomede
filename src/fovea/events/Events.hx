@@ -17,9 +17,6 @@ class Events
     extends EventEmitter
 #end
 {
-    public function run() {
-    }
-
     public static inline var CHANGE:String = "change";
 
 #if flash

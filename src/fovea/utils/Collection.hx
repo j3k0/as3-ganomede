@@ -14,6 +14,9 @@ class Collection extends Events {
     private var merger:Strategy;
 
     public function new() {
+#if flash
+        super();
+#end
         merger = new StrategyChain([
             new MergeArray(this),
             new MergeExisting(this),
