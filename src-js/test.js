@@ -28,7 +28,6 @@ function initialize(done) {
     .error(function initializeError(err) {
         console.error("initialize error");
         console.dir(err);
-        console.dir(err.getStackTrace());
         process.exit(1);
     });
 }
@@ -265,7 +264,10 @@ function done() {
 
 //ganomede.net.Ajax.verbose = true;
 
+var testStrategyChain = require("./testStrategyChain");
+
 initialize(
+    testStrategyChain.bind(null,
     login.bind(null,
     profile.bind(null,
     refreshInvitations.bind(null,
@@ -279,7 +281,7 @@ initialize(
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-)))))))))))));
+))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");
