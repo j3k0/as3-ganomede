@@ -93,10 +93,14 @@ class Collection extends Events {
 
     public function merge(json:Object):Bool {
         if (merger.canExecute(json)) {
-            var changed:Bool = merger.execute(json);
-            if (changed)
+            var result:Object = merger.execute(json);
+            if (result != null && result.changed) {
                 dispatchEvent(new Event(Events.CHANGE));
-            return changed;
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         else {
             return false;
@@ -124,7 +128,7 @@ private class MergeArray extends Strategy {
             return true;
         },
 
-        function(json:Object):Bool { // merge
+        function(json:Object):Object { // merge
             var newArray:Array<Object> = cast(json.data, Array<Object>);
             var changed:Bool = false;
             var keys:Array<String> = [];
@@ -137,7 +141,7 @@ private class MergeArray extends Strategy {
                 if (collection.merge(newArray[i]))
                     changed = true;
             }
-            return changed;
+            return { changed:changed };
         });
     }
 }
@@ -153,17 +157,17 @@ private class MergeExisting extends Strategy {
             return collection.exists(json.id);
         },
 
-        function (json:Object):Bool { // merge
+        function (json:Object):Object { // merge
             var item:Model = collection.get(json.id);
             if (!item.equals(json)) {
                 item.fromJSON(json);
                 if (!collection.shouldKeep(item)) {
                     collection.del(json.id);
                 }
-                return true;
+                return { changed: true };
             }
             else {
-                return false;
+                return { changed: false };
             }
         });
     }
@@ -180,14 +184,14 @@ private class MergeNonExisting extends Strategy {
             return !collection.exists(json.id);
         },
 
-        function (json:Object):Bool { // merge
+        function (json:Object):Object { // merge
             var item:Model = collection.newModel(json);
             if (collection.shouldKeep(item)) {
                 collection.set(json.id, item);
-                return true;
+                return { changed: true };
             }
             else {
-                return false;
+                return { changed: false };
             }
         });
     }

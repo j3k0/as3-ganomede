@@ -16,13 +16,13 @@ class StrategyChain extends Strategy
             return false;
         },
 
-        function(json:Object):Bool { // execute
+        function(json:Object):Object { // execute
             // execute the first strategy that can
             for (i in 0 ... strategies.length) {
                 if (strategies[i].canExecute(json))
                     return strategies[i].execute(json);
             }
-            return false;
+            return null;
         });
     }
 }
