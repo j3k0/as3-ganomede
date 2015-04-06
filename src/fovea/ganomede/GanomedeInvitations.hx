@@ -31,6 +31,11 @@ class GanomedeInvitations extends UserClient
         };
         addEventListener("reset", onReset);
         collection.addEventListener(Events.CHANGE, dispatchEvent);
+        if (client.notifications != null) {
+            client.notifications.listenTo("invitations/v1", function(event:Event):Void {
+                refreshArray();
+            });
+        }
     }
 
     public function invitationsClientFactory(url:String, token:String):AuthenticatedClient {

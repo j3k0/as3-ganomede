@@ -100,6 +100,7 @@ class GanomedeNotifications extends UserClient
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
+        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + JSON.stringify(n.toJSON()));
         dispatchEvent(new GanomedeNotificationEvent(n));
     }
 
