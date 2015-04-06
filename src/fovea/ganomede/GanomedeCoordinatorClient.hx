@@ -14,7 +14,7 @@ class GanomedeCoordinatorClient extends AuthenticatedClient
     }
 
     public function addGame(game:GanomedeGame):Promise {
-        return ajax("POST", game.type + "/games", {
+        return ajax("POST", "/" + game.type + "/games", {
             data: {
                 players: game.players
             }
@@ -31,7 +31,7 @@ class GanomedeCoordinatorClient extends AuthenticatedClient
     }
 
     public function activeGames(type:String):Promise {
-        return ajax("GET", type + "/active-games");
+        return ajax("GET", "/" + type + "/active-games");
     }
 
     public function leaveGame(game:GanomedeGame):Promise {
