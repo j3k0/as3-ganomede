@@ -5,6 +5,7 @@ import fovea.events.Event;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.utils.Collection;
+import haxe.Json;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
@@ -55,10 +56,9 @@ class GanomedeNotifications extends UserClient
         haxe.Timer.delay(poll, 1000);
     }
     public function poll():Void {
-        if (Ajax.verbose) trace("[GanomedeNotifications] poll?");
         var notifClient:GanomedeNotificationsClient = cast authClient;
         if (!notifClient.polling) {
-            if (Ajax.verbose) trace("[GanomedeNotifications] poll!");
+            if (Ajax.verbose) trace("[GanomedeNotifications] poll");
             executeAuth(function():Promise {
                 return notifClient.poll(lastId);
             })
@@ -68,9 +68,7 @@ class GanomedeNotifications extends UserClient
     }
     public function silentPoll():Void {
         var notifClient:GanomedeNotificationsClient = cast authClient;
-        if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll?");
         if (isAuthOK()) {
-            if (Ajax.verbose) trace("[GanomedeNotifications] silentPoll!");
             executeAuth(function():Promise {
                 return notifClient.poll(lastId);
             })
@@ -100,7 +98,7 @@ class GanomedeNotifications extends UserClient
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
-        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + JSON.stringify(n.toJSON()));
+        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + Json.stringify(n.toJSON()));
         dispatchEvent(new GanomedeNotificationEvent(n));
     }
 
