@@ -132,8 +132,9 @@ private class MergeArray extends Strategy {
             var newArray:Array<Object> = cast(json.data, Array<Object>);
             var changed:Bool = false;
             var keys:Array<String> = [];
-            for (model in newArray)
+            for (model in newArray) {
                 keys.push(model.id);
+            }
             collection.keep(keys);
             var i:Int;
             for (i in 0...newArray.length) {
