@@ -81,7 +81,13 @@ class GanomedeGames extends UserClient
 
     public function refreshArray():Promise {
         return refreshCollection(collection, function():Promise {
-            return cast(authClient, GanomedeCoordinatorClient).activeGames(type);
+            return cast(authClient, GanomedeCoordinatorClient).activeGames(type)
+            .then(function(outcome:Object):Void {
+                var array:Array<Object> = cast outcome;
+                for (i in 0...array.length) {
+                    array[i].status = 'active';
+                }
+            });
         });
     }
 }
