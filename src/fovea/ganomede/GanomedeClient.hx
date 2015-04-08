@@ -63,6 +63,12 @@ class GanomedeClient extends ApiClient
             initialized = true;
         });
     }
+
+    // Just make sure all classes are exported
+    public function _fake():Void {
+        var pr:PromiseRunner = null;
+        var wf:Waterfall = null;
+    }
 }
 
 // vim: sw=4:ts=4:et:
