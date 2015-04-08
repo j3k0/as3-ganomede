@@ -60,14 +60,19 @@ class Collection extends Events {
         return map.exists(key);
     }
 
-    public function keep(keys:Array<String>):Void {
+    // returns true iff the collection has changed
+    public function keep(keys:Array<String>):Bool {
+        var changed:Bool = false;
         var keepKeys = new StringMap<Bool>();
         for (i in keys)
             keepKeys.set(i, true);
         for (key in map.keys()) {
-            if (!keepKeys.get(key))
+            if (!keepKeys.get(key)) {
                 del(key);
+                changed = true;
+            }
         }
+        return changed;
     }
 
     public function flushall():Void {
@@ -130,12 +135,11 @@ private class MergeArray extends Strategy {
 
         function(json:Object):Object { // merge
             var newArray:Array<Object> = cast(json.data, Array<Object>);
-            var changed:Bool = false;
             var keys:Array<String> = [];
             for (model in newArray) {
                 keys.push(model.id);
             }
-            collection.keep(keys);
+            var changed:Bool = collection.keep(keys);
             var i:Int;
             for (i in 0...newArray.length) {
                 newArray[i].index = i;
