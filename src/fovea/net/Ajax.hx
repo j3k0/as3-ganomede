@@ -119,13 +119,13 @@ class Ajax extends Events
         }
 
         function ioError(event:IOErrorEvent):Void {
-            // trace("ioErrorHandler: " + event);
             var loader:URLLoader = cast(event.target, URLLoader);
             data = jsonData(loader);
             if (data) {
                 done();
             }
             else {
+                if (verbose) trace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
             }
