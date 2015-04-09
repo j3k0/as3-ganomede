@@ -9,9 +9,17 @@ bin/ganomede.swc:
 	@mkdir -p bin
 	./haxe -swf bin/ganomede.swc -dce no -lib openfl -cp src ${HAXE_MAIN}
 
+bin/ganomede-as3:
+	@mkdir -p bin
+	./haxe -as3 bin/ganomede-as3 -dce no -lib openfl -cp src ${HAXE_MAIN}
+
 swc:
 	@mkdir -p bin
 	./haxe -swf bin/ganomede.swc -dce no -lib openfl -cp src ${HAXE_MAIN}
+
+as3:
+	@mkdir -p bin
+	./haxe -as3 bin/ganomede-as3 -dce no -lib openfl -cp src ${HAXE_MAIN}
 
 js:
 	@mkdir -p bin

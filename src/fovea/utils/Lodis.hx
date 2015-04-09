@@ -4,7 +4,7 @@ package fovea.utils;
     import openfl.events.Event;
     import openfl.errors.Error;
     import openfl.utils.Object;
-    import haxe.Json;
+    import fovea.utils.NativeJSON;
 
     @:expose
     class Lodis extends EventDispatcher {
@@ -19,11 +19,11 @@ package fovea.utils;
         }
 
         private function pack(value:Object):String {
-            return Json.stringify(value);
+            return NativeJSON.stringify(value);
         }
 
         private function unpack(value:String):Object {
-            return Json.parse(value);
+            return NativeJSON.parse(value);
         }
 
         // Extension

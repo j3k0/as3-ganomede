@@ -1,6 +1,6 @@
 package fovea.utils;
 
-import haxe.Json;
+import fovea.utils.NativeJSON;
 import openfl.utils.Object;
 
 @:expose
@@ -23,7 +23,7 @@ class Model
         };
     }
     public function equals(obj:Object):Bool {
-        return haxe.Json.stringify(toJSON()) == haxe.Json.stringify(obj);
+        return NativeJSON.stringify(toJSON()) == NativeJSON.stringify(obj);
     }
 }
 // vim: sw=4:ts=4:et:

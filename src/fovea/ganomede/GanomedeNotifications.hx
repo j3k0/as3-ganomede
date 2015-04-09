@@ -5,7 +5,7 @@ import fovea.events.Event;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.utils.Collection;
-import haxe.Json;
+import fovea.utils.NativeJSON;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
@@ -98,7 +98,7 @@ class GanomedeNotifications extends UserClient
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
-        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + Json.stringify(n.toJSON()));
+        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + NativeJSON.stringify(n.toJSON()));
         dispatchEvent(new GanomedeNotificationEvent(n));
     }
 

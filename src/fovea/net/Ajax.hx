@@ -3,7 +3,7 @@ package fovea.net;
 import openfl.utils.Object;
 import fovea.async.Deferred;
 import fovea.async.Promise;
-import haxe.Json;
+import fovea.utils.NativeJSON;
 
 #if flash
 
@@ -56,7 +56,7 @@ class Ajax extends Events
         urlRequest.method = method.toUpperCase();
 
         if (options.data) {
-            urlRequest.data = Json.stringify(options.data);
+            urlRequest.data = NativeJSON.stringify(options.data);
             if (verbose) trace("AJAX[" + requestID + "] data=" + urlRequest.data);
         }
 
@@ -80,7 +80,7 @@ class Ajax extends Events
         function done():Void {
             removeListeners(dispatcher);
             if (status >= 200 && status <= 299) {
-                if (verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + Json.stringify(data));
+                if (verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
                 var obj:Object = {
                     status: status,
                     data: data
@@ -89,7 +89,7 @@ class Ajax extends Events
                 deferred.resolve(obj);
             }
             else {
-                if (verbose) trace("AJAX[" + options.requestID + "] error[" + status + "]: " + Json.stringify(data));
+                if (verbose) trace("AJAX[" + options.requestID + "] error[" + status + "]: " + NativeJSON.stringify(data));
                 deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
             }
         }
@@ -149,7 +149,7 @@ class Ajax extends Events
         var json:Object = null;
         try {
             if (urlLoader.data) {
-                json = Json.parse(urlLoader.data.toString());
+                json = NativeJSON.parse(urlLoader.data.toString());
             }
         }
         catch (e:Dynamic) {
@@ -230,7 +230,7 @@ class Ajax extends Events
 
         var data = "";
         if (options.data) {
-            data = Json.stringify(options.data);
+            data = NativeJSON.stringify(options.data);
         }
 
         var reqOptions:HttpReqOpt = {
@@ -257,7 +257,7 @@ class Ajax extends Events
                     var json:Dynamic = null;
                     try {
                         if (data != "")
-                            json = cast(Json.parse(data));
+                            json = cast(NativeJSON.parse(data));
                     }
                     catch (err:Dynamic) {
                         trace("[AJAX " + options.requestID + "] JSON parse error (" + data + ")");

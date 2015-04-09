@@ -1,7 +1,6 @@
 package fovea.ganomede;
 
 import openfl.utils.Object;
-import haxe.Json;
 import fovea.utils.Model;
 
 @:expose
