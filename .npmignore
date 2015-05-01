@@ -1,2 +1,14 @@
+.gitignore
+bin/ganomede.swc
+bin/Main.swf
+Makefile
+amxmlc
+haxe
 src-as3
+setenv
+src-js
+adl
+circle.yml
 lib
+src
+test-js-jeko.sh
