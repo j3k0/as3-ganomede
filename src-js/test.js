@@ -9,7 +9,7 @@ if (!serverUrl) {
 }
 
 function initialize(done) {
-    client = new ganomede.GanomedeClient(serverUrl, {
+    client = ganomede.createClient(serverUrl, {
         registry: { enabled: true },
         users: { enabled: true },
         notifications: { enabled: true },

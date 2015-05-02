@@ -1,4 +1,4 @@
-HAXE_MAIN=fovea.ganomede.GanomedeClient fovea.async.Waterfall
+HAXE_MAIN=fovea.ganomede.Ganomede
 
 help:
 	@echo make run ..... Runs the app

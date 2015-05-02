@@ -25,7 +25,7 @@ You can selected individually which subsystem you'd like to enable. By default a
 
 ```js
 var ganomede = require("ganomede");
-var client = new ganomede.GanomedeClient("http://ganomede.server.com:12000", {
+var client = ganomede.createClient("http://ganomede.server.com:12000", {
     registry: { enabled: true },
     users: { enabled: true },
     notifications: { enabled: true },
@@ -260,6 +260,57 @@ notifications.listenTo("invitations/v1", function(event) {
     if (event.notification.type === "received") {
         console.log("invitation received from " + event.notification.data.from);
     }
+});
+```
+
+### Games
+
+The `games` module allows you to manage the users games (list, leave).
+
+To retrieve the client's `GanomedeGames` instance:
+
+```js
+var games = client.games;
+```
+
+Note: the array of games is gonna be this of the logged in user.
+
+#### class GanomedeGame
+
+fields:
+```js
+    var id:String;
+    var type:String;
+    var players:Array of String;
+    var status:String;
+    var url:String;
+```
+
+methods:
+* constructor(obj)
+* toJSON()
+* fromJSON(obj)
+
+valid statuses are:
+* inactive
+* active
+* gameover
+
+`url` gives the address of the ganomede server handling this game. If different from the currently used ganomede server, you'll need to create a new ganomede client to play this game.
+
+#### List Games
+
+```js
+var array = client.games.asArray();
+```
+
+Returns and array of `GanomedeGame`, the module handles keeping this list up to date.
+
+If you wanna make sure to request the list from the server:
+```js
+client.games.refreshArray()
+.then(function() {
+    // client.games.asArray has been updated
 });
 ```
 
