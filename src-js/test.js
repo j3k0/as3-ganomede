@@ -23,7 +23,7 @@ function initialize(done) {
     client.initialize()
     .then(function initializeSuccess(res) {
         console.log("initialize success");
-        console.dir(client.registry.services);
+        // console.dir(client.registry.services);
         done();
     })
     .error(function initializeError(err) {
@@ -47,7 +47,7 @@ function login(done) {
     client.users.login(user)
     .then(function loginSuccess(res) {
         console.log("login success");
-        console.dir(user);
+        // console.dir(user);
         done();
     })
     .error(function loginError(err) {
@@ -257,6 +257,7 @@ function createGame1P(done) {
         type: client.options.games.type,
         players: [ "testuser" ]
     });
+    console.log("create 1 player game");
     client.games.add(g)
     .then(function(res) {
         var a1 = client.games.asArray();
@@ -275,6 +276,60 @@ function createGame1P(done) {
         console.error("games error (addGame)");
         console.dir(err);
         process.exit(1);
+    });
+}
+
+function inviteTurngameHelperDuplicate(done) {
+    console.log("purposely failed invite to turngame");
+    var game = new ganomede.GanomedeGame({
+        type: client.options.games.type,
+        players: [ "testuser", "testuser2" ]
+    });
+    var turngameInvitation = new ganomede.helpers.GanomedeTurnGameInvitation(client);
+    turngameInvitation.send(game)
+    .then(function(res) {
+        console.error("sending duplicate invitation should fail (inviteTurngameHelper)");
+        process.exit(1);
+    })
+    .error(function(err) {
+        done();
+    });
+}
+
+function inviteTurngameHelper(done) {
+    console.log("invite to turngame");
+    var game = new ganomede.GanomedeGame({
+        type: client.options.games.type,
+        players: [ "testuser", "testuserx" ]
+    });
+    client.invitations.cancel(new ganomede.GanomedeInvitation({
+        id: 'd7bb8f947ac624dc43d36943a6550518',
+        type: client.options.games.type,
+        from: "testuser",
+        to: "testuserx"
+    }))
+    .always(function() {
+        // ganomede.net.Ajax.verbose = true;
+        var turngameInvitation = new ganomede.helpers.GanomedeTurnGameInvitation(client);
+        turngameInvitation.send(game)
+        .then(function(res) {
+            if (!turngameInvitation.id) {
+                console.error("turngameInvitation should have an id");
+                process.exit(1);
+            }
+            client.invitations.cancel(turngameInvitation)
+            .then(done)
+            .error(function(err) {
+                console.error("cancel invitation should not fail (inviteTurngameHelper)");
+                console.dir(err);
+                process.exit(1);
+            });
+        })
+        .error(function(err) {
+            console.error("sending invitation should not fail (inviteTurngameHelper)");
+            console.dir(err);
+            process.exit(1);
+        });
     });
 }
 
@@ -306,10 +361,12 @@ initialize(
     createGame2P.bind(null,
     createTurnGame2P.bind(null,
     createGame1P.bind(null,
+    inviteTurngameHelperDuplicate.bind(null,
+    inviteTurngameHelper.bind(null,
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-)))))))))))))));
+)))))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

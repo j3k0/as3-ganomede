@@ -1,6 +1,7 @@
 package fovea.ganomede;
 
 import fovea.async.*;
+import fovea.ganomede.helpers.*;
 
 @:expose
 class Ganomede
@@ -53,5 +54,6 @@ class Ganomede
     public function _fake():Void {
         var pr:PromiseRunner = null;
         var wf:Waterfall = null;
+        var tgi:GanomedeTurnGameInvitation = null;
     }
 }
