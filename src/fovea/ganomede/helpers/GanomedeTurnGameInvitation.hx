@@ -15,15 +15,16 @@ package fovea.ganomede.helpers;
 
 import fovea.async.*;
 import fovea.net.AjaxError;
+import openfl.utils.Object;
 
 @:expose
 class GanomedeTurnGameInvitation extends GanomedeInvitation
 {
     private var client:Ganomede;
 
-    public function new(client:Ganomede) {
+    public function new(client:Ganomede, obj:Object = null) {
         this.client = client;
-        super();
+        super(obj);
     }
 
     private function alreadyHasGameWith(friend:String):Bool {
@@ -103,6 +104,15 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
     }
 
     public function accept():Promise {
-        return null;
+        return Waterfall.run([
+            function():Promise {
+                return client.invitations.accept(this);
+            },
+            function():Promise {
+                return client.games.join(new GanomedeGame({
+                    id: this.gameId
+                }));
+            }
+        ]);
     }
 }
