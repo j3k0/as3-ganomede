@@ -79,7 +79,7 @@ class GanomedeTurnGamesComposite
 
         if (turngame.url != null) {
             prepareClient(turngame)
-            .then(function(result) {
+            .then(function(result:Dynamic):Void {
                 var client:GanomedeClient = cast result.client;
                 client.turngames.refresh(turngame)
                 .then(function(outcome:Dynamic):Void {
