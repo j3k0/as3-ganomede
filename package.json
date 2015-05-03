@@ -4,7 +4,7 @@
   "description": "Ganomede client library",
   "main": "index.js",
   "scripts": {
-    "test": "node src-js/test.js"
+    "test": "node src-js/test.js || node src-js/test.js"
   },
   "repository": {
     "type": "git",
