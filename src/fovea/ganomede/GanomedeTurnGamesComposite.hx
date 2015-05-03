@@ -45,7 +45,7 @@ class GanomedeTurnGamesComposite
                     username: this.client.users.me.username,
                     password: this.client.users.me.password
                 }))
-                .then(function(result:Dynamic):Void {
+                .then(function(outcome:Dynamic):Void {
                     idMap.set(game.id, result.id);
                     deferred.resolve(result);
                 })
@@ -82,7 +82,7 @@ class GanomedeTurnGamesComposite
             .then(function(result) {
                 var client:GanomedeClient = cast result.client;
                 client.turngames.refresh(turngame)
-                .then(function(result:Dynamic):Void {
+                .then(function(outcome:Dynamic):Void {
                     idMap.set(turngame.id, result.id);
                     deferred.resolve(result);
                 })
