@@ -82,7 +82,10 @@ class GanomedeTurnGamesComposite
             .then(function(result) {
                 var client:GanomedeClient = cast result.client;
                 client.turngames.refresh(turngame)
-                .then(deferred.resolve)
+                .then(function(result:Dynamic):Void {
+                    idMap.set(turngame.id, result.id);
+                    deferred.resolve(result);
+                })
                 .error(deferred.reject);
             })
             .error(deferred.reject);
