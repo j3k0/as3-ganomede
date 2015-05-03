@@ -14,6 +14,7 @@ class Ganomede
     public var invitations(default,null):GanomedeInvitations;
     public var notifications(default,null):GanomedeNotifications;
     public var games(default,null):GanomedeGames;
+    public var turngames(default,null):GanomedeTurnGamesComposite;
 
     private var url:String;
     private var options:Dynamic;
@@ -28,6 +29,7 @@ class Ganomede
     //  - options.users.enabled: enable the users module
     //  - options.notifications.enabled: enable the notifications module
     //  - options.invitations.enabled: enable the invitations module
+    //  - options.turngames.enabled: enable the turngames module
     public function new(url:String, options:Dynamic) {
         this.url = url;
         this.options = options;
@@ -42,6 +44,7 @@ class Ganomede
             this.invitations = this.client.invitations;
             this.notifications = this.client.notifications;
             this.games = this.client.games;
+            this.turngames = new GanomedeTurnGamesComposite(client, pool);
             this.initialized = true;
         });
     }

@@ -14,6 +14,7 @@ function initialize(done) {
         users: { enabled: true },
         notifications: { enabled: true },
         invitations: { enabled: true },
+        turngames: { enabled: true },
         games: {
             enabled: true,
             type: "triominos/v1"
@@ -190,6 +191,7 @@ function leaveAllGames(done) {
     }
 }
 
+var game2p;
 function createGame2P(done) {
     var a0 = client.games.asArray();
     if (a0.length != 0) {
@@ -200,6 +202,7 @@ function createGame2P(done) {
         type: client.options.games.type,
         players: [ "testuser", "testuser2" ]
     });
+    console.log("create 2 players game");
     client.games.add(g)
     .then(function(res) {
         var a1 = client.games.asArray();
@@ -211,10 +214,34 @@ function createGame2P(done) {
             console.log("game id and url should have been generated");
             process.exit(1);
         }
+        game2p = g;
         done();
     })
     .error(function(err) {
         console.error("games error (addGame)");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
+function createTurnGame2P(done) {
+    var g = new ganomede.GanomedeTurnGame().fromGame(game2p);
+    console.log("create 2 players turngame");
+    client.turngames.add(g)
+    .then(function(res) {
+        if (g.turn != game2p.players[0] && g.turn != game2p.players[1]) {
+            console.log("it should be to one of the players to play");
+            console.log(g.turn, game2p.players);
+            process.exit(1);
+        }
+        if (g.gameData.stock.pieces.length != 33) {
+            console.log("stock should have 33 pieces");
+            process.exit(1);
+        }
+        done();
+    })
+    .error(function(err) {
+        console.error("turngames error (addGame)");
         console.dir(err);
         process.exit(1);
     });
@@ -277,11 +304,12 @@ initialize(
     refreshGames.bind(null,
     leaveAllGames.bind(null,
     createGame2P.bind(null,
+    createTurnGame2P.bind(null,
     createGame1P.bind(null,
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-))))))))))))));
+)))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

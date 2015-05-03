@@ -130,7 +130,7 @@ package tests
         public function testInitialize():Promise {
             trace("testInitialize");
             var deferred:Deferred = new Deferred();
-            var client:GanomedeClient = new GanomedeClient(GANOMEDE_URL, {
+            var client:Ganomede= new Ganomede(GANOMEDE_URL, {
                 registry: { enabled: true }
             });
 

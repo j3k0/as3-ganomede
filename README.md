@@ -13,6 +13,13 @@ Jean-Christophe Hoelt <hoelt@fovea.cc>
 # License
 GPL v3
 
+# High-level concepts
+
+ * `Ganomede`:
+   * single entry point to an array of services, potentially running on different clusters
+ * `GanomedeClient`:
+   * entry point to a single cluster
+
 # Javascript Documentation
 
 ## API
