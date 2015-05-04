@@ -10,9 +10,9 @@ class ApiError extends AjaxError
     public static inline var INVALID:String = "StormpathResourceError400";
     public static inline var ALREADY_EXISTS:String = "StormpathResourceError2001";
 
-    public function new(pcode:String, pstatus:Int = 0, pdata:Object = null)
+    public function new(pcode:String, pstatus:Int = 0, pdata:Object = null, purl:String = null)
     {
-        super(pcode, pstatus, pdata);
+        super(pcode, pstatus, pdata, purl);
 
         // API Message
         if (data != null && data.message)

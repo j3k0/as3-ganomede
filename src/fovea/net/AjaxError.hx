@@ -15,21 +15,26 @@ class AjaxError extends Error
     // IO Error statuses
     public static inline var IO_ERROR_JSON = 1;
 
-    public function new(pcode:String, pstatus:Int = 0, pdata:Object = null)
+    public function new(pcode:String, pstatus:Int = 0, pdata:Object = null, purl:String = null)
     {
         var msg:String = "AjaxError[" + pcode + "]";
         if (pstatus != 0) {
             msg += " status:" + pstatus;
         }
+        if (purl != null) {
+            msg += " url:" + purl;
+        }
         super(msg, 1838012);
         this.code = pcode;
         this.status = pstatus;
         this.data = pdata;
+        this.url = purl;
     }
 
     public var code(default,null):String = null;
     public var status(default,null):Int = 0;
     public var data(default,null):Object = null;
+    public var url:String = null;
 }
 
 // vim: sw=4:ts=4:et:

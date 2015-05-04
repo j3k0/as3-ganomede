@@ -51,8 +51,8 @@ class ApiClient extends Ajax
         return p;
     }
 
-    private override function ajaxError(code:String, status:Int = 0, data:Object = null):AjaxError {
-        return new ApiError(code, status, data);
+    private override function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
+        return new ApiError(code, status, data, url);
     }
 
     private override function beforeAjax(options:Object):Void {

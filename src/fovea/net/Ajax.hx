@@ -32,8 +32,8 @@ class Ajax extends Events
 
     private function beforeAjax(options:Object):Void {}
     private function afterAjax(options:Object, obj:Object):Void {}
-    private function ajaxError(code:String, status:Int = 0, data:Object = null):AjaxError {
-        return new AjaxError(code, status, data);
+    private function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
+        return new AjaxError(code, status, data, url);
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
@@ -209,8 +209,12 @@ class Ajax extends Events
 
     private function beforeAjax(options:Object):Void {}
     private function afterAjax(options:Object, obj:Object):Void {}
-    private function ajaxError(code:String, status:Int = 0, data:Object = null):AjaxError {
-        return new AjaxError(code, status, data);
+    private function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
+        return new AjaxError(code, status, data, url);
+    }
+
+    public function reqUrl(reqOptions:HttpReqOpt):String {
+        return reqOptions.method + " " + reqOptions.host + ":" + reqOptions.port + "/" + reqOptions.path;
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
@@ -265,7 +269,7 @@ class Ajax extends Events
                             trace("[AJAX " + options.requestID + "] " + err.stack);
                         else
                             trace("[AJAX " + options.requestID + "] " + err);
-                        deferred.reject(ajaxError(AjaxError.IO_ERROR, AjaxError.IO_ERROR_JSON, data));
+                        deferred.reject(ajaxError(AjaxError.IO_ERROR, AjaxError.IO_ERROR_JSON, data, reqUrl(reqOptions)));
                         return;
                     }
                     var obj:Object = {
@@ -277,12 +281,12 @@ class Ajax extends Events
                     deferred.resolve(obj);
                     return;
                 }
-                deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
+                deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data, reqUrl(reqOptions)));
             });
         });
 
         req.on("error", function(error:Dynamic):Void {
-            deferred.reject(ajaxError(AjaxError.IO_ERROR, 0, error.message));
+            deferred.reject(ajaxError(AjaxError.IO_ERROR, 0, error.message, reqUrl(reqOptions)));
         });
 
         if (options.data) {
