@@ -97,6 +97,19 @@ class GanomedeTurnGamesComposite
         return deferred;
     }
 
+    public function addMove(turngame:GanomedeTurnGame, turnmove:GanomedeTurnMove):Promise {
+        var deferred:Deferred = new Deferred();
+        prepareClient(turngame)
+        .then(function(result:Dynamic):Void {
+            var client:GanomedeClient = cast result.client;
+            client.turngames.addMove(turngame, turnmove)
+            .then(deferred.resolve)
+            .error(deferred.reject);
+        })
+        .error(deferred.reject);
+        return deferred;
+    }
+
     public function refreshArray(array:Array<GanomedeTurnGame>):Promise {
         return Parallel.runWithArgs(array, refresh);
     }

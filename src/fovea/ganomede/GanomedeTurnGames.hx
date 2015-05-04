@@ -83,6 +83,20 @@ class GanomedeTurnGames extends UserClient
         });
     }
 
+    public function addMove(turngame:GanomedeTurnGame, move:GanomedeTurnMove):Promise {
+        if (!client.users.me.isAuthenticated()) {
+            if (Ajax.verbose) trace("cant add move to turngame: not authenticated");
+            return error(AjaxError.CLIENT_ERROR);
+        }
+        return executeAuth(function():Promise {
+            var turngamesClient:GanomedeTurnGameClient = cast authClient;
+            return turngamesClient.addMove(turngame, move);
+        })
+        .then(function(outcome:Dynamic):Void {
+            collection.merge(turngame.toJSON());
+        });
+    }
+
     // Refresh the turngames which IDs are in the array parameter.
     public function refreshArray(array:Array<String>):Promise {
         return Parallel.runWithArgs(array, function(id:String):Promise {

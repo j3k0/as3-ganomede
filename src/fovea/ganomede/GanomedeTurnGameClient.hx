@@ -45,7 +45,7 @@ class GanomedeTurnGameClient extends AuthenticatedClient
             return deferred;
         }
         return ajax("POST", "/games/" + game.id + "/moves", {
-            data: game.toJSON()
+            data: move.toJSON()
         }).then(function(result:Object):Void {
             game.fromJSON(result.data);
             move.fromJSON(result.data);
