@@ -19,7 +19,7 @@ class GanomedeTurnGameClient extends AuthenticatedClient
             deferred.reject(new ApiError(AjaxError.HTTP_ERROR, 400));
             return deferred;
         }
-        return ajax("GET", "/games/" + game.id, {})
+        return ajax("GET", "/games/" + game.id)
         .then(function(result:Object):Void {
             game.fromJSON(result.data);
         });
