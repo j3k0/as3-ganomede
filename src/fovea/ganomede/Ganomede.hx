@@ -47,7 +47,27 @@ class Ganomede
             this.games = this.client.games;
             this.turngames = new GanomedeTurnGamesComposite(client, pool);
             this.initialized = true;
+            callReady();
         });
+    }
+
+    private var readyArray = new Array<Deferred>();
+    public function ready():Promise {
+        var deferred:Deferred = new Deferred();
+        if (this.initialized) {
+            deferred.resolve(null);
+        }
+        else {
+            readyArray.push(deferred);
+        }
+        return deferred;
+    }
+    private function callReady():Void {
+        var a = readyArray;
+        readyArray = new Array<Deferred>();
+        for (i in 0...a.length) {
+            a[i].resolve(null);
+        }
     }
 
     // Just make sure all classes are exported
