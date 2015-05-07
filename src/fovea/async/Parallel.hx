@@ -41,6 +41,10 @@ class Parallel
     }
 
     public static function runWithArgs(args:Array<Dynamic>, fn:Dynamic->Promise) : Promise {
+        return privRunWithArgs(args.copy(), fn);
+    }
+
+    private static function privRunWithArgs(args:Array<Dynamic>, fn:Dynamic->Promise) : Promise {
         var deferred:Deferred = new Deferred();
 
         if (args.length == 0) {
@@ -58,7 +62,7 @@ class Parallel
 
             var a:Dynamic = args.shift();
             fn(a).then(done).error(deferred.reject);
-            runWithArgs(args, fn).then(done).error(deferred.reject);
+            privRunWithArgs(args, fn).then(done).error(deferred.reject);
         }, 0);
 
         return deferred;
