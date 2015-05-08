@@ -16,7 +16,9 @@ class GanomedeTurnGamesComposite extends Events
     private var idMap = new StringMap<Int>();
 
     public function new(client:GanomedeClient, pool:GanomedeClientsPool) {
+#if flash
         super();
+#end
         this.pool = pool;
         this.client = client;
     }
