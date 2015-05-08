@@ -4,9 +4,11 @@ import fovea.async.*;
 import openfl.utils.Object;
 import haxe.ds.StringMap;
 import fovea.net.AjaxError;
+import fovea.events.Events;
+import fovea.events.Event;
 
 @:expose
-class GanomedeTurnGamesComposite
+class GanomedeTurnGamesComposite extends Events
 {
     private var pool:GanomedeClientsPool;
     private var client:GanomedeClient;
@@ -31,6 +33,28 @@ class GanomedeTurnGamesComposite
         return deferred;
     }
 
+    private var listenedToMap = new StringMap<Bool>();
+    private function listenToClient(id:Int, client:GanomedeClient):Void {
+        if (listenedToMap.exists('' + id)) {
+            return;
+        }
+        listenedToMap.set('' + id, true);
+        if (client.notifications != null) {
+            client.notifications.listenTo("turngame/v1", function(e:Event):Void {
+                var event:GanomedeNotificationEvent = cast e;
+                // refresh the updated game
+                if (event.notification.type == "move") {
+                    var gameJson:Object = event.notification.data.game;
+                    var game:GanomedeTurnGame = get(gameJson.id);
+                    if (game != null) {
+                        game.fromJSON(gameJson);
+                        dispatchEvent(new GanomedeTurnGameEvent(game));
+                    }
+                }
+            });
+        }
+    }
+
     private function prepareClient(game:GanomedeTurnGame):Promise {
         var deferred:Deferred = new Deferred();
         pool.initializeClient(game.url, {
@@ -40,6 +64,7 @@ class GanomedeTurnGamesComposite
         })
         .then(function(result):Void {
             var client:GanomedeClient = cast result.client;
+            listenToClient(result.id, client);
             if (!client.users.me.isAuthenticated()) {
                 client.users.login(new GanomedeUser({
                     username: this.client.users.me.username,
