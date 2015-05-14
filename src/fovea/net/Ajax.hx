@@ -168,6 +168,7 @@ import js.node.Http.HttpClient;
 import js.node.Http.HttpReqOpt;
 import js.node.Http.HttpClientResp;
 import js.node.Http;
+import js.node.Https;
 import fovea.events.Events;
 
 //import lime.events.Event;
@@ -201,7 +202,7 @@ class Ajax extends Events
         // extract host and port
         var hostPort = url.split("/")[2];
         this.host = hostPort.split(":")[0];
-        this.port = 80;
+        this.port = (this.protocol == "https" ? 443 : 80);
         if (this.host != hostPort) {
             this.port = Std.parseInt(hostPort.split(":")[1]);
         }
@@ -215,6 +216,24 @@ class Ajax extends Events
 
     public function reqUrl(reqOptions:HttpReqOpt):String {
         return reqOptions.method + " " + reqOptions.host + ":" + reqOptions.port + "/" + reqOptions.path;
+    }
+
+    public function prepareRequest(reqOptions:HttpReqOpt, callback:HttpClientResp->Void):ClientRequest {
+        if (this.protocol == "https") {
+            var reqsOptions:HttpsReqOpt = {
+                host: reqOptions.host,
+                port: reqOptions.port,
+                path: reqOptions.path,
+                method: reqOptions.method,
+                headers: reqOptions.headers,
+                ciphers: null,
+                rejectUnauthorized: null
+            };
+            return Https.request(reqsOptions, callback);
+        }
+        else {
+            return Http.request(reqOptions, callback);
+        }
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
@@ -247,9 +266,20 @@ class Ajax extends Events
                 'Content-Length': data.length
             }
         };
+        var req = prepareRequest(reqOptions, function(res:HttpClientResp):Void {
+        /* var reqOptions:HttpReqOpt = {
+            host: this.host,
+            port: this.port,
+            path: this.path + "/" + path,
+            method: method,
+            headers: {
+                "Content-type": "application/json",
+                'Content-Length': data.length
+            }
+        };
 
         // Prepare the request
-        var req = Http.request(reqOptions, function(res:HttpClientResp):Void {
+        var req = Http.request(reqOptions, function(res:HttpClientResp):Void { */
             var status = res.statusCode;
             var data = "";
             res.on("data", function(chunk:String):Void {
