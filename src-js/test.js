@@ -71,6 +71,63 @@ function profile(done) {
     });
 }
 
+function metadata(done) {
+    ganomede.async.Waterfall.run([
+        function() {
+            console.log("readMetadata unknown");
+            return client.users.loadMetadata("invalid-key")
+            .then(function(result) {
+                if (result.value != null) {
+                    console.error("metadata error (invalid-key)");
+                    console.dir(result);
+                    process.exit(1);
+                }
+            });
+        },
+        function() {
+            console.log("saveMetadata val1");
+            return client.users.saveMetadata("my-key", "val1")
+            .then(console.dir);
+        },
+        function() {
+            console.log("readMetadata val1");
+            return client.users.loadMetadata("my-key")
+            .then(function(result) {
+                if (result.value != "val1") {
+                    console.error("metadata error (val1)");
+                    console.dir(result);
+                    process.exit(1);
+                }
+            });
+        },
+        function() {
+            console.log("saveMetadata val2");
+            return client.users.saveMetadata("my-key", "val2")
+            .then(console.dir);
+        },
+        function() {
+            console.log("readMetadata val2");
+            return client.users.loadMetadata("my-key")
+            .then(function(result) {
+                if (result.value != "val2") {
+                    console.error("metadata error (val2)");
+                    console.dir(result);
+                    process.exit(1);
+                }
+            });
+        }
+    ])
+    .error(function metadataError(err) {
+        console.error("metadata error");
+        console.dir(err);
+        process.exit(1);
+    })
+    .then(function() {
+        console.log("metadata success");
+        done();
+    });
+}
+
 function refreshInvitations(done) {
     client.invitations.refreshArray()
     .then(done)
@@ -352,6 +409,7 @@ initialize(
     testStrategyChain.bind(null,
     login.bind(null,
     profile.bind(null,
+    metadata.bind(null,
     refreshInvitations.bind(null,
     invitations.bind(null,
     notifications.bind(null,
@@ -366,7 +424,7 @@ initialize(
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-)))))))))))))))));
+))))))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

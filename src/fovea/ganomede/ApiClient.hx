@@ -17,7 +17,17 @@ class ApiClient extends Ajax
     }
 
     public function service(type:String):ApiClient {
-        return new ApiClient(this.url + "/" + type);
+        var separator:String = "/";
+        if (this.url.length > 0 && this.url.charAt(this.url.length - 1) == '/')
+            separator = "";
+        if (type.length > 0 && type.charAt(0) == '/')
+            separator = "";
+        return new ApiClient(this.url + separator + type);
+    }
+
+    public function setCache(method:String, path:String, value:Object):Void {
+        var cacheID = method + ":" + path;
+        cache.set(cacheID, value);
     }
 
     public function cached(method:String, path:String):Object {

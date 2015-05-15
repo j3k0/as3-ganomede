@@ -81,6 +81,47 @@ class GanomedeUsers extends ApiClient
         return deferred;
     }
 
+    // Retrieve metadata for a user, cache the result.
+    // Note, saving metadata have to update the cache, or this will fail miserably!
+    public function loadUserMetadata(username:String, key:String):Promise {
+        var deferred:Deferred = new Deferred();
+        var endpoint:String = "/" + username + "/metadata/" + key;
+        var obj:Object = cached("GET", endpoint);
+        if (obj) {
+            deferred.resolve(obj.data);
+        }
+        else {
+            cachedAjax("GET", endpoint)
+            .then(function(obj:Object):Void {
+                deferred.resolve(obj.data);
+            })
+            .error(deferred.reject);
+        }
+        return deferred;
+    }
+
+    // Load some metadata for the current user
+    public function loadMetadata(key:String):Promise {
+        return loadUserMetadata(me.username, key);
+    }
+
+    // Save metadata for the current user
+    public function saveMetadata(key:String, value:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/metadata/" + key;
+        var data:Object = { value: value };
+        return ajax("POST", endpoint, {
+            data: data
+        })
+        .then(function(outcome:Object):Void {
+            // Update the GET cache...
+            var endpoint:String = "/" + me.username + "/metadata/" + key;
+            setCache("GET", endpoint, {
+                status: 200,
+                data: data
+            });
+        });
+    }
+
     private function parseMe(obj:Object):Object {
         var oldToken:String = me.token;
         var oldUsername:String = me.username;
