@@ -75,5 +75,6 @@ class Ganomede
         var pr:PromiseRunner = null;
         var wf:Waterfall = null;
         var tgi:GanomedeTurnGameInvitation = null;
+        var tgim:GanomedeTurnGameMover = null;
     }
 }

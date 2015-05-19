@@ -79,6 +79,15 @@ class GanomedeGames extends UserClient
         });
     }
 
+    public function gameover(game:GanomedeGame, gameOverData:Object):Promise {
+        return executeAuth(function():Promise {
+            return cast(authClient, GanomedeCoordinatorClient).gameover(game, gameOverData);
+        })
+        .then(function(outcome:Dynamic):Void {
+            collection.merge(game.toJSON());
+        });
+    }
+
     public function refreshArray():Promise {
         return refreshCollection(collection, function():Promise {
             return cast(authClient, GanomedeCoordinatorClient).activeGames(type)

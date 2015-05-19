@@ -10,6 +10,7 @@ class GanomedeGame extends Model {
     public var waiting:Array<String>;
     public var status:String;
     public var url:String;
+    public var gameOverData:Object;
 
     public function new(obj:Object = null) {
         super(obj);
@@ -22,6 +23,7 @@ class GanomedeGame extends Model {
         if (obj.waiting) waiting = obj.waiting;
         if (obj.status) status = obj.status;
         if (obj.url) url = obj.url;
+        if (obj.gameOverData) gameOverData = obj.gameOverData;
     }
 
     public override function toJSON():Object {
@@ -31,7 +33,8 @@ class GanomedeGame extends Model {
             players:players,
             waiting:waiting,
             status:status,
-            url:url
+            url:url,
+            gameOverData:gameOverData
         };
     }
 }

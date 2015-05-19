@@ -52,6 +52,19 @@ class GanomedeCoordinatorClient extends AuthenticatedClient
         });
     }
 
+    public function gameover(game:GanomedeGame, gameOverData:Object):Promise {
+        return ajax("POST", "/games/" + game.id + "/gameover", {
+            data: {
+                gameOverData: gameOverData
+            }
+        })
+        .then(function(result:Object):Void {
+            if (result.data.id) {
+                game.fromJSON(result.data);
+            }
+        });
+    }
+
     /* private function parseArray(obj:Object):Object {
         var array:Array<Object> = cast(obj, Array<Object>);
         if (array == null) {

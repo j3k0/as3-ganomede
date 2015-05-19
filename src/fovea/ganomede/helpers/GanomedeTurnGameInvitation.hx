@@ -31,9 +31,11 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
         var array = client.games.collection.asArray();
         for (i in 0...array.length) {
             var g:GanomedeGame = cast array[i];
-            for (j in 0...g.players.length) {
-                if (g.players[j] == friend) {
-                    return true;
+            if (g.status != "gameover") {
+                for (j in 0...g.players.length) {
+                    if (g.players[j] == friend) {
+                        return true;
+                    }
                 }
             }
         }
