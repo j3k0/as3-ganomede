@@ -53,13 +53,13 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
         return false;
     }
 
-    public function send(game:GanomedeGame):Promise {
+    public function send(game:GanomedeGame, force:Bool = false):Promise {
         var friend:String = game.players[game.players.length - 1];
         return Waterfall.run([
             // Check game not exists
             function():Promise {
                 var deferred:Deferred = new Deferred();
-                if (alreadyHasGameWith(friend)) {
+                if (!force && alreadyHasGameWith(friend)) {
                     deferred.reject(new ApiError(AjaxError.HTTP_ERROR, 400, {
                         code: "DuplicateGame",
                         message: "A game with this player already exists"
@@ -73,7 +73,7 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
             // Check invitation not exists
             function():Promise {
                 var deferred:Deferred = new Deferred();
-                if (alreadyHasInvitationTo(friend)) {
+                if (!force && alreadyHasInvitationTo(friend)) {
                     deferred.reject(new ApiError(AjaxError.HTTP_ERROR, 400, {
                         code: "DuplicateInvitation",
                         message: "An invitation with this player already exists"
