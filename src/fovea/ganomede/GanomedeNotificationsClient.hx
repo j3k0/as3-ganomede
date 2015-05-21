@@ -34,6 +34,10 @@ class GanomedeNotificationsClient extends AuthenticatedClient
         .error(pollError);
     }
 
+    public function online():Promise {
+        return ajax("GET", "/online");
+    }
+
     public function pollSuccess(outcome:Dynamic):Void {
         outcome.token = this.token;
         outcome.clientId = this.clientId;

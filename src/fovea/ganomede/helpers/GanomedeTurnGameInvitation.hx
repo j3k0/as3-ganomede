@@ -53,6 +53,10 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
         return false;
     }
 
+    public function canInvite(friend:String):Bool {
+        return !alreadyHasGameWith(friend) && !alreadyHasInvitationTo(friend);
+    }
+
     public function send(game:GanomedeGame, force:Bool = false):Promise {
         var friend:String = game.players[game.players.length - 1];
         return Waterfall.run([

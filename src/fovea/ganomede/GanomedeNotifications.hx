@@ -110,5 +110,13 @@ class GanomedeNotifications extends UserClient
             data: data
         });
     }
+
+    public var online:Array<String> = [];
+    public function refreshOnline():Promise {
+        return ajax("GET", "/online")
+        .then(function(outcome:Object):Void {
+            online = outcome.data;
+        });
+    }
 }
 // vim: sw=4:ts=4:et:
