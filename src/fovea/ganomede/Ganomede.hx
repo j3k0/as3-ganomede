@@ -16,6 +16,7 @@ class Ganomede
     public var notifications(default,null):GanomedeNotifications;
     public var games(default,null):GanomedeGames;
     public var turngames(default,null):GanomedeTurnGamesComposite;
+    public var avatars(default,null):GanomedeAvatars;
 
     private var url:String;
     private var options:Dynamic;
@@ -46,6 +47,7 @@ class Ganomede
             this.notifications = this.client.notifications;
             this.games = this.client.games;
             this.turngames = new GanomedeTurnGamesComposite(client, pool);
+            this.avatars = this.client.avatars;
             this.initialized = true;
             callReady();
         });
