@@ -14,6 +14,7 @@ class GanomedeClient extends ApiClient
     public var notifications(default,null):GanomedeNotifications;
     public var games(default,null):GanomedeGames;
     public var turngames(default,null):GanomedeTurnGames;
+    public var avatars(default,null):GanomedeAvatars;
 
     public var options(default,null):Dynamic = {}
 
@@ -41,6 +42,7 @@ class GanomedeClient extends ApiClient
         if (!options.invitations) options.invitations = {};
         if (!options.users) options.users = {};
         if (!options.turngames) options.turngames = {};
+        if (!options.avatars) options.avatars = {};
 
         if (options.registry.enabled)
             registry = new GanomedeRegistry(this, url + "/registry/v1");
@@ -54,6 +56,8 @@ class GanomedeClient extends ApiClient
             games = new GanomedeGames(this, options.games.type);
         if (options.turngames.enabled)
             turngames = new GanomedeTurnGames(this);
+        if (options.avatars.enabled)
+            avatars = new GanomedeAvatars(this);
     }
 
     public function initialize():Promise {
@@ -64,6 +68,7 @@ class GanomedeClient extends ApiClient
         if (notifications != null) a.push(notifications.initialize);
         if (games != null) a.push(games.initialize);
         if (turngames != null) a.push(turngames.initialize);
+        if (avatars != null) a.push(avatars.initialize);
         return Parallel.run(a)
         .then(function(outcome:Dynamic):Void {
             initialized = true;
