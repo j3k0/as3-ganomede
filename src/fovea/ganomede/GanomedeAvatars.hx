@@ -62,7 +62,8 @@ class GanomedeAvatars extends ApiClient
             if (Ajax.verbose) trace("[AVATARS] Complete (" + status + ")");
             removeListeners();
             var obj:Object = {
-                status: status
+                status: status,
+                url: my("original.png")
             };
             deferred.resolve(obj);
         };
@@ -100,11 +101,19 @@ class GanomedeAvatars extends ApiClient
     //  - 256.png
     //  - 128.png
     //  - 64.png
-    public function load(username:String, version:String):Promise {
-      //return ajax("GET", 
-        return null;
-    }
 #end
+
+    public function user(username:String, version:String):String {
+        if (cdnHost != null)
+            return "http://" + cdnHost + "/" + TYPE + "/" + username + "/" + version;
+        else
+            return url + "/" + username + "/" + version;
+    }
+
+    public function my(version:String):String {
+        var username = client.users.me.username;
+        return url + "/" + username + "/" + version + "?r=" + Math.random();
+    }
 }
 
 // vim: sw=4:ts=4:et:
