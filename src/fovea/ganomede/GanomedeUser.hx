@@ -9,6 +9,7 @@ class GanomedeUser {
     public var surname:String;
     public var email:String;
     public var password:String;
+    public var facebookId:String;
     public var facebookToken:String;
 
     public var token(default,set):String = null;
@@ -30,6 +31,7 @@ class GanomedeUser {
             email = obj.email;
             password = obj.password;
             token = obj.token;
+            facebookId = obj.facebookId;
             facebookToken = obj.facebookToken;
         }
     }
@@ -41,6 +43,7 @@ class GanomedeUser {
         if (obj.email) email = obj.email;
         if (obj.password) password = obj.password;
         if (obj.token) token = obj.token;
+        if (obj.facebookId) facebookId = obj.facebookId;
         if (obj.facebookToken) facebookToken = obj.facebookToken;
     }
 
@@ -52,6 +55,7 @@ class GanomedeUser {
             email: email,
             password: password,
             token: token,
+            facebookId: facebookId,
             facebookToken: facebookToken
         };
     }

@@ -50,6 +50,7 @@ class GanomedeUsers extends ApiClient
             data: {
                 username: user.username,
                 password: user.password,
+                facebookId: user.facebookId,
                 facebookToken: user.facebookToken
             },
             parse: parseMe
