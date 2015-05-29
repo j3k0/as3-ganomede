@@ -49,7 +49,8 @@ class GanomedeUsers extends ApiClient
         return ajax("POST", "/login", {
             data: {
                 username: user.username,
-                password: user.password
+                password: user.password,
+                facebookToken: user.facebookToken
             },
             parse: parseMe
         })

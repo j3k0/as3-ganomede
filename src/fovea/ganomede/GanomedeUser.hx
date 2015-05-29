@@ -9,6 +9,7 @@ class GanomedeUser {
     public var surname:String;
     public var email:String;
     public var password:String;
+    public var facebookToken:String;
 
     public var token(default,set):String = null;
     public function set_token(value:String):String {
@@ -29,6 +30,7 @@ class GanomedeUser {
             email = obj.email;
             password = obj.password;
             token = obj.token;
+            facebookToken = obj.facebookToken;
         }
     }
 
@@ -39,6 +41,7 @@ class GanomedeUser {
         if (obj.email) email = obj.email;
         if (obj.password) password = obj.password;
         if (obj.token) token = obj.token;
+        if (obj.facebookToken) facebookToken = obj.facebookToken;
     }
 
     public function toJSON():Object {
@@ -48,7 +51,8 @@ class GanomedeUser {
             surname: surname,
             email: email,
             password: password,
-            token: token
+            token: token,
+            facebookToken: facebookToken
         };
     }
 }
