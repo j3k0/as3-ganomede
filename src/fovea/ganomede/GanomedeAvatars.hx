@@ -65,6 +65,7 @@ class GanomedeAvatars extends ApiClient
                 status: status,
                 url: my("original.png")
             };
+            dispatchEvent(new Event(GanomedeEvents.CHANGE));
             deferred.resolve(obj);
         };
         var ioError = function(event:IOErrorEvent):Void {
