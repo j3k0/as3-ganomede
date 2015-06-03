@@ -18,7 +18,7 @@ class Ganomede
     public var turngames(default,null):GanomedeTurnGamesComposite;
     public var avatars(default,null):GanomedeAvatars;
 
-    private var url:String;
+    public var url(default,null):String;
     private var options:Dynamic;
 
     // Constructor
