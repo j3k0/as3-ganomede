@@ -34,10 +34,14 @@ class GanomedeAvatars extends ApiClient
 
     public function initialize():Promise {
         return ajax("GET", "/about")
-        .then(function(o:Object):Void {
+        .then(function(outcome:Object):Void {
+            var o:Object = outcome.data;
             initialized = true;
-            if (o && o.config && o.cdnHost) {
-                cdnHost = o.config.cdnHost;
+            if (o && o.config) {
+                if (o.config.cdnHost)
+                    cdnHost = o.config.cdnHost;
+                else if (o.config.cdn)
+                    cdnHost = o.config.cdn;
             }
         });
     }
