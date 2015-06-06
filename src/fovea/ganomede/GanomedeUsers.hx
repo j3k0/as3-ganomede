@@ -48,6 +48,14 @@ class GanomedeUsers extends ApiClient
         return ajax("POST", "/auth/" + me.token + "/passwordResetEmail");
     }
 
+    public function forgotPassword(email:String):Promise {
+        return ajax("POST", "/passwordResetEmail", {
+            data: {
+                email: email
+            }
+        });
+    }
+
     public function login(user:GanomedeUser):Promise {
         me = user;
         return ajax("POST", "/login", {
