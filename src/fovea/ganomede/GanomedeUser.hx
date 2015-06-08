@@ -37,6 +37,7 @@ class GanomedeUser {
     }
 
     public function fromJSON(obj:Object):Void {
+        if (obj == null) return;
         if (obj.username) username = obj.username;
         if (obj.givenName) givenName = obj.givenName;
         if (obj.surname) surname = obj.surname;

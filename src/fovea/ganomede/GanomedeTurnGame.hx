@@ -25,6 +25,7 @@ class GanomedeTurnGame extends Model {
     }
 
     public override function fromJSON(obj:Object):Void {
+        if (obj == null) return;
         if (obj.id && id != obj.id) { id = obj.id; dispatchUpdate(); }
         if (obj.type && type != obj.type) { type = obj.type; dispatchUpdate(); }
         if (obj.players && players != obj.players) { players = obj.players; dispatchUpdate(); }

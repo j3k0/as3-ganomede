@@ -14,6 +14,7 @@ class GanomedeService
     public var pingMs:Int;
 
     public function new(obj:Object) {
+        if (obj == null) return;
         type = obj.type;
         version = obj.version;
         description = obj.description;

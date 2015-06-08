@@ -25,6 +25,7 @@ class GanomedeNotification {
     }
 
     public function fromJSON(obj:Object):Void {
+        if (obj == null) return;
         if (obj.id) id = obj.id;
         if (obj.type) type = obj.type;
         if (obj.to) to = obj.to;

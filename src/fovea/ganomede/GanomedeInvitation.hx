@@ -26,6 +26,7 @@ class GanomedeInvitation extends Model {
     } */
 
     public override function fromJSON(obj:Object):Void {
+        if (obj == null) return;
         if (obj.id) id = obj.id;
         if (obj.gameId) gameId = obj.gameId;
         if (obj.type) type = obj.type;
