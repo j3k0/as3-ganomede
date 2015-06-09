@@ -26,8 +26,12 @@ class GanomedeTurnGamesComposite extends Events
     public function add(turngame:GanomedeTurnGame):Promise {
         var deferred:Deferred = new Deferred();
         prepareClient(turngame)
-        .then(function(result:Dynamic):Void {
+        .then(function clientPrepared(result:Dynamic):Void {
             var client:GanomedeClient = cast result.client;
+            if (client == null || client.turngames == null) {
+                deferred.reject(new ApiError(AjaxError.CLIENT_ERROR, 400));
+                return;
+            }
             client.turngames.add(turngame)
             .then(deferred.resolve)
             .error(deferred.reject);
@@ -43,7 +47,7 @@ class GanomedeTurnGamesComposite extends Events
         }
         listenedToMap.set('' + id, true);
         if (client.notifications != null) {
-            client.notifications.listenTo("turngame/v1", function(e:Event):Void {
+            client.notifications.listenTo("turngame/v1", function turngameNotification(e:Event):Void {
                 var event:GanomedeNotificationEvent = cast e;
                 // refresh the updated game
                 if (event.notification.type == "move") {
@@ -61,19 +65,23 @@ class GanomedeTurnGamesComposite extends Events
     private function prepareClient(game:GanomedeTurnGame):Promise {
         var deferred:Deferred = new Deferred();
         pool.initializeClient(game.url, {
-            turngame: { enabled: true },
+            turngames: { enabled: true },
             users: { enabled: true },
             notifications: { enabled: true}
         })
-        .then(function(result):Void {
+        .then(function clientInitialized(result:Dynamic):Void {
             var client:GanomedeClient = cast result.client;
+            if (client == null) {
+                deferred.reject(new ApiError(AjaxError.CLIENT_ERROR, 400));
+                return;
+            }
             listenToClient(result.id, client);
             if (!client.users.me.isAuthenticated()) {
                 client.users.login(new GanomedeUser({
                     username: this.client.users.me.username,
                     password: this.client.users.me.password
                 }))
-                .then(function(outcome:Dynamic):Void {
+                .then(function userLoggedIn(outcome:Dynamic):Void {
                     idMap.set(game.id, result.id);
                     deferred.resolve(result);
                 })
@@ -107,10 +115,10 @@ class GanomedeTurnGamesComposite extends Events
 
         if (turngame.url != null) {
             prepareClient(turngame)
-            .then(function(result:Dynamic):Void {
+            .then(function clientPrepared(result:Dynamic):Void {
                 var client:GanomedeClient = cast result.client;
                 client.turngames.refresh(turngame)
-                .then(function(outcome:Dynamic):Void {
+                .then(function turngamesRefreshed(outcome:Dynamic):Void {
                     idMap.set(turngame.id, result.id);
                     deferred.resolve(result);
                 })
@@ -128,7 +136,7 @@ class GanomedeTurnGamesComposite extends Events
     public function addMove(turngame:GanomedeTurnGame, turnmove:GanomedeTurnMove):Promise {
         var deferred:Deferred = new Deferred();
         prepareClient(turngame)
-        .then(function(result:Dynamic):Void {
+        .then(function clientPrepared(result:Dynamic):Void {
             var client:GanomedeClient = cast result.client;
             client.turngames.addMove(turngame, turnmove)
             .then(deferred.resolve)
