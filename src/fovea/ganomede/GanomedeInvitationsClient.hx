@@ -20,7 +20,7 @@ class GanomedeInvitationsClient extends AuthenticatedClient
                 type: invitation.type,
                 to: invitation.to
             }
-        }).then(function(result:Object):Void {
+        }).then(function invitationAdded(result:Object):Void {
             if (result.data.id) {
                 invitation.id = result.data.id;
             }
@@ -50,7 +50,7 @@ class GanomedeInvitationsClient extends AuthenticatedClient
                 reason: reason
             }
         })
-        .then(function(result:Object):Void {
+        .then(function invitationDeleted(result:Object):Void {
             if (!result.data || result.data.ok == true)
                 deferred.resolve();
             else

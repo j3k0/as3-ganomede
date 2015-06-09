@@ -23,12 +23,12 @@ class GanomedeUsers extends ApiClient
     public function initialize():Promise {
         var deferred:Deferred = new Deferred();
         deferred.resolve();
-        return deferred.then(function(obj:Object):Void {
-                initialized = true;
-                if (me.isAuthenticated()) {
-                    dispatchLoginEvent(null);
-                }
-            });
+        return deferred.then(function initializedFn(obj:Object):Void {
+            initialized = true;
+            if (me.isAuthenticated()) {
+                dispatchLoginEvent(null);
+            }
+        });
     }
 
     private function dispatchLoginEvent(result:Object):Void {
@@ -83,7 +83,7 @@ class GanomedeUsers extends ApiClient
             ajax("GET", "/auth/" + me.token + "/me", {
                 parse: parseMe
             })
-            .then(function(outcome:Object):Void {
+            .then(function fetched(outcome:Object):Void {
                 deferred.resolve(user);
             })
             .error(deferred.reject);
@@ -106,7 +106,7 @@ class GanomedeUsers extends ApiClient
         }
         else {
             cachedAjax("GET", endpoint)
-            .then(function(obj:Object):Void {
+            .then(function metadataLoaded(obj:Object):Void {
                 deferred.resolve(obj.data);
             })
             .error(deferred.reject);
@@ -126,7 +126,7 @@ class GanomedeUsers extends ApiClient
         return ajax("POST", endpoint, {
             data: data
         })
-        .then(function(outcome:Object):Void {
+        .then(function metadataSaved(outcome:Object):Void {
             // Update the GET cache...
             var endpoint:String = "/" + me.username + "/metadata/" + key;
             setCache("GET", endpoint, {

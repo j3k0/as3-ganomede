@@ -15,7 +15,7 @@ class GanomedeInvitations extends UserClient
     public var collection(default,never) = new Collection();
     public function asArray():Array<GanomedeInvitation> {
         var array = collection.asArray();
-        array.sort(function(a:Model, b:Model):Int {
+        array.sort(function arrayComparator(a:Model, b:Model):Int {
             return cast(a, GanomedeInvitation).index - cast(b, GanomedeInvitation).index;
         });
         return cast array;
@@ -26,13 +26,13 @@ class GanomedeInvitations extends UserClient
 
     public function new(client:GanomedeClient) {
         super(client, invitationsClientFactory, GanomedeInvitationsClient.TYPE);
-        collection.modelFactory = function(json:Object):GanomedeInvitation {
+        collection.modelFactory = function modelFactory(json:Object):GanomedeInvitation {
             return new GanomedeInvitation(json);
         };
         addEventListener("reset", onReset);
         collection.addEventListener(Events.CHANGE, dispatchEvent);
         if (client.notifications != null) {
-            client.notifications.listenTo("invitations/v1", function(event:Event):Void {
+            client.notifications.listenTo("invitations/v1", function invitationNotification(event:Event):Void {
                 refreshArray();
             });
         }
@@ -54,11 +54,11 @@ class GanomedeInvitations extends UserClient
         }
         invitation.from = client.users.me.username;
 
-        return executeAuth(function():Promise {
+        return executeAuth(function addInvitationFn():Promise {
             var invitationsClient:GanomedeInvitationsClient = cast authClient;
             return invitationsClient.addInvitation(invitation);
         })
-        .then(function(outcome:Dynamic):Void {
+        .then(function invitationAdded(outcome:Dynamic):Void {
             collection.merge(invitation.toJSON());
         });
     }
@@ -75,11 +75,11 @@ class GanomedeInvitations extends UserClient
 
     private function deleteInvitation(invitation:GanomedeInvitation, reason:String):Promise {
         var deferred:Deferred = new Deferred();
-        executeAuth(function():Promise {
+        executeAuth(function deleteInvitationFn():Promise {
             var invitationsClient:GanomedeInvitationsClient = cast authClient;
             return invitationsClient.deleteInvitation(invitation, reason);
         })
-        .then(function(outcome:Dynamic):Void {
+        .then(function invitationDeleted(outcome:Dynamic):Void {
             collection.del(invitation.id);
             dispatchEvent(new Event(Events.CHANGE));
             deferred.resolve();
@@ -89,7 +89,7 @@ class GanomedeInvitations extends UserClient
     }
 
     public function refreshArray():Promise {
-        return refreshCollection(collection, function():Promise {
+        return refreshCollection(collection, function arrayRefreshed():Promise {
             return cast(authClient, GanomedeInvitationsClient).listInvitations();
         });
     }
