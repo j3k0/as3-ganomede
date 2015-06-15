@@ -26,7 +26,7 @@ class GanomedeNotificationsClient extends AuthenticatedClient
         }
         polling = true;
         var uri:String = UrlFormatter.format("/messages", {
-            after: (after >= 0 ? after : null)
+            after: after // >= 0 ? after : null)
         });
 
         return ajax("GET", uri, { parse: this.parseArray })

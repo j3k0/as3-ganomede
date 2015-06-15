@@ -70,7 +70,7 @@ class GanomedeNotifications extends UserClient
         var notifClient:GanomedeNotificationsClient = cast authClient;
         if (isAuthOK()) {
             executeAuth(function():Promise {
-                return notifClient.poll(lastId);
+                return notifClient.poll(-2);
             })
             .then(function(result:Object) {
                 result.silent = true;
