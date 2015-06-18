@@ -12,6 +12,7 @@ import openfl.net.URLRequest;
 import openfl.net.URLRequestHeader;
 import openfl.net.URLRequestMethod;
 import openfl.events.HTTPStatusEvent;
+import openfl.events.EventDispatcher;
 import openfl.events.IEventDispatcher;
 import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
@@ -70,6 +71,18 @@ class Ajax extends Events
         return deferred;
     }
 
+    public static inline var ONLINE = "online";
+    public static inline var OFFLINE = "offline";
+    private static var onlineEvent = new Event(ONLINE);
+    private static var offlineEvent = new Event(OFFLINE);
+    public static var connection = new EventDispatcher();
+    public static function when(status:String, fn:Event->Void):Void {
+        connection.addEventListener(status, fn);
+    }
+    public static function stopListening(status:String, fn:Event->Void):Void {
+        connection.removeEventListener(status, fn);
+    }
+
     private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object):Void {
 
         var status:Int = 0;
@@ -80,6 +93,7 @@ class Ajax extends Events
         function done():Void {
             removeListeners(dispatcher);
             if (status >= 200 && status <= 299) {
+                connection.dispatchEvent(onlineEvent);
                 if (verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
                 var obj:Object = {
                     status: status,
@@ -116,6 +130,7 @@ class Ajax extends Events
             //trace("securityErrorHandler: " + event);
             removeListeners(dispatcher);
             deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
+            connection.dispatchEvent(offlineEvent);
         }
 
         function ioError(event:IOErrorEvent):Void {
@@ -128,6 +143,7 @@ class Ajax extends Events
                 if (verbose) trace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
+                connection.dispatchEvent(offlineEvent);
             }
         }
 
