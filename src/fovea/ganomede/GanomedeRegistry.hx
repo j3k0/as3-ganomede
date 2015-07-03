@@ -61,6 +61,15 @@ class GanomedeRegistry extends ApiClient
             array[i] = new GanomedeService(array[i]);
         return array;
     }
+
+    public function getService(type:String, major:Int):GanomedeService {
+        for (i in 0...services.length) {
+            if (services[i].type == type && services[i].versionMajor() == major) {
+                return services[i];
+            }
+        }
+        return null;
+    }
 }
 
 // vim: sw=4:ts=4:et:

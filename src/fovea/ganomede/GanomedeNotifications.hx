@@ -113,7 +113,21 @@ class GanomedeNotifications extends UserClient
 
     public var online:Array<String> = [];
     public function refreshOnline():Promise {
-        return ajax("GET", "/online")
+        var method = "GET";
+        var endpoint = "/online";
+        
+        // POST /auth/token/online supported since service version 1.1.0
+        var service = client.registry.getService("notifications", 1);
+        var postSupported = (service != null && service.versionGE(1,1,0));
+
+        if (client.users.me != null && postSupported) {
+            var token = client.users.me.token;
+            if (token != null) {
+                method = "POST";
+                endpoint = "/auth/" + token + "/online";
+            }
+        }
+        return ajax(method, endpoint)
         .then(function(outcome:Object):Void {
             online = outcome.data;
         });

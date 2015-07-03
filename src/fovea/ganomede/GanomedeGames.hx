@@ -43,6 +43,7 @@ class GanomedeGames extends UserClient
     }
 
     public function onReset(event:Event):Void {
+        if (Ajax.verbose) trace("reset!");
         collection.flushall();
         refreshArray();
     }

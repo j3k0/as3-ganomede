@@ -136,6 +136,15 @@ class GanomedeUsers extends ApiClient
         });
     }
 
+    public var friends(default, null) = new Array<String>();
+    public function refreshFriends():Promise {
+        var endpoint:String = "/auth/" + me.token + "/friends";
+        return ajax("GET", endpoint)
+        .then(function friendsRefreshed(outcome:Object):Void {
+            friends = outcome.data;
+        });
+    }
+
     private function parseMe(obj:Object):Object {
         var oldToken:String = me.token;
         var oldUsername:String = me.username;
