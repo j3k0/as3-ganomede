@@ -25,7 +25,7 @@ class GanomedeService
 
     public function splitVersion():Array<Int> {
         var sret:Array<String>;
-        var ret = new Array<Int>;
+        var ret = new Array<Int>();
         if (version != null) {
             sret = version.split(".");
             for (i in 0...sret.length) {
