@@ -132,5 +132,18 @@ class GanomedeNotifications extends UserClient
             online = outcome.data;
         });
     }
+
+    public function savePushToken(pushToken:GanomedePushToken):Promise {
+        if (client.users.me != null) {
+            var token = client.users.me.token;
+            var endpoint = "/auth/" + token + "/push-token";
+            return ajax("POST", endpoint, {
+                data: pushToken.toJSON()
+            });
+        }
+        else {
+            return new Deferred().reject(new Error("Not authenticated"));
+        }
+    }
 }
 // vim: sw=4:ts=4:et:
