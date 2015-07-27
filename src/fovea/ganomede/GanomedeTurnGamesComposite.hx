@@ -147,6 +147,10 @@ class GanomedeTurnGamesComposite extends Events
     }
 
     public function refreshArray(array:Array<GanomedeTurnGame>):Promise {
-        return Parallel.runWithArgs(array, refresh);
+        return Parallel.runWithArgs(array, function(turngame:GanomedeTurnGame):Promise {
+            var deferred = new Deferred();
+            refresh(turngame).always(function():Void { deferred.resolve(null); });
+            return deferred;
+        });
     }
 }

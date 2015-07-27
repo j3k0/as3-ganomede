@@ -7,6 +7,7 @@ import fovea.net.Ajax;
 import fovea.net.AjaxError;
 import fovea.utils.Collection;
 import fovea.utils.Model;
+import openfl.errors.Error;
 import openfl.utils.Object;
 
 @:expose
@@ -100,7 +101,14 @@ class GanomedeTurnGames extends UserClient
     // Refresh the turngames which IDs are in the array parameter.
     public function refreshArray(array:Array<String>):Promise {
         return Parallel.runWithArgs(array, function(id:String):Promise {
-            return refresh(new GanomedeTurnGame({ id:id }));
+            var deferred = new Deferred();
+            refresh(new GanomedeTurnGame({ id:id }))
+            .then(deferred.resolve)
+            .error(function(err:Error):Void {
+                if (Ajax.verbose) trace("failed to refresh turngame(" + id + "): " + err);
+                deferred.resolve(null);
+            });
+            return deferred;
         });
     }
 
