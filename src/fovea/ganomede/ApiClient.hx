@@ -78,6 +78,21 @@ class ApiClient extends Ajax
         if (options.cacheID)
             cache.set(options.cacheID, obj);
     }
+
+    public function ajaxGetData(path:String):Deferred {
+        var deferred:Deferred = new Deferred();
+        ajax("GET", path)
+        .then(function(outcome:Object):Void {
+            if (outcome == null || outcome.data == null) {
+                deferred.reject(new ApiError(AjaxError.IO_ERROR));
+            }
+            else {
+                deferred.resolve(outcome.data);
+            }
+        })
+        .error(deferred.reject);
+        return deferred;
+    }
 }
 
 // vim: sw=4:ts=4:et:
