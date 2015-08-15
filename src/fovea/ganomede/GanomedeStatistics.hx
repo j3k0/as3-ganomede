@@ -7,6 +7,20 @@ import fovea.net.AjaxError;
 import fovea.events.Event;
 import fovea.events.Events;
 
+//
+// Link to ganomede-statistics module.
+//
+// The server module fetches over-ed game as they get registered
+// into ganomede-coordinator.
+//
+// It stores its own archive of games by players, but adds for each
+// the updated level and ranking of both players.
+//
+// This class provides access points to archive, rank and level for
+// any player from its username.
+//
+// See https://github.com/j3k0/ganomede-statistics for the full REST API
+//
 @:expose
 class GanomedeStatistics extends ApiClient
 {
@@ -32,7 +46,7 @@ class GanomedeStatistics extends ApiClient
         return "/" + username + "/" + endpoint;
     }
 
-    public function archive(username:String):Promise {
+    public function getArchive(username:String):Promise {
         return ajaxGetData(makePath(username, "archive"));
     }
 }
