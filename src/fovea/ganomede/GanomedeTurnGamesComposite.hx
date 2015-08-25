@@ -1,11 +1,12 @@
 package fovea.ganomede;
 
 import fovea.async.*;
-import openfl.utils.Object;
-import haxe.ds.StringMap;
-import fovea.net.AjaxError;
-import fovea.events.Events;
 import fovea.events.Event;
+import fovea.events.Events;
+import fovea.net.AjaxError;
+import haxe.ds.StringMap;
+import openfl.errors.Error;
+import openfl.utils.Object;
 
 @:expose
 class GanomedeTurnGamesComposite extends Events
@@ -146,10 +147,15 @@ class GanomedeTurnGamesComposite extends Events
         return deferred;
     }
 
-    public function refreshArray(array:Array<GanomedeTurnGame>):Promise {
+    public function refreshArray(array:Array<GanomedeTurnGame>, on404:GanomedeTurnGame->Error->Void = null):Promise {
         return Parallel.runWithArgs(array, function(turngame:GanomedeTurnGame):Promise {
             var deferred = new Deferred();
-            refresh(turngame).always(function():Void { deferred.resolve(null); });
+            refresh(turngame)
+            .always(function():Void { deferred.resolve(null); })
+            .error(function(error:Error):Void {
+                if (on404 != null)
+                    on404(turngame, error);
+            });
             return deferred;
         });
     }
