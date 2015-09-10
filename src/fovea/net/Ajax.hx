@@ -143,7 +143,9 @@ class Ajax extends Events
 
         var deferred:Deferred = new Deferred();
 
-        var requestID:String = StringTools.hex(Math.floor(Math.random() * 0xffff));
+        var requestID:String = options.requestID != null
+            ? options.requestID
+            : StringTools.hex(Math.floor(Math.random() * 0xffff));
         options.requestID = requestID;
         if (verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url + path);
 
