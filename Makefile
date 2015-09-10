@@ -26,9 +26,14 @@ js:
 	@#./haxe -js bin/ganomede.js -dce no -lib openfl -cp lib/js-kit -cp src ${HAXE_MAIN}
 	./haxe -js bin/ganomede.js -lib openfl -cp lib/js-kit -cp src ${HAXE_MAIN}
 
-ajaxjs:
+ajaxweb: bin/ajaxweb.js
+
+bin/ajaxweb.js:
 	@mkdir -p bin
+	npm install
 	./haxe -js bin/ajax.js -lib openfl -cp lib/js-kit -cp src fovea.net.Ajax
+	./node_modules/.bin/browserify src-js/ajaxweb.js > bin/ajaxweb.js
+	./node_modules/.bin/uglifyjs bin/ajaxweb.js > bin/ajaxweb.min.js
 
 build: swc
 	@mkdir -p bin

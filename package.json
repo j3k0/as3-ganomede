@@ -23,5 +23,16 @@
   "bugs": {
     "url": "https://github.com/j3k0/as3-ganomede/issues"
   },
-  "homepage": "https://github.com/j3k0/as3-ganomede"
+  "homepage": "https://github.com/j3k0/as3-ganomede",
+  "devDependencies": {
+    "browserify": "^11.0.1",
+    "crypto": "0.0.3",
+    "events": "^1.0.2",
+    "http-browserify": "^1.7.0",
+    "https-browserify": "0.0.1",
+    "net-browserify": "^0.2.1",
+    "stream-browserify": "^2.0.1",
+    "uglifyjs": "^2.4.10",
+    "url": "^0.11.0"
+  }
 }
