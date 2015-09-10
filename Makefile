@@ -26,6 +26,10 @@ js:
 	@#./haxe -js bin/ganomede.js -dce no -lib openfl -cp lib/js-kit -cp src ${HAXE_MAIN}
 	./haxe -js bin/ganomede.js -lib openfl -cp lib/js-kit -cp src ${HAXE_MAIN}
 
+ajaxjs:
+	@mkdir -p bin
+	./haxe -js bin/ajax.js -lib openfl -cp lib/js-kit -cp src fovea.net.Ajax
+
 build: swc
 	@mkdir -p bin
 	./amxmlc -output bin/Main.swf src-as3/Main.as -compiler.source-path src-as3/ -compiler.library-path bin/ganomede.swc
