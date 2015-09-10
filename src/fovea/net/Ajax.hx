@@ -26,9 +26,7 @@ import openfl.utils.Object;
 class Ajax implements IAjax extends Events
 {
     public static var verbose:Bool = false;
-    public static var implFactory = function(parent:Ajax):IAjax {
-        return new AjaxOpenFL(parent);
-    }
+    public static var implFactory = AjaxOpenFL.factory;
     public var impl:IAjax = null;
     public var url:String;
 

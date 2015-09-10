@@ -18,13 +18,15 @@ import fovea.events.Events;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
-class AjaxOpenFL implements IAjax extends Events
+class AjaxOpenFL implements IAjax
 {
     public var parent:Ajax;
 
     public function new(parent:Ajax) {
-        super();
         this.parent = parent;
+    }
+    public static function factory(parent:Ajax):IAjax {
+        return new AjaxOpenFL(parent);
     }
 
     private function beforeAjax(options:Object):Void {
