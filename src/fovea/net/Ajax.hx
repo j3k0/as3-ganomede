@@ -7,6 +7,8 @@ import fovea.utils.NativeJSON;
 
 #if flash
 
+import fovea.net.IAjax;
+import fovea.net.AjaxOpenFL;
 import openfl.net.URLLoader;
 import openfl.net.URLRequest;
 import openfl.net.URLRequestHeader;
@@ -21,159 +23,41 @@ import fovea.events.Events;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
-class Ajax extends Events
+class Ajax implements IAjax extends Events
 {
     public static var verbose:Bool = false;
+    public static var implFactory = function(parent:Ajax):IAjax {
+        return new AjaxOpenFL(parent);
+    }
+    public var impl:IAjax = null;
     public var url:String;
 
     public function new(url:String) {
         super();
         this.url = url;
+        this.impl = implFactory(this);
     }
 
-    private function beforeAjax(options:Object):Void {}
-    private function afterAjax(options:Object, obj:Object):Void {}
-    private function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
+    public function beforeAjax(options:Object):Void {}
+    public function afterAjax(options:Object, obj:Object):Void {}
+    public function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
         return new AjaxError(code, status, data, url);
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
-
-        if (options == null)
-            options = {};
-        options.method = method;
-        options.path = path;
-
-        var deferred:Deferred = new Deferred();
-
-        var requestID:String = StringTools.hex(Math.floor(Math.random() * 0xffff));
-        options.requestID = requestID;
-        if (verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url + path);
-
-        beforeAjax(options);
-
-        // Prepare the request
-        var urlRequest:URLRequest= new URLRequest(this.url + path);
-        urlRequest.method = method.toUpperCase();
-
-        if (options.data) {
-            urlRequest.data = NativeJSON.stringify(options.data);
-            if (verbose) trace("AJAX[" + requestID + "] data=" + urlRequest.data);
-        }
-
-        var hdr:URLRequestHeader = new URLRequestHeader("Content-type", "application/json");
-        urlRequest.requestHeaders.push(hdr);
-
-        var urlLoader:URLLoader = new URLLoader();
-        configureListeners(urlLoader, deferred, options);
-        urlLoader.load(urlRequest);
-
-        return deferred;
+        return this.impl.ajax(method, path, options);
     }
 
     public static inline var ONLINE = "online";
     public static inline var OFFLINE = "offline";
-    private static var onlineEvent = new Event(ONLINE);
-    private static var offlineEvent = new Event(OFFLINE);
+    public static var onlineEvent = new Event(ONLINE);
+    public static var offlineEvent = new Event(OFFLINE);
     public static var connection = new EventDispatcher();
     public static function when(status:String, fn:Event->Void):Void {
         connection.addEventListener(status, fn);
     }
     public static function stopListening(status:String, fn:Event->Void):Void {
         connection.removeEventListener(status, fn);
-    }
-
-    private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object):Void {
-
-        var status:Int = 0;
-        var data:Object = null;
-
-        var removeListeners:IEventDispatcher->Void = null;
-
-        function done():Void {
-            removeListeners(dispatcher);
-            if (status >= 200 && status <= 299) {
-                connection.dispatchEvent(onlineEvent);
-                if (verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
-                var obj:Object = {
-                    status: status,
-                    data: data
-                };
-                afterAjax(options, obj);
-                deferred.resolve(obj);
-            }
-            else {
-                if (verbose) trace("AJAX[" + options.requestID + "] error[" + status + "]: " + NativeJSON.stringify(data));
-                deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
-            }
-        }
-
-        function complete(event:Event):Void {
-            // trace("complete: " + event);
-            var loader:URLLoader = cast(event.target, URLLoader);
-            data = jsonData(loader);
-            done();
-        }
-
-        function httpStatus(event:HTTPStatusEvent):Void {
-            // trace("httpStatus: " + event);
-            status = event.status;
-            if (verbose) trace("AJAX[" + options.requestID + "] status[" + status + "]");
-        }
-
-        /* dispatcher.addEventListener(Event.OPEN, function(event:Event):Void {
-            trace("openHandler: " + event); });
-        dispatcher.addEventListener(ProgressEvent.PROGRESS, function(event:ProgressEvent):Void {
-            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal); }); */
-
-        function securityError(event:SecurityErrorEvent):Void {
-            //trace("securityErrorHandler: " + event);
-            removeListeners(dispatcher);
-            deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
-            connection.dispatchEvent(offlineEvent);
-        }
-
-        function ioError(event:IOErrorEvent):Void {
-            var loader:URLLoader = cast(event.target, URLLoader);
-            data = jsonData(loader);
-            if (data) {
-                done();
-            }
-            else {
-                if (verbose) trace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
-                removeListeners(dispatcher);
-                deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
-                connection.dispatchEvent(offlineEvent);
-            }
-        }
-
-        dispatcher.addEventListener(Event.COMPLETE, complete);
-        dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityError);
-        dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioError);
-        dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatus);
-
-        removeListeners = function(dispatcher:IEventDispatcher):Void {
-            dispatcher.removeEventListener(Event.COMPLETE, complete);
-            dispatcher.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, securityError);
-            dispatcher.removeEventListener(IOErrorEvent.IO_ERROR, ioError);
-            dispatcher.removeEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatus);
-        }
-    }
-
-    // The JSON data.
-    private function jsonData(urlLoader:URLLoader):Object {
-        var json:Object = null;
-        try {
-            if (urlLoader.data) {
-                json = NativeJSON.parse(urlLoader.data.toString());
-            }
-        }
-        catch (e:Dynamic) {
-            if (verbose) {
-                trace("[AJAX] JSON parsing Error (" + Std.string(e) + ")");
-            }
-        }
-        return json;
     }
 }
 

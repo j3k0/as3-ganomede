@@ -61,18 +61,18 @@ class ApiClient extends Ajax
         return p;
     }
 
-    private override function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
+    public override function ajaxError(code:String, status:Int = 0, data:Object = null, url:String = null):AjaxError {
         return new ApiError(code, status, data, url);
     }
 
-    private override function beforeAjax(options:Object):Void {
+    public override function beforeAjax(options:Object):Void {
         if (options.cache) {
             options.cacheID = options.method + ":" + options.path;
             if (Ajax.verbose) trace("AJAX[" + options.requestID + "]: will cache");
         }
     }
 
-    private override function afterAjax(options:Object, obj:Object):Void {
+    public override function afterAjax(options:Object, obj:Object):Void {
         if (options.parse)
             obj.data = options.parse(obj.data);
         if (options.cacheID)
