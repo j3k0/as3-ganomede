@@ -45,7 +45,8 @@ class GanomedeInvitationsClient extends AuthenticatedClient
 
     public function deleteInvitation(invite:GanomedeInvitation, reason:String):Promise {
         var deferred:Deferred = new Deferred();
-        ajax("DELETE", "/invitations/" + invite.id, {
+        // ajax("DELETE", "/invitations/" + invite.id, {
+        ajax("POST", "/invitations/" + invite.id + "/delete", {
             data: {
                 reason: reason
             }
