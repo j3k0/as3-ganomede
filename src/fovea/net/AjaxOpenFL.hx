@@ -53,7 +53,7 @@ class AjaxOpenFL implements IAjax
 
         var requestID:String = StringTools.hex(Math.floor(Math.random() * 0xffff));
         options.requestID = requestID;
-        if (Ajax.verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url() + path);
+        Ajax.dtrace("AJAX[" + requestID + "] " + method + " " + this.url() + path);
 
         beforeAjax(options);
 
@@ -63,7 +63,7 @@ class AjaxOpenFL implements IAjax
 
         if (options.data) {
             urlRequest.data = NativeJSON.stringify(options.data);
-            if (Ajax.verbose) trace("AJAX[" + requestID + "] data=" + urlRequest.data);
+            Ajax.dtrace("AJAX[" + requestID + "] data=" + urlRequest.data);
         }
 
         var hdr:URLRequestHeader = new URLRequestHeader("Content-type", "application/json");
@@ -88,7 +88,7 @@ class AjaxOpenFL implements IAjax
             removeListeners(dispatcher);
             if (status >= 200 && status <= 299) {
                 Ajax.connection.dispatchEvent(Ajax.onlineEvent);
-                if (Ajax.verbose) trace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
+                Ajax.dtrace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
                 var obj:Object = {
                     status: status,
                     data: data
@@ -97,7 +97,7 @@ class AjaxOpenFL implements IAjax
                 deferred.resolve(obj);
             }
             else {
-                if (Ajax.verbose) trace("AJAX[" + options.requestID + "] error[" + status + "]: " + NativeJSON.stringify(data));
+                Ajax.dtrace("AJAX[" + options.requestID + "] error[" + status + "]: " + NativeJSON.stringify(data));
                 deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
             }
         }
@@ -112,7 +112,7 @@ class AjaxOpenFL implements IAjax
         function httpStatus(event:HTTPStatusEvent):Void {
             // trace("httpStatus: " + event);
             status = event.status;
-            if (Ajax.verbose) trace("AJAX[" + options.requestID + "] status[" + status + "]");
+            Ajax.dtrace("AJAX[" + options.requestID + "] status[" + status + "]");
         }
 
         /* dispatcher.addEventListener(Event.OPEN, function(event:Event):Void {
@@ -134,7 +134,7 @@ class AjaxOpenFL implements IAjax
                 done();
             }
             else {
-                if (Ajax.verbose) trace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
+                Ajax.dtrace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
                 Ajax.connection.dispatchEvent(Ajax.offlineEvent);
@@ -163,9 +163,8 @@ class AjaxOpenFL implements IAjax
             }
         }
         catch (e:Dynamic) {
-            if (Ajax.verbose) {
-                trace("[AJAX] JSON parsing Error (" + Std.string(e) + ")");
-            }
+            Ajax.dtrace("[AJAX] JSON parsing Error (" + Std.string(e) + ")");
+            Ajax.dtrace("[AJAX] data = \"" + urlLoader.data.toString() + "\"");
         }
         return json;
     }

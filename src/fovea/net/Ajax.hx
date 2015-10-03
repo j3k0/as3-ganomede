@@ -26,6 +26,11 @@ import openfl.utils.Object;
 class Ajax implements IAjax extends Events
 {
     public static var verbose:Bool = false;
+    public static var dtrace = function(txt:String):Void {
+        if (verbose)
+            trace(txt);
+    }
+
     public static var implFactory = AjaxOpenFL.factory;
     public var impl:IAjax = null;
     public var url:String;
@@ -147,7 +152,7 @@ class Ajax extends Events
             ? options.requestID
             : StringTools.hex(Math.floor(Math.random() * 0xffff));
         options.requestID = requestID;
-        if (verbose) trace("AJAX[" + requestID + "] " + method + " " + this.url + path);
+        dtrace("AJAX[" + requestID + "] " + method + " " + this.url + path);
 
         beforeAjax(options);
 
@@ -186,7 +191,7 @@ class Ajax extends Events
                 data += chunk;
             });
             res.on("end", function():Void {
-                if (verbose) trace("AJAX[" + requestID + "] processing request");
+                dtrace("AJAX[" + requestID + "] processing request");
                 if (status >= 200 && status <= 299) {
                     var json:Dynamic = null;
                     try {
@@ -194,11 +199,11 @@ class Ajax extends Events
                             json = cast(NativeJSON.parse(data));
                     }
                     catch (err:Dynamic) {
-                        trace("[AJAX " + options.requestID + "] JSON parse error (" + data + ")");
+                        dtrace("[AJAX " + options.requestID + "] JSON parse error (" + data + ")");
                         if (err.stack)
-                            trace("[AJAX " + options.requestID + "] " + err.stack);
+                            dtrace("[AJAX " + options.requestID + "] " + err.stack);
                         else
-                            trace("[AJAX " + options.requestID + "] " + err);
+                            dtrace("[AJAX " + options.requestID + "] " + err);
                         deferred.reject(ajaxError(AjaxError.IO_ERROR, AjaxError.IO_ERROR_JSON, data, reqUrl(reqOptions)));
                         return;
                     }
@@ -206,7 +211,7 @@ class Ajax extends Events
                         status: status,
                         data: json
                     };
-                    if (verbose) trace("AJAX[" + options.requestID + "] done[" + status + "]: " + data);
+                    dtrace("AJAX[" + options.requestID + "] done[" + status + "]: " + data);
                     afterAjax(options, obj);
                     deferred.resolve(obj);
                     return;
@@ -221,7 +226,7 @@ class Ajax extends Events
 
         if (options.data) {
             req.write(data);
-            if (verbose) trace("AJAX[" + requestID + "] data=" + data);
+            dtrace("AJAX[" + requestID + "] data=" + data);
         }
         req.end();
 
