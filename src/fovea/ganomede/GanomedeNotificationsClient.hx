@@ -29,7 +29,7 @@ class GanomedeNotificationsClient extends AuthenticatedClient
             after: after // >= 0 ? after : null)
         });
 
-        return ajax("GET", uri, { parse: this.parseArray })
+        return ajax("GET", uri, { parse: this.parseArray, silentIOError:true })
         .then(pollSuccess)
         .error(pollError);
     }
