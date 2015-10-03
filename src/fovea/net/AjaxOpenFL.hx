@@ -137,7 +137,8 @@ class AjaxOpenFL implements IAjax
                 Ajax.dtrace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
-                Ajax.connection.dispatchEvent(Ajax.offlineEvent);
+                if (!options.silentIOError)
+                    Ajax.connection.dispatchEvent(Ajax.offlineEvent);
             }
         }
 
