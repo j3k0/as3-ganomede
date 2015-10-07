@@ -81,6 +81,10 @@ import fovea.events.Events;
 class Ajax extends Events
 {
     public static var verbose:Bool = false;
+    public static var dtrace = function(txt:String):Void {
+        if (verbose)
+            trace(txt);
+    }
 
     public var url:String;
 
