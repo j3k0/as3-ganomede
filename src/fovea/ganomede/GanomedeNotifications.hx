@@ -25,7 +25,7 @@ class GanomedeNotifications extends UserClient
     public function listenTo(emiter:String, callback:Event->Void):Void {
         this.on(emiter, callback);
     }
-       
+
     private var lastId:Int = -1;
     private function onPollSuccess(result:Object):Void {
         try {

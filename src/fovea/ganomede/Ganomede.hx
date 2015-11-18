@@ -18,6 +18,7 @@ class Ganomede
     public var turngames(default,null):GanomedeTurnGamesComposite;
     public var avatars(default,null):GanomedeAvatars;
     public var statistics(default,null):GanomedeStatistics;
+    public var chats(default,null):GanomedeChats;
 
     public var url(default,null):String;
     private var options:Dynamic;
@@ -49,6 +50,7 @@ class Ganomede
             this.games = this.client.games;
             this.turngames = new GanomedeTurnGamesComposite(client, pool);
             this.avatars = this.client.avatars;
+            this.chats = this.client.chats;
             this.statistics = this.client.statistics;
             this.initialized = true;
             callReady();
