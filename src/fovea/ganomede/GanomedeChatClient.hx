@@ -42,6 +42,10 @@ class GanomedeChatClient extends AuthenticatedClient
         });
     }
 
+    public function encodeURIComponent(s:String):String {
+        return StringTools.replace(s, "/", "%2F");
+    }
+
     // Room [/chat/v1/auth/:authToken/rooms/:roomId]
     //
     // + authToken (string, required) ... Authentication token
@@ -49,7 +53,7 @@ class GanomedeChatClient extends AuthenticatedClient
     //
     // Retrieve content of a room [GET]
     public function loadRoom(room:GanomedeChatRoom):Promise {
-        return ajax("GET", "/rooms/" + room.id)
+        return ajax("GET", "/rooms/" + encodeURIComponent(room.id))
         .then(function(result:Object):Void {
             if (result.data.id) {
                 room.fromJSON(result.data);
@@ -65,7 +69,7 @@ class GanomedeChatClient extends AuthenticatedClient
     //
     // Append a new message to the room and updates room's TTL. If the number of messages in the room exceeds MAX_MESSAGES, the oldest will be discarded.
     public function postMessage(room:GanomedeChatRoom, message:GanomedeChatMessage):Promise {
-        return ajax("POST", "/rooms/" + room.id + "/message", {
+        return ajax("POST", "/rooms/" + encodeURIComponent(room.id) + "/messages", {
             data: message.toJSON()
         });
     }
