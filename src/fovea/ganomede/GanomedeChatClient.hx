@@ -68,10 +68,20 @@ class GanomedeChatClient extends AuthenticatedClient
     // Add a message [POST]
     //
     // Append a new message to the room and updates room's TTL. If the number of messages in the room exceeds MAX_MESSAGES, the oldest will be discarded.
-    public function postMessage(room:GanomedeChatRoom, message:GanomedeChatMessage):Promise {
+    public function postMessage(room:GanomedeChatRoom, message) {
         return ajax("POST", "/rooms/" + encodeURIComponent(room.id) + "/messages", {
-            data: message.toJSON()
+            data: messageDataWithPush(message)
         });
+    }
+
+    public function messageDataWithPush(message:GanomedeChatMessage) {
+        var data = message.toJSON();
+        data.push = {
+            "app": message.type,
+            "title": [ "new_message_title", message.from ],
+            "message": [ "new_message_message", message.message, message.from ]
+        };
+        return data;
     }
 }
 
