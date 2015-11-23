@@ -53,7 +53,7 @@ class GanomedeChats extends UserClient
                     type: data.type,
                     message: data.message
                 };
-                room.messages.push(new GanomedeChatMessage(msg));
+                room.messages.unshift(new GanomedeChatMessage(msg));
                 dispatchEvent(new GanomedeChatEvent(room));
             }
             /* else {
