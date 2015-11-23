@@ -104,7 +104,7 @@ class GanomedeChats extends UserClient
             return chatClient.postMessage(room, message);
         })
         .then(function messagePosted(outcome:Dynamic):Void {
-            room.messages.push(message);
+            room.messages.unshift(message);
         });
     }
 
