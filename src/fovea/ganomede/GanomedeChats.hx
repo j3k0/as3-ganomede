@@ -90,7 +90,7 @@ class GanomedeChats extends UserClient
         }
 
         return executeAuth(function joinRoomFn():Promise {
-            var chatClient:GanomedeChatClient= cast authClient;
+            var chatClient:GanomedeChatClient = cast authClient;
             return chatClient.joinRoom(room);
         })
         .then(function roomJoined(outcome:Dynamic):Void {
@@ -99,13 +99,13 @@ class GanomedeChats extends UserClient
     }
 
     public function postMessage(room:GanomedeChatRoom, message:GanomedeChatMessage):Promise {
+        room.messages.unshift(message);
         return executeAuth(function postMessageFn():Promise {
             var chatClient:GanomedeChatClient= cast authClient;
             return chatClient.postMessage(room, message);
-        })
-        .then(function messagePosted(outcome:Dynamic):Void {
-            room.messages.unshift(message);
         });
+        //.then(function messagePosted(outcome:Dynamic):Void {
+        //});
     }
 
     //public function refreshArray():Promise {
