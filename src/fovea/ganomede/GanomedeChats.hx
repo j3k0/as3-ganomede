@@ -46,23 +46,22 @@ class GanomedeChats extends UserClient
         var data = e.notification.data;
         if (data != null && data.roomId != null) {
             var room:GanomedeChatRoom = cast collection.get(data.roomId);
-            if (room != null) {
-                var msg:Object = {
-                    timestamp: data.timestamp,
-                    from: data.from,
-                    type: data.type,
-                    message: data.message
-                };
-                room.messages.unshift(new GanomedeChatMessage(msg));
-                dispatchEvent(new GanomedeChatEvent(room));
-            }
-            /* else {
+            var msg:Object = {
+                timestamp: data.timestamp,
+                from: data.from,
+                type: data.type,
+                message: data.message
+            };
+            if (room == null) {
                 room = new GanomedeChatRoom({
                     id: data.roomId,
-                    type: 
-                    messages: [ msg ]
+                    type: data.type,
+                    users: [ client.users.me.username, data.from ],
+                    messages: []
                 });
-            } */
+            }
+            room.messages.unshift(new GanomedeChatMessage(msg));
+            dispatchEvent(new GanomedeChatEvent(room));
         }
     }
 
