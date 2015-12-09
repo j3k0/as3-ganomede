@@ -4,6 +4,10 @@ help:
 	@echo make run ..... Runs the app
 	@echo make build ... Compiles the app
 	@echo make clean ... Cleanup binaries
+	@echo
+	@echo make js ...... Build js library
+	@echo make as3 ..... Build as3 source code
+	@echo make swc ...... Build swc library
 
 bin/ganomede.swc:
 	@mkdir -p bin
