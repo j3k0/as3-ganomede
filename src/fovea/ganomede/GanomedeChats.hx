@@ -55,7 +55,7 @@ class GanomedeChats extends UserClient
             if (room == null) {
                 room = new GanomedeChatRoom({
                     id: data.roomId,
-                    type: data.type,
+                    type: data.roomId.split("/").slice(0,2).join("/"),
                     users: [ client.users.me.username, data.from ],
                     messages: []
                 });
