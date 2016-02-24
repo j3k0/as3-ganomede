@@ -57,7 +57,7 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
         return !alreadyHasGameWith(friend) && !alreadyHasInvitationTo(friend);
     }
 
-    public function send(game:GanomedeGame, force:Bool = false):Promise {
+    public function send(game:GanomedeGame, gameConfig:Object, force:Bool = false):Promise {
         var friend:String = game.players[game.players.length - 1];
         return Waterfall.run([
             // Check game not exists
@@ -94,7 +94,9 @@ class GanomedeTurnGameInvitation extends GanomedeInvitation
             },
             // Create turngame
             function():Promise {
-                var turngame = new GanomedeTurnGame(game.toJSON());
+                var data:Object = game.toJSON();
+                data.gameConfig = gameConfig;
+                var turngame = new GanomedeTurnGame(data);
                 return client.turngames.add(turngame);
             },
             // Send invitation
