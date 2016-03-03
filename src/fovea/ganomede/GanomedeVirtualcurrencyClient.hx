@@ -1,0 +1,74 @@
+package fovea.ganomede;
+
+import openfl.utils.Object;
+import fovea.async.*;
+import fovea.net.AjaxError;
+
+@:expose
+class GanomedeVirtualCurrencyClient extends AuthenticatedClient
+{
+    public static inline var TYPE:String = "virtualcurrency/v1";
+
+    public function new(baseUrl:String, token:String) {
+        super(baseUrl, TYPE, token);
+    }
+
+    public function listProducts():Promise {
+        return cachedAjax("GET", "/products");
+    }
+
+    public function getCount(currencyCode:String):Promise {
+        return ajax("GET", "/coins/" + currencyCode + "/count", { cache: false });
+    }
+
+    /*public function addInvitation(invitation:GanomedeInvitation):Promise {
+        return ajax("POST", "/invitations", {
+            data: {
+                gameId: invitation.gameId,
+                type: invitation.type,
+                to: invitation.to
+            }
+        }).then(function invitationAdded(result:Object):Void {
+            if (result.data.id) {
+                invitation.id = result.data.id;
+            }
+        });
+    }
+
+    public function listVirtualCurrency():Promise {
+        return ajax("GET", "/invitations");
+    }*/
+
+    /* private function parseArray(obj:Object):Object {
+        var array:Array<Object> = cast(obj, Array<Object>);
+        if (array == null) {
+            return obj;
+        }
+        var i:Int;
+        for (i in 0...array.length) {
+            array[i] = new GanomedeInvitation(array[i]);
+        }
+        return array;
+    }
+
+    public function deleteInvitation(invite:GanomedeInvitation, reason:String):Promise {
+        var deferred:Deferred = new Deferred();
+        // ajax("DELETE", "/invitations/" + invite.id, {
+        ajax("POST", "/invitations/" + invite.id + "/delete", {
+            data: {
+                reason: reason
+            }
+        })
+        .then(function invitationDeleted(result:Object):Void {
+            if (!result.data || result.data.ok == true)
+                deferred.resolve();
+            else
+                deferred.reject(new ApiError(AjaxError.HTTP_ERROR, result.status, result.data));
+        })
+        .error(deferred.reject);
+        return deferred;
+    }*/
+}
+
+// vim: sw=4:ts=4:et:
+

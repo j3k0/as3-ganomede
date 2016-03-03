@@ -18,7 +18,8 @@ function initialize(done) {
         games: {
             enabled: true,
             type: "triominos/v1"
-        }
+        },
+        virtualcurrency: { enabled: true }
     });
     client.initialize()
     .then(function initializeSuccess(res) {
@@ -166,6 +167,42 @@ function invitations(done) {
         process.exit(1);
     });
 }
+
+function virtualcurrencyProducts(done) {
+    console.log("virtualcurrency.products");
+    client.virtualcurrency.refreshProductsArray()
+    .then(function() {
+        if (client.virtualcurrency.products.asArray().length == 0) {
+            console.error("virtualcurrency.products failed to load products.");
+            process.exit(1);
+        }
+        console.log("virtualcurrency.products success");
+        done();
+    })
+    .error(function productsError(err) {
+        console.error("virtualcurrency.products error");
+        console.dir(err);
+        process.exit(1);
+    });
+}
+
+function virtualcurrencyBalance(done) {
+    console.log("virtualcurrency.balance");
+    client.virtualcurrency.refreshBalance("test-currency-1")
+    .then(function() {
+        console.dir(client.virtualcurrency.balances.get("test-currency-1"));
+        if (client.virtualcurrency.balances.get("test-currency-1").count !== 0) {
+            console.error("virtualcurrency.balance failed to load.");
+            process.exit(1);
+        }
+        done();
+    })
+    .error(function balanceError(err) {
+        console.error("virtualcurrency.balance error");
+        console.dir(err);
+        process.exit(1);
+    });
+};
 
 function notifications(done) {
     console.log("notification");
@@ -408,6 +445,8 @@ var testStrategyChain = require("./testStrategyChain");
 initialize(
     testStrategyChain.bind(null,
     login.bind(null,
+    virtualcurrencyProducts.bind(null,
+    virtualcurrencyBalance.bind(null,
     profile.bind(null,
     metadata.bind(null,
     refreshInvitations.bind(null,
@@ -424,7 +463,7 @@ initialize(
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-))))))))))))))))));
+))))))))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");

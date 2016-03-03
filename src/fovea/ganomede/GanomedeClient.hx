@@ -16,6 +16,7 @@ class GanomedeClient extends ApiClient
     public var turngames(default,null):GanomedeTurnGames;
     public var avatars(default,null):GanomedeAvatars;
     public var chats(default,null):GanomedeChats;
+    public var virtualcurrency(default,null):GanomedeVirtualCurrency;
     public var statistics(default,null):GanomedeStatistics;
 
     public var options(default,null):Dynamic = {}
@@ -46,6 +47,7 @@ class GanomedeClient extends ApiClient
         if (!options.turngames) options.turngames = {};
         if (!options.avatars) options.avatars = {};
         if (!options.chats) options.chats = {};
+        if (!options.virtualcurrency) options.virtualcurrency = {};
         if (!options.statistics) options.statistics = {};
 
         if (options.registry.enabled)
@@ -64,6 +66,8 @@ class GanomedeClient extends ApiClient
             avatars = new GanomedeAvatars(this);
         if (options.chats.enabled)
             chats = new GanomedeChats(this);
+        if (options.virtualcurrency.enabled)
+            virtualcurrency = new GanomedeVirtualCurrency(this);
         if (options.statistics.enabled)
             statistics = new GanomedeStatistics(this, options.games.type);
     }
@@ -78,6 +82,7 @@ class GanomedeClient extends ApiClient
         if (turngames != null) a.push(turngames.initialize);
         if (avatars != null) a.push(avatars.initialize);
         if (chats != null) a.push(chats.initialize);
+        if (virtualcurrency != null) a.push(virtualcurrency.initialize);
         if (statistics != null) a.push(statistics.initialize);
         return Parallel.run(a)
         .then(function(outcome:Dynamic):Void {
