@@ -16,6 +16,14 @@ class GanomedeVirtualCurrency extends UserClient
     // Collection of products
     //
     public var products(default,never) = new Collection();
+
+    private function initProducts():Void {
+        products.modelFactory = function productFactory(json:Object):GanomedeVProduct {
+            return new GanomedeVProduct(json);
+        };
+        products.addEventListener(Events.CHANGE, dispatchEvent);
+    }
+
     public function refreshProductsArray():Promise {
         return refreshCollection(products, function arrayRefreshed():Promise {
             return cast(authClient, GanomedeVirtualCurrencyClient).listProducts();
@@ -26,6 +34,23 @@ class GanomedeVirtualCurrency extends UserClient
     // Collection of balances
     //
     public var balances(default,never) = new Collection();
+
+    private function initBalances():Void {
+        balances.modelFactory = function balanceFactor(json:Object):GanomedeVMoney {
+            return new GanomedeVMoney(json);
+        };
+        balances.addEventListener(Events.CHANGE, dispatchEvent);
+
+        // Refresh all balances each time the virtualcurrency module sends a notification
+        if (client.notifications != null) {
+            client.notifications.listenTo("virtualcurrency/v1", function virtualcurrencyNotification(event:Event):Void {
+                balances.forEach(function(model:Model):Void {
+                    refreshBalance(model.id);
+                });
+            });
+        }
+    }
+
     public function refreshBalance(currencyCode:String):Promise {
         return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencyCode)
         .then(function getCountResult(outcome:Dynamic):Void {
@@ -36,16 +61,12 @@ class GanomedeVirtualCurrency extends UserClient
         });
     }
 
+    // Constructor
     public function new(client:GanomedeClient) {
         super(client, virtualcurrencyClientFactory, GanomedeVirtualCurrencyClient.TYPE);
-        products.modelFactory = function productFactory(json:Object):GanomedeVProduct {
-            return new GanomedeVProduct(json);
-        };
-        balances.modelFactory = function balanceFactor(json:Object):GanomedeVMoney {
-            return new GanomedeVMoney(json);
-        };
+        initProducts();
+        initBalances();
         addEventListener("reset", onReset);
-        products.addEventListener(Events.CHANGE, dispatchEvent);
     }
 
     public function virtualcurrencyClientFactory(url:String, token:String):AuthenticatedClient {
