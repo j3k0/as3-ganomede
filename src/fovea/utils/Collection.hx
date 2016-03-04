@@ -40,6 +40,12 @@ class Collection extends Events {
         return ret;
     }
 
+    public function forEach(fn:Model->Void):Void {
+        var keys = map.keys();
+        for (key in keys)
+            fn(map.get(key));
+    }
+
     public function get(key:String):Model {
         return map.get(key);
     }
