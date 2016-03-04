@@ -37,17 +37,25 @@ function initialize(done) {
 function login(done) {
     user = new ganomede.GanomedeUser({
         username: process.env.GANOMEDE_TEST_USERNAME,
-        password: process.env.GANOMEDE_TEST_PASSWORD
+        password: process.env.GANOMEDE_TEST_PASSWORD,
+        token:    process.env.GANOMEDE_TEST_TOKEN
     });
-    if (!user.username || !user.password) {
-        console.error("Please specify your test username and password using environment variables:");
+    if (!user.username || !(user.password || user.token)) {
+        console.error("Please specify your test username and (password|token) using environment variables:");
         console.error(" - GANOMEDE_TEST_USERNAME");
         console.error(" - GANOMEDE_TEST_PASSWORD");
+        console.error(" - GANOMEDE_TEST_TOKEN");
         process.exit(1);
     }
-    client.users.login(user)
+    var method = "login";
+    if (user.token) {
+        client.users.me.token = user.token;
+        method = "fetch";
+    }
+    client.users[method](user)
     .then(function loginSuccess(res) {
         console.log("login success");
+        user = client.users.me;
         // console.dir(user);
         done();
     })
