@@ -21,6 +21,42 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
         return ajax("GET", "/coins/" + currencyCode + "/count", { cache: false });
     }
 
+    private function encodeVar(a:Dynamic):String {
+        if (Type.getClassName(Type.getClass(a)) == 'String')
+            return a;
+        else if (Type.getClassName(Type.getClass(a)) == 'Array')
+            return a.join(",");
+        else
+            return "" + a;
+    }
+
+    private function pushVar(array:Array<String>, options:Object, variable:String):Void {
+        if (options != null) {
+            var value:Dynamic = Reflect.field(options, variable);
+            if (value != null)
+                array.push(variable + "=" + encodeVar(value));
+        }
+    }
+
+    private function makePath(p:String, vars:Array<String>):String {
+        if (vars.length > 0)
+            return p + "?" + vars.join("&");
+        else
+            return p;
+    }
+
+    // options:
+    //  - currencies: Array of currency codes
+    //  - reasons: Either "purchase" or "reward"
+    //  - limit: Max number of entries to retrieve
+    public function getTransactions(options:Object = null):Promise {
+        var vars:Array<String> = [];
+        pushVar(vars, options, "reasons");
+        pushVar(vars, options, "currencies");
+        pushVar(vars, options, "limit");
+        return ajax("GET", makePath("/transactions", vars));
+    }
+
     /*public function addInvitation(invitation:GanomedeInvitation):Promise {
         return ajax("POST", "/invitations", {
             data: {

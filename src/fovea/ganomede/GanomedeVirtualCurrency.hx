@@ -12,6 +12,17 @@ import fovea.events.Events;
 @:expose
 class GanomedeVirtualCurrency extends UserClient
 {
+    private var knownCurrencies:Array<String> = [];
+    private function isKnown(currency:String):Bool {
+        for (i in 0 ... knownCurrencies.length)
+            if (knownCurrencies[i] == currency) return true;
+        return false;
+    }
+    private function rememberCurrency(currency:String):Void {
+        if (!isKnown(currency))
+            knownCurrencies.push(currency);
+    }
+
     //
     // Collection of products
     //
@@ -52,6 +63,7 @@ class GanomedeVirtualCurrency extends UserClient
     }
 
     public function refreshBalance(currencyCode:String):Promise {
+        rememberCurrency(currencyCode);
         return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencyCode)
         .then(function getCountResult(outcome:Dynamic):Void {
             if (outcome.data) {
@@ -61,11 +73,53 @@ class GanomedeVirtualCurrency extends UserClient
         });
     }
 
+    public function refreshBalancesArray():Void {
+        for (i in 0 ... knownCurrencies.length)
+            refreshBalance(knownCurrencies[i]);
+    }
+
+    //
+    // Collection of purchases
+    //
+    
+    public var purchases(default,never) = new Collection();
+
+    private function initPurchases():Void {
+        purchases.modelFactory = function purchaseFactor(json:Object):GanomedeVTransaction {
+            return new GanomedeVTransaction(json);
+        };
+        purchases.addEventListener(Events.CHANGE, dispatchEvent);
+    }
+
+    public function refreshPurchasesArray(currencies:Array<String> = null):Promise {
+
+        if (currencies != null) {
+            for (i in 0 ... currencies.length)
+                rememberCurrency(currencies[i]);
+        }
+        else {
+            currencies = knownCurrencies;
+        }
+
+        return cast(authClient, GanomedeVirtualCurrencyClient).getTransactions({
+            reasons: "purchase",
+            currencies: currencies,
+            limit: 999999
+        })
+        .then(function getTransactionsResult(outcome:Dynamic):Void {
+            if (outcome.data) {
+                outcome.data.id = outcome.data.id || outcome.data._id;
+                purchases.merge(outcome.data);
+            }
+        });
+    }
+
     // Constructor
     public function new(client:GanomedeClient) {
         super(client, virtualcurrencyClientFactory, GanomedeVirtualCurrencyClient.TYPE);
         initProducts();
         initBalances();
+        initPurchases();
         addEventListener("reset", onReset);
     }
 
@@ -76,7 +130,10 @@ class GanomedeVirtualCurrency extends UserClient
     private function onReset(event:Event):Void {
         products.flushall();
         balances.flushall();
+        purchases.flushall();
         refreshProductsArray();
+        refreshPurchasesArray();
+        refreshBalancesArray();
     }
 
     /*
