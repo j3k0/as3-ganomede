@@ -57,21 +57,19 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
         return ajax("GET", makePath("/transactions", vars));
     }
 
-    /*public function addInvitation(invitation:GanomedeInvitation):Promise {
-        return ajax("POST", "/invitations", {
-            data: {
-                gameId: invitation.gameId,
-                type: invitation.type,
-                to: invitation.to
+    public function addPurchase(productId:String, cost:GanomedeVMoney):Promise {
+
+        var data:Object = {
+            item_id: productId,
+            cost: {
             }
-        }).then(function invitationAdded(result:Object):Void {
-            if (result.data.id) {
-                invitation.id = result.data.id;
-            }
-        });
+        };
+        Reflect.setField(data.cost, cost.id, cost.count);
+
+        return ajax("POST", "/purchases", { data: data });
     }
 
-    public function listVirtualCurrency():Promise {
+    /*public function listVirtualCurrency():Promise {
         return ajax("GET", "/invitations");
     }*/
 

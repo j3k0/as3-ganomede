@@ -1,13 +1,14 @@
 package fovea.ganomede;
 
 import fovea.async.*;
-import fovea.utils.Collection;
-import fovea.utils.Model;
-import openfl.utils.Object;
-import fovea.net.Ajax;
-import fovea.net.AjaxError;
 import fovea.events.Event;
 import fovea.events.Events;
+import fovea.net.Ajax;
+import fovea.net.AjaxError;
+import fovea.utils.Collection;
+import fovea.utils.Model;
+import openfl.errors.Error;
+import openfl.utils.Object;
 
 @:expose
 class GanomedeVirtualCurrency extends UserClient
@@ -134,6 +135,29 @@ class GanomedeVirtualCurrency extends UserClient
         refreshProductsArray();
         refreshPurchasesArray();
         refreshBalancesArray();
+    }
+
+    private function finalizePurchase(deferred:Deferred):Void {
+        var finalize:Void->Void = null;
+        finalize = function():Void {
+            refreshPurchasesArray()
+            .then(deferred.resolve)
+            .error(function(err:Error):Void {
+                haxe.Timer.delay(finalize, 1000);
+            });
+        };
+        finalize();
+    }
+
+    public function purchase(pid:String, cost:GanomedeVMoney):Promise {
+        var deferred = new Deferred();
+        cast(authClient, GanomedeVirtualCurrencyClient).addPurchase(pid, cost)
+        .then(function getTransactionsResult(outcome:Dynamic):Void {
+            finalizePurchase(deferred);
+            refreshBalancesArray();
+        })
+        .error(deferred.reject);
+        return deferred;
     }
 
     /*
