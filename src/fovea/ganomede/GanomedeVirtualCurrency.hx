@@ -65,7 +65,9 @@ class GanomedeVirtualCurrency extends UserClient
 
     public function refreshBalance(currencyCode:String):Promise {
         rememberCurrency(currencyCode);
-        return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencyCode)
+        return executeAuth(function():Promise {
+            return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencyCode);
+        })
         .then(function getCountResult(outcome:Dynamic):Void {
             if (outcome.data) {
                 outcome.data.id = outcome.data.currency;
@@ -102,16 +104,12 @@ class GanomedeVirtualCurrency extends UserClient
             currencies = knownCurrencies;
         }
 
-        return cast(authClient, GanomedeVirtualCurrencyClient).getTransactions({
-            reasons: "purchase",
-            currencies: currencies,
-            limit: 999999
-        })
-        .then(function getTransactionsResult(outcome:Dynamic):Void {
-            if (outcome.data) {
-                outcome.data.id = outcome.data.id || outcome.data._id;
-                purchases.merge(outcome.data);
-            }
+        return refreshCollection(purchases, function():Promise {
+            return cast(authClient, GanomedeVirtualCurrencyClient).getTransactions({
+                reasons: "purchase",
+                currencies: currencies,
+                limit: 999999
+            });
         });
     }
 

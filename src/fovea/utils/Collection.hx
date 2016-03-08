@@ -131,6 +131,7 @@ private class MergeArray extends Strategy {
 
         super(function(json:Object):Bool { // canMerge
             if (json == null || json.data == null) return false;
+            if (!json.data.push) return false;
             var newArray:Array<Object> = cast(json.data, Array<Object>);
             if (newArray == null) return false;
             for (i in 0...newArray.length)

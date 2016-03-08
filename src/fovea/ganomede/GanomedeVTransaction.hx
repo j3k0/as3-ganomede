@@ -27,7 +27,7 @@ class GanomedeVTransaction extends Model {
         if (obj.timestamp && timestamp != obj.timestamp) { timestamp = obj.timestamp; dispatchUpdate(); }
         if (obj.username && username != obj.username) { username = obj.username; dispatchUpdate(); }
         if (obj.reason && reason != obj.reason) { reason = obj.reason; dispatchUpdate(); }
-        if (obj.data && data != obj.data) { data = obj.data; dispatchUpdate(); }
+        if (obj.data) { data = obj.data; dispatchUpdate(); }
     }
 
     private var listeners = new Array<Void->Void>();

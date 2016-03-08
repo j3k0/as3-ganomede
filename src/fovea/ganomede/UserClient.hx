@@ -101,7 +101,9 @@ class UserClient extends ApiClient
                     deferred.resolve();
                 }
                 else {
-                    deferred.reject(new ApiError(AjaxError.IO_ERROR));
+                    deferred.reject(new ApiError(AjaxError.IO_ERROR, 0, {
+                        message: "Failed to merge response data into collection"
+                    }));
                 }
             })
             .error(deferred.reject);

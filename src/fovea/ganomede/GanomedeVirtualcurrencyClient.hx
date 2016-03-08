@@ -21,20 +21,19 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
         return ajax("GET", "/coins/" + currencyCode + "/count", { cache: false });
     }
 
-    private function encodeVar(a:Dynamic):String {
-        if (Type.getClassName(Type.getClass(a)) == 'String')
-            return a;
-        else if (Type.getClassName(Type.getClass(a)) == 'Array')
-            return a.join(",");
-        else
-            return "" + a;
-    }
-
     private function pushVar(array:Array<String>, options:Object, variable:String):Void {
         if (options != null) {
             var value:Dynamic = Reflect.field(options, variable);
             if (value != null)
-                array.push(variable + "=" + encodeVar(value));
+                array.push(variable + "=" + value);
+        }
+    }
+
+    private function pushArray(array:Array<String>, options:Object, variable:String):Void {
+        if (options != null) {
+            var value:Array<String> = Reflect.field(options, variable);
+            if (value != null)
+                array.push(variable + "=" + value.join(","));
         }
     }
 
@@ -51,8 +50,8 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
     //  - limit: Max number of entries to retrieve
     public function getTransactions(options:Object = null):Promise {
         var vars:Array<String> = [];
+        pushArray(vars, options, "currencies");
         pushVar(vars, options, "reasons");
-        pushVar(vars, options, "currencies");
         pushVar(vars, options, "limit");
         return ajax("GET", makePath("/transactions", vars));
     }
@@ -60,7 +59,7 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
     public function addPurchase(productId:String, cost:GanomedeVMoney):Promise {
 
         var data:Object = {
-            item_id: productId,
+            itemId: productId,
             cost: {
             }
         };

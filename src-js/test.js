@@ -210,7 +210,25 @@ function virtualcurrencyBalance(done) {
         console.dir(err);
         process.exit(1);
     });
-};
+}
+
+function virtualcurrencyPurchases(done) {
+    console.log("virtualcurrency.purchases");
+    client.virtualcurrency.refreshPurchasesArray(["triominos-gold", "triominos-silver"])
+    .then(function() {
+        if (client.virtualcurrency.purchases.asArray().length == 0) {
+            console.error("virtualcurrency.purchases failed to load purchases.");
+            process.exit(1);
+        }
+        console.log("virtualcurrency.purchases success");
+        done();
+    })
+    .error(function purchasesError(err) {
+        console.error("virtualcurrency.purchases error");
+        console.dir(err);
+        process.exit(1);
+    });
+}
 
 function notifications(done) {
     console.log("notification");
@@ -455,6 +473,8 @@ initialize(
     login.bind(null,
     virtualcurrencyProducts.bind(null,
     virtualcurrencyBalance.bind(null,
+    virtualcurrencyPurchases.bind(null,
+                                done,
     profile.bind(null,
     metadata.bind(null,
     refreshInvitations.bind(null,
@@ -471,7 +491,7 @@ initialize(
     leaveAllGames.bind(null,
     logout.bind(null,
     done
-))))))))))))))))))));
+)))))))))))))))))))));
 
 setTimeout(function() {
     console.error("test timeout");
