@@ -17,8 +17,10 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
         return cachedAjax("GET", "/products");
     }
 
-    public function getCount(currencyCode:String):Promise {
-        return ajax("GET", "/coins/" + currencyCode + "/count", { cache: false });
+    public function getCount(currencyCodes:Array<String>):Promise {
+        return ajax("GET", "/coins/" + currencyCodes.join(",") + "/count", {
+            cache: false
+        });
     }
 
     private function pushVar(array:Array<String>, options:Object, variable:String):Void {

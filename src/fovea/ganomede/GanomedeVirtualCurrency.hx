@@ -56,29 +56,46 @@ class GanomedeVirtualCurrency extends UserClient
         // Refresh all balances each time the virtualcurrency module sends a notification
         if (client.notifications != null) {
             client.notifications.listenTo("virtualcurrency/v1", function virtualcurrencyNotification(event:Event):Void {
-                balances.forEach(function(model:Model):Void {
-                    refreshBalance(model.id);
-                });
+                refreshBalancesArray();
             });
         }
     }
 
-    public function refreshBalance(currencyCode:String):Promise {
-        rememberCurrency(currencyCode);
-        return executeAuth(function():Promise {
-            return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencyCode);
+    public function refreshBalances(currencies:Array<String>, deferred:Deferred = null):Promise {
+
+        for (i in 0 ... currencies.length)
+            rememberCurrency(currencies[i]);
+
+        if (deferred == null)
+            deferred = new Deferred();
+
+        if (!isAuthOK()) {
+            haxe.Timer.delay(function():Void {
+                refreshBalances(currencies, deferred);
+            }, 1000);
+            return deferred;
+        }
+
+        executeAuth(function():Promise {
+            return cast(authClient, GanomedeVirtualCurrencyClient).getCount(currencies);
         })
         .then(function getCountResult(outcome:Dynamic):Void {
             if (outcome.data) {
-                outcome.data.id = outcome.data.currency;
-                balances.merge(outcome.data);
+                var data:Array<Object> = outcome.data;
+                for (i in 0 ... data.length)
+                    data[i].id = data[i].currency;
+                balances.merge(outcome);
             }
-        });
+            deferred.resolve(outcome);
+        })
+        .then(deferred.resolve)
+        .error(deferred.reject);
+
+        return deferred;
     }
 
     public function refreshBalancesArray():Void {
-        for (i in 0 ... knownCurrencies.length)
-            refreshBalance(knownCurrencies[i]);
+        refreshBalances(knownCurrencies);
     }
 
     //
