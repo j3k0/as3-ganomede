@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import fovea.async.*;
 import fovea.ganomede.helpers.*;
+import fovea.utils.ReadyStatus;
 
 @:expose
 class Ganomede
@@ -9,7 +10,7 @@ class Ganomede
     private var pool = new GanomedeClientsPool();
     private var client:GanomedeClient;
 
-    public var initialized(default,null):Bool = false;
+    public var status(default,null):ReadyStatus = new ReadyStatus();
     public var registry(default,null):GanomedeRegistry;
     public var users(default,null):GanomedeUsers;
     public var invitations(default,null):GanomedeInvitations;
@@ -54,28 +55,8 @@ class Ganomede
             this.chats = this.client.chats;
             this.virtualcurrency = this.client.virtualcurrency;
             this.statistics = this.client.statistics;
-            this.initialized = true;
-            callReady();
+            this.status.setReady();
         });
-    }
-
-    private var readyArray = new Array<Deferred>();
-    public function ready():Promise {
-        var deferred:Deferred = new Deferred();
-        if (this.initialized) {
-            deferred.resolve(null);
-        }
-        else {
-            readyArray.push(deferred);
-        }
-        return deferred;
-    }
-    private function callReady():Void {
-        var a = readyArray;
-        readyArray = new Array<Deferred>();
-        for (i in 0...a.length) {
-            a[i].resolve(null);
-        }
     }
 
     // Just make sure all classes are exported
@@ -85,4 +66,9 @@ class Ganomede
         var tgi:GanomedeTurnGameInvitation = null;
         var tgim:GanomedeTurnGameMover = null;
     }
+
+    public function ready():Promise {
+        return this.status.ready();
+    }
 }
+// vim: ts=4:sw=4:et:
