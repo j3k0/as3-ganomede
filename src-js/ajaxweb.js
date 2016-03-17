@@ -3,6 +3,22 @@ var ajax = require("../bin/ajax");
 var ajaxWeb = {};
 var ajaxes = {};
 var ajaxRequest = ajaxWeb.ajaxRequest = function(reqId, baseUrl, method, path, options) {
+
+    // unescape everything
+    //
+    // Escaping was added to prevent this:
+    //   > WARNING: For content targeting Flash Player version 14 or higher,
+    //   > ExternalInterface escapes strings using JSON conventions. To
+    //   > maintain compatibility, content published to earlier Flash Player
+    //   > versions continues to use the legacy escaping behavior.
+    //
+    // ref: http://stackoverflow.com/questions/26157126/what-is-externalinterface-escapes-strings-using-json-conventions-in-the-new-fl
+    reqId = unescape(reqId);
+    baseUrl = unescape(baseUrl);
+    method = unescape(method);
+    path = unescape(path);
+    options = JSON.parse(unescape(options));
+
     var a = ajaxes[baseUrl];
     if (!a)
         a = ajaxes[baseUrl] = new fovea.net.Ajax(baseUrl);
