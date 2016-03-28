@@ -70,6 +70,10 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
         return ajax("POST", "/purchases", { data: data });
     }
 
+    public function addPackPurchase(packPurchase:GanomedePackPurchase):Promise {
+        return ajax("POST", "/packs/" + packPurchase.packId + "/purchases", { data: packPurchase.toJSON() });
+    }
+
     /*public function listVirtualCurrency():Promise {
         return ajax("GET", "/invitations");
     }*/

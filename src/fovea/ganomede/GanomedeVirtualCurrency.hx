@@ -175,6 +175,10 @@ class GanomedeVirtualCurrency extends UserClient
         return deferred;
     }
 
+    public function purchasePack(packPurchase:GanomedePackPurchase):Promise {
+        return cast(authClient, GanomedeVirtualCurrencyClient).addPackPurchase(packPurchase);
+    }
+
     /*
     public function add(virtualcurrency:GanomedeVirtualCurrency):Promise {
         if (!client.users.me.isAuthenticated()) {
