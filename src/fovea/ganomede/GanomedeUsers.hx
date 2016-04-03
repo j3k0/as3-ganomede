@@ -2,6 +2,7 @@ package fovea.ganomede;
 
 import fovea.async.*;
 import fovea.events.Event;
+import fovea.utils.ReadyStatus;
 import openfl.utils.Object;
 import fovea.net.AjaxError;
 
@@ -14,6 +15,7 @@ class GanomedeUsers extends ApiClient
     private var client:GanomedeClient = null;
     // current authenticated user
     public var me(default,null):GanomedeUser = new GanomedeUser();
+    public var loginStatus(default,null):ReadyStatus = new ReadyStatus();
 
     public function new(client:GanomedeClient) {
         super(client.url + "/" + TYPE);
@@ -33,6 +35,7 @@ class GanomedeUsers extends ApiClient
 
     private function dispatchLoginEvent(result:Object):Void {
         dispatchEvent(new Event(GanomedeEvents.LOGIN));
+        loginStatus.setReady();
     }
 
     public function signUp(user:GanomedeUser):Promise {
@@ -85,6 +88,7 @@ class GanomedeUsers extends ApiClient
             })
             .then(function fetched(outcome:Object):Void {
                 deferred.resolve(user);
+                loginStatus.setReady();
             })
             .error(deferred.reject);
         } 

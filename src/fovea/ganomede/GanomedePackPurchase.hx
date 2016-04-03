@@ -15,7 +15,6 @@ class GanomedePackPurchase {
 
     "type": "android-playstore",
     "playTransactionId": "1000000121389",
-    "playReceiptData": "bAsE64jUnK",
     "playSignature": "johndoe",
     "playSignedData": "bAsE64jUnK"
 
@@ -33,7 +32,7 @@ class GanomedePackPurchase {
 
     // android
     public var playTransactionId:String;
-    public var playReceiptData:String;
+    // public var playReceiptData:String;
     public var playSignature:String;
     public var playSignedData:String;
 
@@ -56,7 +55,7 @@ class GanomedePackPurchase {
         if (obj.iosTransactionId) iosTransactionId = obj.iosTransactionId;
         if (obj.iosAppStoreReceipt) iosAppStoreReceipt = obj.iosAppStoreReceipt;
         if (obj.playTransactionId) playTransactionId = obj.playTransactionId;
-        if (obj.playReceiptData) playReceiptData = obj.playReceiptData;
+        // if (obj.playReceiptData) playReceiptData = obj.playReceiptData;
         if (obj.playSignature) playSignature = obj.playSignature;
         if (obj.playSignedData) playSignedData = obj.playSignedData;
         if (obj.claimReason) claimReason = obj.claimReason;
@@ -70,7 +69,7 @@ class GanomedePackPurchase {
             iosTransactionId: iosTransactionId,
             iosAppStoreReceipt: iosAppStoreReceipt,
             playTransactionId: playTransactionId,
-            playReceiptData: playReceiptData,
+            // playReceiptData: playReceiptData,
             playSignature: playSignature,
             playSignedData: playSignedData,
             claimReason: claimReason,
