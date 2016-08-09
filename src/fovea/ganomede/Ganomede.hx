@@ -19,6 +19,7 @@ class Ganomede
     public var turngames(default,null):GanomedeTurnGamesComposite;
     public var avatars(default,null):GanomedeAvatars;
     public var statistics(default,null):GanomedeStatistics;
+    public var challenges(default,null):GanomedeChallenges;
     public var chats(default,null):GanomedeChats;
     public var virtualcurrency(default,null):GanomedeVirtualCurrency;
 
@@ -55,6 +56,7 @@ class Ganomede
             this.chats = this.client.chats;
             this.virtualcurrency = this.client.virtualcurrency;
             this.statistics = this.client.statistics;
+            this.challenges = this.client.challenges;
             this.status.setReady();
         });
     }
