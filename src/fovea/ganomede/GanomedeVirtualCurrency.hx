@@ -88,7 +88,7 @@ class GanomedeVirtualCurrency extends UserClient
             }
             deferred.resolve(outcome);
         })
-        .then(deferred.resolve)
+        // .then(deferred.resolve)
         .error(deferred.reject);
 
         return deferred;
