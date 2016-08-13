@@ -24,8 +24,33 @@ class GanomedeChallenges extends UserClient
         return collection.toJSON();
     }
 
+    public var currentChallenge = new GanomedeChallenge();
     public function current():Promise {
-        return cast(authClient, GanomedeChallengesClient).currentChallenge();
+        // If the cached challenge still is active, return it.
+        if (currentChallenge != null && currentChallenge.end <= Date.now().getTime() / 1000) {
+            var deferred:Deferred = new Deferred();
+            deferred.resolve(currentChallenge.toJSON());
+            return deferred;
+        }
+
+        // No active cached challenge, load from server.
+        return cast(authClient, GanomedeChallengesClient).currentChallenge()
+        .then(function challengeAdded(outcome:Dynamic):Void {
+            if (outcome.data.id) {
+                // Cache the loaded challenge
+                currentChallenge.fromJSON(outcome.data);
+                adjustTimes(currentChallenge);
+            }
+        });
+    }
+
+    private function adjustTimes(data:GanomedeChallenge):Void {
+        if (data == null) return;
+        // Adjust start and end to local device time
+        var now:Float = Date.now().getTime();
+        var oldEnd:Float = data.end;
+        data.end = now + data.secondsToEnd * 1000 - 1;
+        data.start = data.end - oldEnd + data.start;
     }
 
     public function new(client:GanomedeClient) {

@@ -9,6 +9,7 @@ class GanomedeChallenge extends Model {
     public var start:Float;
     public var end:Float;
     public var secondsToEnd:Float;
+    public var gameData:Object;
 
     public function new(obj:Object = null) {
         super(obj);
@@ -21,12 +22,14 @@ class GanomedeChallenge extends Model {
         if (obj.start) start = obj.start;
         if (obj.end) end = obj.end;
         if (obj.secondsToEnd) secondsToEnd = obj.secondsToEnd;
+        if (obj.gameData) gameData = obj.gameData;
     }
 
     public override function toJSON():Object {
         return {
             id:id,
             type:type,
+            gameData:gameData,
             start:start,
             end:end,
             secondsToEnd:secondsToEnd
