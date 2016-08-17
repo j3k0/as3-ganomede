@@ -44,6 +44,16 @@ class GanomedeChallenges extends UserClient
         });
     }
 
+    public function postUserEntry(moves:Array<Object>):Promise {
+        return Waterfall.run([
+            current,
+            function():Promise {
+                var client = cast(authClient, GanomedeChallengesClient);
+                return client.postUserEntry(currentChallenge.id, moves);
+            }
+        ]);
+    }
+
     private function adjustTimes(data:GanomedeChallenge):Void {
         if (data == null) return;
         // Adjust start and end to local device time

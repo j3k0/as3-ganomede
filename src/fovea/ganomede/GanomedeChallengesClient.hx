@@ -47,7 +47,17 @@ class GanomedeChallengesClient extends AuthenticatedClient
     }
 
     public function getUserEntries():Promise {
-        return ajax("GET", "/auth/" + this.token + "/entries");
+        return ajax("GET", "/entries");
+    }
+
+    public function postUserEntry(challengeId:String, moves:Array<Object>):Promise {
+        var id = encodeURIComponent(challengeId);
+        return ajax("POST", "/challenges/" + id + "/entries", {
+            data: {
+                authToken: token,
+                moves: moves
+            }
+        });
     }
 
     /* private function parseArray(obj:Object):Object {
