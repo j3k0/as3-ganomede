@@ -28,7 +28,7 @@ class GanomedeChallenges extends UserClient
     public function current():Promise {
         // If the cached challenge still is active, return it.
         if (currentChallenge != null && currentChallenge.end <= Date.now().getTime() / 1000) {
-            var deferred:Deferred = new Deferred();
+            var deferred = new Deferred();
             deferred.resolve(currentChallenge.toJSON());
             return deferred;
         }
@@ -75,6 +75,19 @@ class GanomedeChallenges extends UserClient
                 refreshArray();
             });
         } */
+    }
+
+    public function getLeaderboard(challengeId:String):Promise {
+        var deferred = new Deferred();
+        cast(authClient, GanomedeChallengesClient).getLeaderboard(challengeId)
+        .then(function getLeaderboardFn(outcome:Dynamic):Void {
+            var array:Array<Object> = outcome.data;
+            for (i in 0...array.length)
+                array[i] = new GanomedeChallengeEntry(array[i]);
+            deferred.resolve(array);
+        })
+        .error(deferred.reject);
+        return deferred;
     }
 
     public function challengesClientFactory(url:String, token:String):AuthenticatedClient {
