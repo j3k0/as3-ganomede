@@ -54,6 +54,20 @@ class GanomedeChallenges extends UserClient
         ]);
     }
 
+    public function getUserEntries():Promise {
+        var deferred = new Deferred();
+        var client = cast(authClient, GanomedeChallengesClient);
+        return client.getUserEntries()
+        .then(function userEntriesGotten(outcome:Dynamic):Void {
+            var array:Array<Object> = outcome.data;
+            for (i in 0...array.length)
+                array[i] = new GanomedeChallengeEntry(array[i]);
+            deferred.resolve(array);
+        })
+        .error(deferred.reject);
+        return deferred;
+    }
+
     private function adjustTimes(data:GanomedeChallenge):Void {
         if (data == null) return;
         // Adjust start and end to local device time
