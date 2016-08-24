@@ -62,7 +62,9 @@ class GanomedeChallenges extends UserClient
             var array:Array<Object> = outcome.data;
             for (i in 0...array.length)
                 array[i] = new GanomedeChallengeEntry(array[i]);
-            deferred.resolve(array);
+            deferred.resolve({
+                data: array
+            });
         })
         .error(deferred.reject);
         return deferred;
