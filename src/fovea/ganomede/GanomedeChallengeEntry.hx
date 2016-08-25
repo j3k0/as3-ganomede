@@ -15,6 +15,7 @@ class GanomedeChallengeEntry extends Model {
     public var bestScore:Float;
     public var bestTime:Float;
     public var ranking:Float;
+    public var secondsToEnd:Float;
 
     public function new(obj:Object = null) {
         super(obj);
@@ -32,6 +33,7 @@ class GanomedeChallengeEntry extends Model {
         if (obj.bestScore) bestScore = obj.bestScore;
         if (obj.ranking) ranking = obj.ranking;
         if (obj.challengeId) challengeId = obj.challengeId;
+        if (obj.secondsToEnd) secondsToEnd = obj.secondsToEnd;
     }
 
     public override function toJSON():Object {
@@ -44,6 +46,7 @@ class GanomedeChallengeEntry extends Model {
             bestTime:bestTime,
             bestScore:bestScore,
             ranking:ranking,
+            secondsToEnd:secondsToEnd,
             challengeId:challengeId
         };
     }
