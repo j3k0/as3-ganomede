@@ -27,7 +27,7 @@ class GanomedeChallenges extends UserClient
     public var currentChallenge = new GanomedeChallenge();
     public function current():Promise {
         // If the cached challenge still is active, return it.
-        if (currentChallenge != null && currentChallenge.end >= Date.now().getTime() / 1000) {
+        if (currentChallenge != null && currentChallenge.end >= Date.now().getTime()) {
             var deferred = new Deferred();
             deferred.resolve(currentChallenge.toJSON());
             return deferred;
