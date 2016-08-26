@@ -15,6 +15,15 @@ class GanomedeChallenge extends Model {
         super(obj);
     }
 
+    public function reset():Void {
+        id = null;
+        type = null;
+        start = 0;
+        end = 0;
+        secondsToEnd = 0;
+        gameData = null;
+    }
+
     public override function fromJSON(obj:Object):Void {
         if (obj == null) return;
         if (obj.id) id = obj.id;

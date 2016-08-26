@@ -27,15 +27,16 @@ class GanomedeChallenges extends UserClient
     public var currentChallenge = new GanomedeChallenge();
     public function current():Promise {
         // If the cached challenge still is active, return it.
-        if (currentChallenge != null && currentChallenge.end <= Date.now().getTime() / 1000) {
+        if (currentChallenge != null && currentChallenge.end >= Date.now().getTime() / 1000) {
             var deferred = new Deferred();
             deferred.resolve(currentChallenge.toJSON());
             return deferred;
         }
 
         // No active cached challenge, load from server.
+        currentChallenge.reset();
         return cast(authClient, GanomedeChallengesClient).currentChallenge()
-        .then(function challengeAdded(outcome:Dynamic):Void {
+        .then(function currentChallengeLoaded(outcome:Dynamic):Void {
             if (outcome.data.id) {
                 // Cache the loaded challenge
                 currentChallenge.fromJSON(outcome.data);
