@@ -61,8 +61,10 @@ class GanomedeChallenges extends UserClient
         return client.getUserEntries()
         .then(function userEntriesGotten(outcome:Dynamic):Void {
             var array:Array<Object> = outcome.data;
-            for (i in 0...array.length)
+            for (i in 0...array.length) {
+                array[i].username = this.client.users.me.username;
                 array[i] = new GanomedeChallengeEntry(array[i]);
+            }
             deferred.resolve({
                 data: array
             });
