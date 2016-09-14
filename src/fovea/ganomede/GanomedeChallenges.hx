@@ -101,8 +101,10 @@ class GanomedeChallenges extends UserClient
         cast(authClient, GanomedeChallengesClient).getLeaderboard(challengeId)
         .then(function getLeaderboardFn(outcome:Dynamic):Void {
             var array:Array<Object> = outcome.data;
-            for (i in 0...array.length)
+            for (i in 0...array.length) {
                 array[i] = new GanomedeChallengeEntry(array[i]);
+                array[i].ranking = (i + 1);
+            }
             deferred.resolve({
                 entries: array
             });
