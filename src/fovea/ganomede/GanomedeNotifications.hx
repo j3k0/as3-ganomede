@@ -112,23 +112,35 @@ class GanomedeNotifications extends UserClient
     }
 
     public var online:Array<String> = [];
-    public function refreshOnline():Promise {
+    public function refreshOnline(tag:String):Promise {
+        if (Ajax.verbose) trace("[GanomedeNotifications] refreshOnline(" + tag + ")");
+
         var method = "GET";
         var endpoint = "/online";
+        if (tag != null) {
+            endpoint = endpoint + "/" + tag;
+        }
         
+        // Removing support for notification < 1.1.0
         // POST /auth/token/online supported since service version 1.1.0
-        var service = client.registry.getService("notifications", 1);
-        var postSupported = (service != null && service.versionGE(1,1,0));
+        // var service = client.registry.getService("notifications", 1);
+        // var postSupported = (service != null && service.versionGE(1,1,0));
+
+       var postSupported = true;
 
         if (client.users.me != null && postSupported) {
             var token = client.users.me.token;
             if (token != null) {
                 method = "POST";
                 endpoint = "/auth/" + token + "/online";
+                if (tag != null) {
+                    endpoint = endpoint + "/" + tag;
+                }
             }
         }
         return ajax(method, endpoint)
         .then(function(outcome:Object):Void {
+            if (Ajax.verbose) trace("[GanomedeNotifications] online.then(): " + NativeJSON.stringify(outcome));
             online = outcome.data;
         });
     }
