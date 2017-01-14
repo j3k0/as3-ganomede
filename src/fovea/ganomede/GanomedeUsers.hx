@@ -123,6 +123,25 @@ class GanomedeUsers extends ApiClient
         return loadUserMetadata(me.username, key);
     }
 
+    // Load multiple metadatas for the current user
+    // TODO: replace by a single API call
+    public function loadMetadatas(keys:Array<String>):Promise {
+        var ret = {};
+        var load = function(key:String):Promise {
+            return loadMetadata(key)
+            .then(function(outcome:Dynamic):Void {
+                Reflect.setField(ret, key, outcome.value);
+            });
+        };
+        var deferred:Deferred = new Deferred();
+        Parallel.runWithArgs(keys, load)
+        .then(function(outcome:Dynamic):Void {
+            deferred.resolve(ret);
+        })
+        .error(deferred.reject);
+        return deferred;
+    }
+
     // Save metadata for the current user
     public function saveMetadata(key:String, value:String):Promise {
         var endpoint:String = "/auth/" + me.token + "/metadata/" + key;
