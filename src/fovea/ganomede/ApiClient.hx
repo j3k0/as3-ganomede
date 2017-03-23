@@ -38,19 +38,51 @@ class ApiClient extends Ajax
             return null;
     }
 
+    public var pending = new StringMap<Promise>();
+    public function setPending(method, path, deferred):Promise {
+        var key = method + ":" + path;
+        pending.set(key, deferred);
+        deferred.always(function():Void {
+            pending.remove(key);
+        });
+        return deferred;
+    }
+    public function getPending(method, path):Promise {
+        var key = method + ":" + path;
+        if (pending.exists(key))
+            return pending.get(key);
+        else
+            return null;
+    }
+
     public function cachedAjax(method:String, path:String, options:Object = null):Promise {
         if (options == null)
             options = {};
+
         var obj:Object = cached(method, path);
         if (obj != null) {
             var deferred:Deferred = new Deferred();
             deferred.resolve(obj);
-            ajax(method, path, { cache: true, parse: options.parse });
+            //
+            // JC: I just commented the ajax call out.
+            // I understand this triggers a refresh,
+            // so cached metadata don't get outdated too quickly,
+            // but then this caching doesn't save any server load...
+            // TODO: run it just from time to time
+            // (store "lastFetchDate" for each request)
+            //
+            // ajax(method, path, { cache: true, parse: options.parse });
             return deferred;
         }
-        else {
-            return ajax(method, path, { cache: true, parse: options.parse });
+
+        var pending = getPending(method, path);
+        if (pending != null) {
+            return pending;
         }
+
+        return setPending(
+            method, path,
+            ajax(method, path, { cache: true, parse: options.parse }));
     }
 
     // Return a rejected promise with an ApiError
