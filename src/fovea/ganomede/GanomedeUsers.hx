@@ -120,7 +120,7 @@ class GanomedeUsers extends ApiClient
 
     // Load some metadata for the current user
     public function loadMetadata(key:String):Promise {
-        return loadUserMetadata(me.username, key);
+        return loadUserMetadata("auth/" + me.token, key);
     }
 
     // Load multiple metadatas for the current user
