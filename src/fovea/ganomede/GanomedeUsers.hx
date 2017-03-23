@@ -120,7 +120,30 @@ class GanomedeUsers extends ApiClient
 
     // Load some metadata for the current user
     public function loadMetadata(key:String):Promise {
-        return loadUserMetadata("auth/" + me.token, key);
+        if (me != null && key == "email" && me.email != null)
+            return new Deferred().resolve({
+                value: me.email
+            });
+        else if (me != null && me.metadata != null && Reflect.hasField(me.metadata, key))
+            return new Deferred().resolve({
+                value: Reflect.field(me.metadata, key)
+            });
+        else if (me.token == null) {
+            return new Deferred().resolve({
+                value: null
+            });
+        }
+        return loadUserMetadata("auth/" + me.token, key)
+        .then(function(outcome:Dynamic):Void {
+            if (me == null)
+                return;
+            if (me.metadata == null)
+                me.metadata = {};
+            if (key == 'email')
+                me.email = outcome.value;
+            else
+                Reflect.setField(me.metadata, key, outcome.value);
+        });
     }
 
     // Load multiple metadatas for the current user
