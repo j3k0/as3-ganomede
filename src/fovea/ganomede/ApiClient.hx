@@ -11,6 +11,9 @@ class ApiClient extends Ajax
 {
     // cache requests result
     private var cache = new StringMap<Object>();
+    public function clearCache():Void {
+        cache = new StringMap<Object>();
+    }
 
     public function new(url:String) {
         super(url);
