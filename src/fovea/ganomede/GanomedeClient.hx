@@ -8,7 +8,7 @@ import fovea.async.*;
 class GanomedeClient extends ApiClient
 {
     public var initialized(default,null):Bool = false;
-    public var registry(default,null):GanomedeRegistry;
+    // public var registry(default,null):GanomedeRegistry;
     public var users(default,null):GanomedeUsers;
     public var invitations(default,null):GanomedeInvitations;
     public var notifications(default,null):GanomedeNotifications;
@@ -40,7 +40,7 @@ class GanomedeClient extends ApiClient
 
         // Cleanup options
         if (!options) this.options = options = {};
-        if (!options.registry) options.registry = {};
+        // if (!options.registry) options.registry = {};
         if (!options.games) options.games = {};
         if (!options.notifications) options.notifications = {};
         if (!options.invitations) options.invitations = {};
@@ -52,8 +52,8 @@ class GanomedeClient extends ApiClient
         if (!options.statistics) options.statistics = {};
         if (!options.challenges) options.challenges = {};
 
-        if (options.registry.enabled)
-            registry = new GanomedeRegistry(this, url + "/registry/v1");
+        // if (options.registry.enabled)
+        //     registry = new GanomedeRegistry(this, url + "/registry/v1");
         if (options.users.enabled)
             users = new GanomedeUsers(this);
         if (options.notifications.enabled)
@@ -78,7 +78,7 @@ class GanomedeClient extends ApiClient
 
     public function initialize():Promise {
         var a = [];
-        if (registry != null) a.push(registry.initialize);
+        // if (registry != null) a.push(registry.initialize);
         if (users != null) a.push(users.initialize);
         if (invitations != null) a.push(invitations.initialize);
         if (notifications != null) a.push(notifications.initialize);

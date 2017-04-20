@@ -11,7 +11,7 @@ class Ganomede
     private var client:GanomedeClient;
 
     public var status(default,null):ReadyStatus = new ReadyStatus();
-    public var registry(default,null):GanomedeRegistry;
+    // public var registry(default,null):GanomedeRegistry;
     public var users(default,null):GanomedeUsers;
     public var invitations(default,null):GanomedeInvitations;
     public var notifications(default,null):GanomedeNotifications;
@@ -46,7 +46,7 @@ class Ganomede
         return pool.initializeClient(url, options)
         .then(function(result):Void {
             this.client = result.client;
-            this.registry = this.client.registry;
+            // this.registry = this.client.registry;
             this.users = this.client.users;
             this.invitations = this.client.invitations;
             this.notifications = this.client.notifications;
