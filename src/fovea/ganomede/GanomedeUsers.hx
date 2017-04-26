@@ -189,21 +189,26 @@ class GanomedeUsers extends ApiClient
         return deferred;
     }
 
+    public function setUserCache(username:String, key:String, data:Object):Void {
+        var endpoint:String = "/" + username + "/metadata/" + key;
+        setCache("GET", endpoint, {
+            status: 200,
+            data: data
+        });
+    }
+
     // Save metadata for the current user
     public function saveMetadata(key:String, value:String):Promise {
         var endpoint:String = "/auth/" + me.token + "/metadata/" + key;
         var data:Object = { value: value };
+        setUserCache('auth/' + me.token, key, data);
+        setUserCache(me.username, key, data);
         return ajax("POST", endpoint, {
             data: data
-        })
-        .then(function metadataSaved(outcome:Object):Void {
-            // Update the GET cache...
-            var endpoint:String = "/" + me.username + "/metadata/" + key;
-            setCache("GET", endpoint, {
-                status: 200,
-                data: data
-            });
         });
+        //.then(function metadataSaved(outcome:Object):Void {
+        // Update the GET cache...
+        //});
     }
 
     public var friends(default, null) = new Array<String>();
