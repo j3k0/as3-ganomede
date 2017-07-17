@@ -474,7 +474,6 @@ initialize(
     virtualcurrencyProducts.bind(null,
     virtualcurrencyBalance.bind(null,
     virtualcurrencyPurchases.bind(null,
-                                done,
     profile.bind(null,
     metadata.bind(null,
     refreshInvitations.bind(null,
