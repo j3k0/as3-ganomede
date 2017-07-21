@@ -14,7 +14,7 @@ class GanomedeVirtualCurrencyClient extends AuthenticatedClient
     }
 
     public function listProducts():Promise {
-        return cachedAjax("GET", "/products");
+        return cachedAjax("GET", "/products?limit=999999");
     }
 
     public function getCount(currencyCodes:Array<String>):Promise {
