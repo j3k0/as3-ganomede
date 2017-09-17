@@ -38,6 +38,7 @@ class GanomedeTurnGames extends UserClient
                 // refresh the updated game
                 if (event.notification.type == "move") {
                     collection.merge(event.notification.data.game);
+                    refresh(new GanomedeTurnGame({ id:event.notification.data.game.id }));
                 }
             });
         }
