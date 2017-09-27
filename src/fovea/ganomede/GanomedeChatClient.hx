@@ -79,7 +79,9 @@ class GanomedeChatClient extends AuthenticatedClient
         data.push = {
             "app": message.type,
             "title": [ "new_message_title", message.from ],
-            "message": [ "new_message_message", message.message, message.from ]
+            "titleArgsTypes": [ "directory:name" ],
+            "message": [ "new_message_message", message.message, message.from ],
+            "messageArgsTypes": [ "string", "directory:name" ]
         };
         return data;
     }
