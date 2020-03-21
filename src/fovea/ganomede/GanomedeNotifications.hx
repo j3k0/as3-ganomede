@@ -18,6 +18,14 @@ class GanomedeNotifications extends UserClient
         addEventListener("reset", onReset);
     }
 
+    private var keepPolling:Bool = true;
+    public function stopPolling():Void {
+        this.keepPolling = false;
+    }
+    public function startPolling():Void {
+        this.keepPolling = true;
+    }
+
     public function notificationsClientFactory(url:String, token:String):AuthenticatedClient {
         return new GanomedeNotificationsClient(url, token);
     }
@@ -56,6 +64,10 @@ class GanomedeNotifications extends UserClient
         haxe.Timer.delay(poll, 1000);
     }
     public function poll():Void {
+        if (!keepPolling) {
+            haxe.Timer.delay(poll, 1000);
+            return;
+        }
         var notifClient:GanomedeNotificationsClient = cast authClient;
         if (!notifClient.polling) {
             if (Ajax.verbose) trace("[GanomedeNotifications] poll");
