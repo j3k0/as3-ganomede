@@ -157,6 +157,14 @@ class GanomedeNotifications extends UserClient
         });
     }
 
+    public function lastSeen(usernames: Array<String>): Promise {
+        if (Ajax.verbose) trace("[GanomedeNotifications] lastSeen(" + NativeJSON.stringify(usernames) + ")");
+        return ajax("GET", "/lastseen/" + usernames.join(","))
+        .then(function(outcome:Object):Void {
+            if (Ajax.verbose) trace("[GanomedeNotifications] lastSeen.then(): " + NativeJSON.stringify(outcome));
+        });
+    }
+
     public function savePushToken(pushToken:GanomedePushToken):Promise {
         if (client.users.me != null) {
             var token = client.users.me.token;
