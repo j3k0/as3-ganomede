@@ -48,8 +48,28 @@ class GanomedeStatistics extends ApiClient
         return "/" + username + "/" + endpoint;
     }
 
+    // Array<{
+    //   "game": {
+    //     "id": String;
+    //     "date": Number;
+    //     "players": Array<{
+    //       "username": String;
+    //       "score": int;
+    //     }>
+    //   }
+    //   "outcome": {
+    //     "newLevel": Number;
+    //     "newRank": int;
+    //   }
+    // }>
     public function getArchive(username:String):Promise {
-        return ajaxGetData(makePath(username, "archive"));
+        var deferred:Deferred = new Deferred();
+        ajaxGetData(makePath(username, "archive"))
+        .then(function(obj:Array<Object>):Void {
+            deferred.resolve(GanomedeGameArchive.fromJSON(obj));
+        })
+        .error(deferred.reject);
+        return deferred;
     }
 }
 
