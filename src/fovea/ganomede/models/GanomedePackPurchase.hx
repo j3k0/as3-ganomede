@@ -1,4 +1,4 @@
-package fovea.ganomede;
+package fovea.ganomede.models;
 
 import openfl.utils.Object;
 

@@ -1,6 +1,7 @@
 package fovea.ganomede;
 
 import fovea.async.*;
+import fovea.ganomede.models.GanomedePushToken;
 import fovea.events.Event;
 import fovea.net.Ajax;
 import fovea.net.AjaxError;

@@ -1,6 +1,8 @@
 package fovea.ganomede;
 
 import openfl.utils.Object;
+import fovea.ganomede.models.GanomedeTurnGame;
+import fovea.ganomede.models.GanomedeTurnMove;
 import fovea.async.*;
 import fovea.net.AjaxError;
 

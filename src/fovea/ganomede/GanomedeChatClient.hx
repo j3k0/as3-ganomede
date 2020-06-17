@@ -3,6 +3,8 @@ package fovea.ganomede;
 import openfl.utils.Object;
 import fovea.async.*;
 import fovea.net.AjaxError;
+import fovea.ganomede.models.GanomedeChatRoom;
+import fovea.ganomede.models.GanomedeChatMessage;
 
 //
 // Multi-rooms chat service.

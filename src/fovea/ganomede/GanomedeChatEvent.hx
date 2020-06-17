@@ -1,6 +1,7 @@
 package fovea.ganomede;
 
 import fovea.events.Event;
+import fovea.ganomede.models.GanomedeChatRoom;
 
 //
 // ChatEvents are dispatched on the channel named after their type.

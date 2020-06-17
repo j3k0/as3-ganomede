@@ -1,11 +1,13 @@
 package fovea.ganomede;
 
-import fovea.async.*;
-import openfl.utils.Object;
-import fovea.net.Ajax;
-import fovea.net.AjaxError;
+import fovea.async.Deferred;
+import fovea.async.Promise;
 import fovea.events.Event;
 import fovea.events.Events;
+import fovea.ganomede.models.GanomedeGameArchive;
+import fovea.net.Ajax;
+import fovea.net.AjaxError;
+import openfl.utils.Object;
 
 //
 // Link to ganomede-statistics module.

@@ -1,5 +1,6 @@
 package fovea.ganomede;
 
+import fovea.ganomede.models.GanomedeTurnGame;
 import fovea.events.Event;
 
 @:expose

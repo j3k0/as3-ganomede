@@ -1,6 +1,8 @@
 package fovea.ganomede;
 
 import fovea.async.*;
+import fovea.ganomede.models.GanomedeChallenge;
+import fovea.ganomede.models.GanomedeChallengeEntry;
 import fovea.utils.Collection;
 import fovea.utils.Model;
 import openfl.utils.Object;

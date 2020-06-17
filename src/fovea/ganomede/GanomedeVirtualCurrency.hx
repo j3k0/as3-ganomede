@@ -1,6 +1,11 @@
 package fovea.ganomede;
 
-import fovea.async.*;
+import fovea.ganomede.models.GanomedePackPurchase;
+import fovea.ganomede.models.GanomedeVProduct;
+import fovea.ganomede.models.GanomedeVMoney;
+import fovea.ganomede.models.GanomedeVTransaction;
+import fovea.async.Deferred;
+import fovea.async.Promise;
 import fovea.events.Event;
 import fovea.events.Events;
 import fovea.net.Ajax;

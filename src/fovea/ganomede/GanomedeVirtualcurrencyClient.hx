@@ -2,6 +2,8 @@ package fovea.ganomede;
 
 import openfl.utils.Object;
 import fovea.async.*;
+import fovea.ganomede.models.GanomedeVMoney;
+import fovea.ganomede.models.GanomedePackPurchase;
 import fovea.net.AjaxError;
 
 @:expose

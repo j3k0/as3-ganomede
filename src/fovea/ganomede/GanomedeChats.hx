@@ -1,13 +1,15 @@
 package fovea.ganomede;
 
-import fovea.async.*;
+import fovea.async.Promise;
+import fovea.events.Event;
+import fovea.events.Events;
+import fovea.ganomede.models.GanomedeChatMessage;
+import fovea.ganomede.models.GanomedeChatRoom;
+import fovea.net.Ajax;
+import fovea.net.AjaxError;
 import fovea.utils.Collection;
 import fovea.utils.Model;
 import openfl.utils.Object;
-import fovea.net.Ajax;
-import fovea.net.AjaxError;
-import fovea.events.Event;
-import fovea.events.Events;
 
 @:expose
 class GanomedeChats extends UserClient
