@@ -220,6 +220,29 @@ class GanomedeUsers extends ApiClient
         });
     }
 
+    public function reportUser(username:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/reported-user";
+        return ajax("POST", endpoint, {
+            data: { username: username }
+        });
+    }
+
+    public function encodeURIComponent(s:String):String {
+        return StringTools.replace(s, "/", "%2F");
+    }
+
+    public function unblockUser(username:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/blocked-users/" + encodeURIComponent(username);
+        return ajax("DELETE", endpoint);
+    }
+
+    public function blockUser(username:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/blocked-users";
+        return ajax("POST", endpoint, {
+            data: { username: username }
+        });
+    }
+
     private function parseMe(obj:Object):Object {
         var oldToken:String = me.token;
         var oldUsername:String = me.username;
