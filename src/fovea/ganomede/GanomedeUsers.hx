@@ -65,6 +65,9 @@ class GanomedeUsers extends ApiClient
             data: {
                 username: user.username,
                 password: user.password,
+                appleId: user.appleId,
+                appleIdentityToken: user.appleIdentityToken,
+                appleAuthorizationCode: user.appleAuthorizationCode,
                 facebookId: user.facebookId,
                 facebookToken: user.facebookToken
             },
