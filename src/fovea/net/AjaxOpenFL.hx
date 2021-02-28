@@ -22,6 +22,9 @@ class AjaxOpenFL implements IAjax
 {
     public var parent:Ajax;
 
+    public static var ioErrorListener:IOErrorEvent->Error->Void = null;
+    public static var securityErrorListener:SecurityErrorEvent->Error->Void = null;
+
     public function new(parent:Ajax) {
         this.parent = parent;
     }
@@ -43,6 +46,12 @@ class AjaxOpenFL implements IAjax
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
+
+        // This error object is created to capture the caller's stack.
+        var callerMessage:String = (~/\/auth\/[A-Za-z0-9]+\//g).replace(method + ' ' + this.url() + path, '/auth/…/');
+        callerMessage = (~/\?.+/).replace(callerMessage, '…');
+        callerMessage = (~/http[s]:\/\/[a-z0-9.-]+/).replace(callerMessage, '…');
+        var caller:Error = new Error(callerMessage);
 
         if (options == null)
             options = {};
@@ -70,14 +79,14 @@ class AjaxOpenFL implements IAjax
         urlRequest.requestHeaders.push(new URLRequestHeader("Accept", "application/json"));
 
         var urlLoader:URLLoader = new URLLoader();
-        configureListeners(urlLoader, deferred, options);
+        configureListeners(urlLoader, deferred, options, caller);
         urlLoader.load(urlRequest);
 
         return deferred;
     }
 
 
-    private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object):Void {
+    private function configureListeners(dispatcher:IEventDispatcher, deferred:Deferred, options:Object, caller:Error):Void {
 
         var status:Int = 0;
         var data:Object = null;
@@ -125,6 +134,7 @@ class AjaxOpenFL implements IAjax
             removeListeners(dispatcher);
             deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
             Ajax.connection.dispatchEvent(Ajax.offlineEvent);
+            if (securityErrorListener != null) securityErrorListener(event, caller);
         }
 
         function ioError(event:IOErrorEvent):Void {
@@ -134,12 +144,14 @@ class AjaxOpenFL implements IAjax
                 done();
             }
             else {
+                // TODO: Add a way for the NetErrorTracker to be notified of this IOErrorEvent
                 Ajax.dtrace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
                 if (!options.silentIOError)
                     Ajax.connection.dispatchEvent(Ajax.offlineEvent);
             }
+            if (ioErrorListener != null) ioErrorListener(event, caller);
         }
 
         dispatcher.addEventListener(Event.COMPLETE, complete);
