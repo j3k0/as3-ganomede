@@ -22,8 +22,8 @@ class AjaxOpenFL implements IAjax
 {
     public var parent:Ajax;
 
-    public static var ioErrorListener:IOErrorEvent->Error->Void = null;
-    public static var securityErrorListener:SecurityErrorEvent->Error->Void = null;
+    public static var ioErrorListener:IOErrorEvent->Error->Object->Void = null;
+    public static var securityErrorListener:SecurityErrorEvent->Error->Object->Void = null;
 
     public function new(parent:Ajax) {
         this.parent = parent;
@@ -57,12 +57,13 @@ class AjaxOpenFL implements IAjax
             options = {};
         options.method = method;
         options.path = path;
+        options.url = this.url();
 
         var deferred:Deferred = new Deferred();
 
-        var requestID:String = StringTools.hex(Math.floor(Math.random() * 0xffff));
+        var requestID:String = uuid4();
         options.requestID = requestID;
-        Ajax.dtrace("AJAX[" + requestID + "] " + method + " " + this.url() + path);
+        Ajax.dtrace("AJAX[" + requestID.substr(0, 4) + "] " + method + " " + this.url() + path + " (req_id=" + requestID + ")");
 
         beforeAjax(options);
 
@@ -72,11 +73,12 @@ class AjaxOpenFL implements IAjax
 
         if (options.data) {
             urlRequest.data = NativeJSON.stringify(options.data);
-            Ajax.dtrace("AJAX[" + requestID + "] data=" + urlRequest.data);
+            Ajax.dtrace("AJAX[" + requestID.substr(0, 4) + "] data=" + urlRequest.data);
         }
 
         urlRequest.requestHeaders.push(new URLRequestHeader("Content-type", "application/json"));
         urlRequest.requestHeaders.push(new URLRequestHeader("Accept", "application/json"));
+        urlRequest.requestHeaders.push(new URLRequestHeader("X-Request-Id", requestID));
 
         var urlLoader:URLLoader = new URLLoader();
         configureListeners(urlLoader, deferred, options, caller);
@@ -97,7 +99,7 @@ class AjaxOpenFL implements IAjax
             removeListeners(dispatcher);
             if (status >= 200 && status <= 299) {
                 Ajax.connection.dispatchEvent(Ajax.onlineEvent);
-                Ajax.dtrace("AJAX[" + options.requestID + "] success[" + status + "]: " + NativeJSON.stringify(data));
+                Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] success[" + status + "]: " + NativeJSON.stringify(data));
                 var obj:Object = {
                     status: status,
                     data: data
@@ -106,7 +108,7 @@ class AjaxOpenFL implements IAjax
                 deferred.resolve(obj);
             }
             else {
-                Ajax.dtrace("AJAX[" + options.requestID + "] error[" + status + "]: " + NativeJSON.stringify(data));
+                Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] error[" + status + "]: " + NativeJSON.stringify(data));
                 deferred.reject(ajaxError(AjaxError.HTTP_ERROR, status, data));
             }
         }
@@ -121,7 +123,7 @@ class AjaxOpenFL implements IAjax
         function httpStatus(event:HTTPStatusEvent):Void {
             // trace("httpStatus: " + event);
             status = event.status;
-            Ajax.dtrace("AJAX[" + options.requestID + "] status[" + status + "]");
+            Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] status[" + status + "]");
         }
 
         /* dispatcher.addEventListener(Event.OPEN, function(event:Event):Void {
@@ -134,7 +136,7 @@ class AjaxOpenFL implements IAjax
             removeListeners(dispatcher);
             deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
             Ajax.connection.dispatchEvent(Ajax.offlineEvent);
-            if (securityErrorListener != null) securityErrorListener(event, caller);
+            if (securityErrorListener != null) securityErrorListener(event, caller, options);
         }
 
         function ioError(event:IOErrorEvent):Void {
@@ -145,13 +147,13 @@ class AjaxOpenFL implements IAjax
             }
             else {
                 // TODO: Add a way for the NetErrorTracker to be notified of this IOErrorEvent
-                Ajax.dtrace("AJAX[" + options.requestID + "] ioErrorHandler: " + event);
+                Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
                 if (!options.silentIOError)
                     Ajax.connection.dispatchEvent(Ajax.offlineEvent);
             }
-            if (ioErrorListener != null) ioErrorListener(event, caller);
+            if (ioErrorListener != null) ioErrorListener(event, caller, options);
         }
 
         dispatcher.addEventListener(Event.COMPLETE, complete);
@@ -180,6 +182,35 @@ class AjaxOpenFL implements IAjax
             Ajax.dtrace("[AJAX] data = \"" + urlLoader.data.toString() + "\"");
         }
         return json;
+    }
+
+    /**
+    * Generate an uuid4 value
+    */
+    public static function uuid4(): String {
+        return zeroPad(randInt(0, 0xffff))
+            + zeroPad(randInt(0, 0xffff))
+            + '-'
+            + zeroPad(randInt(0, 0xffff))
+            + '-'
+            + zeroPad((randInt(0, 0x0fff) | 0x4000))
+            + '-'
+            + zeroPad((randInt(0, 0x3fff) | 0x8000))
+            + '-'
+            + zeroPad(randInt(0, 0xffff))
+            + zeroPad(randInt(0, 0xffff))
+            + zeroPad(randInt(0, 0xffff)).toLowerCase();
+    }
+
+    public static function zeroPad(number:Int):String {
+        return StringTools.hex(number, 4);
+    }
+
+    /**
+     * Generate a random int between min and max passed-in values.
+     */
+    public static function randInt(min:Int, max:Int):Int {
+        return Math.round(min + Math.random() * (max - min));
     }
 }
 // vim: sw=4:ts=4:et:
