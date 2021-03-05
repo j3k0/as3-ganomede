@@ -150,10 +150,12 @@ class AjaxOpenFL implements IAjax
                 Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));
-                if (!options.silentIOError)
+                if (!options.silentIOError) {
+                    // errors were kinda expected, no need to make noise about that.
                     Ajax.connection.dispatchEvent(Ajax.offlineEvent);
+                    if (ioErrorListener != null) ioErrorListener(event, caller, options);
+                }
             }
-            if (ioErrorListener != null) ioErrorListener(event, caller, options);
         }
 
         dispatcher.addEventListener(Event.COMPLETE, complete);
@@ -188,7 +190,7 @@ class AjaxOpenFL implements IAjax
     * Generate an uuid4 value
     */
     public static function uuid4(): String {
-        return zeroPad(randInt(0, 0xffff))
+        return (zeroPad(randInt(0, 0xffff))
             + zeroPad(randInt(0, 0xffff))
             + '-'
             + zeroPad(randInt(0, 0xffff))
@@ -199,7 +201,7 @@ class AjaxOpenFL implements IAjax
             + '-'
             + zeroPad(randInt(0, 0xffff))
             + zeroPad(randInt(0, 0xffff))
-            + zeroPad(randInt(0, 0xffff)).toLowerCase();
+            + zeroPad(randInt(0, 0xffff))).toLowerCase();
     }
 
     public static function zeroPad(number:Int):String {
