@@ -22,8 +22,8 @@ class AjaxOpenFL implements IAjax
 {
     public var parent:Ajax;
 
-    public static var ioErrorListener:IOErrorEvent->Error->Object->Void = null;
-    public static var securityErrorListener:SecurityErrorEvent->Error->Object->Void = null;
+    public static var ioErrorListener:IOErrorEvent->Error->Object->Int->Void = null;
+    public static var securityErrorListener:SecurityErrorEvent->Error->Object->Int->Void = null;
 
     public function new(parent:Ajax) {
         this.parent = parent;
@@ -136,7 +136,7 @@ class AjaxOpenFL implements IAjax
             removeListeners(dispatcher);
             deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
             Ajax.connection.dispatchEvent(Ajax.offlineEvent);
-            if (securityErrorListener != null) securityErrorListener(event, caller, options);
+            if (securityErrorListener != null) securityErrorListener(event, caller, options, status);
         }
 
         function ioError(event:IOErrorEvent):Void {
@@ -153,7 +153,7 @@ class AjaxOpenFL implements IAjax
                 if (!options.silentIOError) {
                     // errors were kinda expected, no need to make noise about that.
                     Ajax.connection.dispatchEvent(Ajax.offlineEvent);
-                    if (ioErrorListener != null) ioErrorListener(event, caller, options);
+                    if (ioErrorListener != null) ioErrorListener(event, caller, options, status);
                 }
             }
         }
