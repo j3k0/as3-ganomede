@@ -18,16 +18,28 @@ import fovea.events.Events;
 import openfl.errors.Error;
 import openfl.utils.Object;
 
+/** 
+ * Make an ajax request using OpenFL's library.
+ */
 class AjaxOpenFL implements IAjax
 {
     public var parent:Ajax;
 
+    /**
+     * External function called when there's an IO Error
+     */
     public static var ioErrorListener:IOErrorEvent->Error->Object->Int->Void = null;
+    /**
+     * External function called when there's a Security Error
+     */
     public static var securityErrorListener:SecurityErrorEvent->Error->Object->Int->Void = null;
 
+    /** Prepare an ajax request */
     public function new(parent:Ajax) {
         this.parent = parent;
     }
+
+    /** Static constuctor */
     public static function factory(parent:Ajax):IAjax {
         return new AjaxOpenFL(parent);
     }
@@ -146,7 +158,6 @@ class AjaxOpenFL implements IAjax
                 done();
             }
             else {
-                // TODO: Add a way for the NetErrorTracker to be notified of this IOErrorEvent
                 Ajax.dtrace("AJAX[" + options.requestID.substr(0, 4) + "] ioErrorHandler: " + event);
                 removeListeners(dispatcher);
                 deferred.reject(ajaxError(AjaxError.IO_ERROR, status, data));

@@ -48,7 +48,24 @@ class Ajax implements IAjax extends Events
     }
 
     public function ajax(method:String, path:String, options:Object = null):Promise {
-        return this.impl.ajax(method, path, options);
+        var ret:Deferred = new Deferred();
+        this.impl.ajax(method, path, options)
+        .then(function(result:Object):Void {
+            ret.resolve(result);
+        })
+        .error(function(error:Error):Void {
+            var ajaxError:AjaxError = cast(error);
+            if (ajaxError != null && (ajaxError.status == 504 || ajaxError.status == 503 || ajaxError.status == 502)) {
+                dtrace("Request failed with status 503/504, retrying in 1s");
+                haxe.Timer.delay(function():Void {
+                    this.impl.ajax(method, path, options).then(ret.resolve).error(ret.reject);
+                }, 1000);
+            }
+            else {
+                ret.reject(error);
+            }
+        });
+        return ret;
     }
 
     public static inline var ONLINE = "online";
