@@ -5,6 +5,7 @@ import fovea.events.Event;
 import fovea.utils.ReadyStatus;
 import openfl.utils.Object;
 import fovea.net.AjaxError;
+import openfl.errors.Error;
 
 @:expose
 class GanomedeUsers extends ApiClient
@@ -202,6 +203,9 @@ class GanomedeUsers extends ApiClient
 
     // Save metadata for the current user
     public function saveMetadata(key:String, value:String):Promise {
+        if (me.token == null || me.token == "undefined") {
+            return new Deferred().reject(new Error("Not authenticated"));
+        }
         var endpoint:String = "/auth/" + me.token + "/metadata/" + key;
         var data:Object = { value: value };
         setUserCache('auth/' + me.token, key, data);
