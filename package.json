@@ -1,6 +1,6 @@
 {
   "name": "ganomede",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "description": "Ganomede client library",
   "main": "index.js",
   "scripts": {
