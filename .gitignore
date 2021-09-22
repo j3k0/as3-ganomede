@@ -1,2 +1,5 @@
 /bin
 /node_modules
+/airpackage/README.md
+/airpackage/*.airpackage
+/airpackage/swc/
