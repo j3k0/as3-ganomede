@@ -226,6 +226,26 @@ class GanomedeUsers extends ApiClient
             friends = outcome.data;
         });
     }
+    public function addFriend(userId:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/friends";
+        if (friends.indexOf(userId) >= 0) {
+            return new Deferred().resolve({});
+        }
+        return ajax("POST", endpoint, {
+            data: [userId]
+        })
+        .then(function(outcome:Dynamic):Void {
+            friends.push(userId);
+        });
+    }
+
+    public function removeFriend(username:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/friends/" + encodeURIComponent(username);
+        return ajax("DELETE", endpoint)
+        .then(function(outcome:Dynamic):Void {
+            friends.remove(username);
+        });
+    }
 
     public function reportUser(username:String):Promise {
         var endpoint:String = "/auth/" + me.token + "/reported-user";
