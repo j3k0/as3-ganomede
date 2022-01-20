@@ -185,7 +185,7 @@ class Ajax extends Events
         var reqOptions:HttpReqOpt = {
             host: this.host,
             port: this.port,
-            path: this.path + "/" + path,
+            path: this.path + (path.charAt(0) != "/" ? "/" : "") + path,
             method: method,
             headers: {
                 "Content-type": "application/json",
