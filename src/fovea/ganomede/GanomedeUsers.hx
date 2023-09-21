@@ -254,6 +254,21 @@ class GanomedeUsers extends ApiClient
         });
     }
 
+    public function submitOtp(otp:String):Promise {
+        var endpoint:String = "/auth/" + me.token + "/otp/submit";
+        return ajax("POST", endpoint, {
+            data: { accessCode: otp }
+        });
+    }
+
+    public function requestOtp(email:String):Promise {
+        //xx2
+        var endpoint:String = "/auth/" + me.token + "/otp/request";
+        return ajax("POST", endpoint, {
+            data: { email: email }
+        });
+    }
+
     public function encodeURIComponent(s:String):String {
         return StringTools.replace(s, "/", "%2F");
     }
