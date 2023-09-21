@@ -26,6 +26,7 @@ import openfl.utils.Object;
 class Ajax implements IAjax extends Events
 {
     public static var verbose:Bool = false;
+    public static var xAppVersionHeader:String = "";
     public static var dtrace = function(txt:String):Void {
         if (verbose)
             trace(txt);
@@ -101,6 +102,7 @@ import fovea.events.Events;
 class Ajax extends Events
 {
     public static var verbose:Bool = false;
+    public static var xAppVersionHeader:String = "";
     public static var dtrace = function(txt:String):Void {
         if (verbose)
             trace(txt);
@@ -194,6 +196,7 @@ class Ajax extends Events
             path: this.path + (path.charAt(0) != "/" ? "/" : "") + path,
             method: method,
             headers: {
+                "X-App-Version": Ajax.xAppVersionHeader,
                 "Content-type": "application/json",
                 'Content-Length': data.length
             }
