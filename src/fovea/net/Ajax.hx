@@ -30,6 +30,9 @@ class Ajax implements IAjax extends Events
         if (verbose)
             trace(txt);
     }
+    public static function haxeTrace(txt:String):Void {
+        trace(txt);
+    }
 
     public static var implFactory = AjaxOpenFL.factory;
     public var impl:IAjax = null;
@@ -101,6 +104,9 @@ class Ajax extends Events
     public static var dtrace = function(txt:String):Void {
         if (verbose)
             trace(txt);
+    }
+    public static function haxeTrace(txt:String):Void {
+        trace(txt);
     }
 
     public var url:String;

@@ -50,7 +50,7 @@ class GanomedeInvitations extends UserClient
 
     public function add(invitation:GanomedeInvitation):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant add invitation: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant add invitation: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
         invitation.from = client.users.me.username;

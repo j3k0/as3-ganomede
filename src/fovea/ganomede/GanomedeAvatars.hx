@@ -63,7 +63,7 @@ class GanomedeAvatars extends ApiClient
         var removeListeners:Void->Void = null;
         var status:Int = 0;
         var onComplete = function(event:Event):Void {
-            if (Ajax.verbose) trace("[AVATARS] Complete (" + status + ")");
+            if (Ajax.verbose) Ajax.dtrace("[AVATARS] Complete (" + status + ")");
             removeListeners();
             var obj:Object = {
                 status: status,
@@ -73,12 +73,12 @@ class GanomedeAvatars extends ApiClient
             deferred.resolve(obj);
         };
         var ioError = function(event:IOErrorEvent):Void {
-            if (Ajax.verbose) trace("[AVATARS] ioError " + event);
+            if (Ajax.verbose) Ajax.dtrace("[AVATARS] ioError " + event);
             removeListeners();
             deferred.reject(ajaxError(AjaxError.IO_ERROR, status));
         };
         var securityError = function(event:SecurityErrorEvent):Void {
-            if (Ajax.verbose) trace("[AVATARS] securityError " + event);
+            if (Ajax.verbose) Ajax.dtrace("[AVATARS] securityError " + event);
             removeListeners();
             deferred.reject(ajaxError(AjaxError.SECURITY_ERROR));
         };

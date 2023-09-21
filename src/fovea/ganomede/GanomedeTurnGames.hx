@@ -61,7 +61,7 @@ class GanomedeTurnGames extends UserClient
 
     public function add(turngame:GanomedeTurnGame):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant create turngame: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant create turngame: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
         return executeAuth(function():Promise {
@@ -75,7 +75,7 @@ class GanomedeTurnGames extends UserClient
 
     public function refresh(turngame:GanomedeTurnGame):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant load turngame: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant load turngame: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
         return executeAuth(function():Promise {
@@ -89,7 +89,7 @@ class GanomedeTurnGames extends UserClient
 
     public function addMove(turngame:GanomedeTurnGame, move:GanomedeTurnMove):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant add move to turngame: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant add move to turngame: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
         return executeAuth(function():Promise {
@@ -108,7 +108,7 @@ class GanomedeTurnGames extends UserClient
             refresh(new GanomedeTurnGame({ id:id }))
             .then(deferred.resolve)
             .error(function(err:Error):Void {
-                if (Ajax.verbose) trace("failed to refresh turngame(" + id + "): " + err);
+                if (Ajax.verbose) Ajax.dtrace("failed to refresh turngame(" + id + "): " + err);
                 deferred.resolve(null);
             });
             return deferred;

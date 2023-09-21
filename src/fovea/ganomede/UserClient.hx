@@ -85,7 +85,7 @@ class UserClient extends ApiClient
         }
 
         if (newAuthToken != oldAuthToken) {
-            if (Ajax.verbose) trace("[UserClient] reset");
+            if (Ajax.verbose) Ajax.dtrace("[UserClient] reset");
             authClient = clientFactory(client.url, newAuthToken);
             dispatchEvent(new Event("reset"));
         }
@@ -109,7 +109,7 @@ class UserClient extends ApiClient
             .error(deferred.reject);
         }
         else {
-            if (Ajax.verbose) trace("Can't load if not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("Can't load if not authenticated");
             deferred.reject(new ApiError(AjaxError.CLIENT_ERROR));
         }
         return deferred;

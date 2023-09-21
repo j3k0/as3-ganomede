@@ -44,14 +44,14 @@ class GanomedeGames extends UserClient
     }
 
     public function onReset(event:Event):Void {
-        if (Ajax.verbose) trace("reset!");
+        if (Ajax.verbose) Ajax.dtrace("reset!");
         collection.flushall();
         refreshArray();
     }
 
     public function add(game:GanomedeGame):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant add game: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant add game: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
 

@@ -78,15 +78,15 @@ class GanomedeChats extends UserClient
 
     public function join(room:GanomedeChatRoom):Promise {
         if (!client.users.me.isAuthenticated()) {
-            if (Ajax.verbose) trace("cant join chat room: not authenticated");
+            if (Ajax.verbose) Ajax.dtrace("cant join chat room: not authenticated");
             return error(AjaxError.CLIENT_ERROR);
         }
         if (room.type == null) {
-            if (Ajax.verbose) trace("cant join chat room: missing type");
+            if (Ajax.verbose) Ajax.dtrace("cant join chat room: missing type");
             return error(AjaxError.CLIENT_ERROR);
         }
         if (room.users == null || room.users.length == 0) {
-            if (Ajax.verbose) trace("cant join chat room: no users");
+            if (Ajax.verbose) Ajax.dtrace("cant join chat room: no users");
             return error(AjaxError.CLIENT_ERROR);
         }
 

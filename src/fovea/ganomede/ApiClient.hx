@@ -103,7 +103,7 @@ class ApiClient extends Ajax
     public override function beforeAjax(options:Object):Void {
         if (options.cache) {
             options.cacheID = options.method + ":" + options.path;
-            if (Ajax.verbose) trace("AJAX[" + options.requestID + "]: will cache");
+            if (Ajax.verbose) Ajax.dtrace("AJAX[" + options.requestID + "]: will cache");
         }
     }
 

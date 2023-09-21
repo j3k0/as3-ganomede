@@ -41,10 +41,10 @@ class GanomedeNotifications extends UserClient
             // result.state;
             var notifClient:GanomedeNotificationsClient = cast authClient;
             var notifications:Array<Object> = cast(result.data, Array<Object>);
-            if (Ajax.verbose) trace("[GanomedeNotifications] results for " + result.token);
+            if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] results for " + result.token);
             if (notifications == null || result.token != notifClient.token || result.clientId != notifClient.clientId) {
                 if (Ajax.verbose && notifications != null )
-                    trace("skip");
+                    Ajax.dtrace("skip");
                 haxe.Timer.delay(poll, 100);
                 return;
             }
@@ -57,7 +57,7 @@ class GanomedeNotifications extends UserClient
             }
         }
         catch (error:String) {
-            if (Ajax.verbose) trace("[GanomedeNotifications] ERROR " + error);
+            if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] ERROR " + error);
         }
         haxe.Timer.delay(poll, 100);
     }
@@ -71,7 +71,7 @@ class GanomedeNotifications extends UserClient
         }
         var notifClient:GanomedeNotificationsClient = cast authClient;
         if (!notifClient.polling) {
-            if (Ajax.verbose) trace("[GanomedeNotifications] poll");
+            if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] poll");
             executeAuth(function():Promise {
                 return notifClient.poll(lastId);
             })
@@ -111,7 +111,7 @@ class GanomedeNotifications extends UserClient
     }
 
     private function dispatchNotification(n:GanomedeNotification):Void {
-        if (Ajax.verbose) trace("[GanomedeNotifications] notification: " + NativeJSON.stringify(n.toJSON()));
+        if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] notification: " + NativeJSON.stringify(n.toJSON()));
         dispatchEvent(new GanomedeNotificationEvent(n));
     }
 
@@ -126,7 +126,7 @@ class GanomedeNotifications extends UserClient
 
     public var online:Array<String> = [];
     public function refreshOnline(tag:String):Promise {
-        if (Ajax.verbose) trace("[GanomedeNotifications] refreshOnline(" + tag + ")");
+        if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] refreshOnline(" + tag + ")");
 
         var method = "GET";
         var endpoint = "/online";
@@ -153,16 +153,16 @@ class GanomedeNotifications extends UserClient
         }
         return ajax(method, endpoint)
         .then(function(outcome:Object):Void {
-            if (Ajax.verbose) trace("[GanomedeNotifications] online.then(): " + NativeJSON.stringify(outcome));
+            if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] online.then(): " + NativeJSON.stringify(outcome));
             online = outcome.data;
         });
     }
 
     public function lastSeen(usernames: Array<String>): Promise {
-        if (Ajax.verbose) trace("[GanomedeNotifications] lastSeen(" + NativeJSON.stringify(usernames) + ")");
+        if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] lastSeen(" + NativeJSON.stringify(usernames) + ")");
         return ajax("GET", "/lastseen/" + usernames.join(","))
         .then(function(outcome:Object):Void {
-            if (Ajax.verbose) trace("[GanomedeNotifications] lastSeen.then(): " + NativeJSON.stringify(outcome));
+            if (Ajax.verbose) Ajax.dtrace("[GanomedeNotifications] lastSeen.then(): " + NativeJSON.stringify(outcome));
         });
     }
 
