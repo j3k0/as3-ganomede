@@ -262,7 +262,6 @@ class GanomedeUsers extends ApiClient
     }
 
     public function requestOtp(email:String):Promise {
-        //xx2
         var endpoint:String = "/auth/" + me.token + "/otp/request";
         return ajax("POST", endpoint, {
             data: { email: email }
