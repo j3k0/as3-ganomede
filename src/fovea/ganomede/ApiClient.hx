@@ -33,6 +33,11 @@ class ApiClient extends Ajax
         cache.set(cacheID, value);
     }
 
+    public function removeFromCache(method:String, path:String):Void {
+        var cacheID = method + ":" + path;
+        cache.remove(cacheID);
+    }
+
     public function cached(method:String, path:String):Object {
         var key = method + ":" + path;
         if (cache.exists(key))
@@ -64,6 +69,7 @@ class ApiClient extends Ajax
 
         var obj:Object = cached(method, path);
         if (obj != null) {
+            if (Ajax.verbose) Ajax.dtrace("AJAX[" + options.requestID + "]: using cache.");
             var deferred:Deferred = new Deferred();
             deferred.resolve(obj);
             //
@@ -110,7 +116,7 @@ class ApiClient extends Ajax
     public override function afterAjax(options:Object, obj:Object):Void {
         if (options.parse)
             obj.data = options.parse(obj.data);
-        if (options.cacheID)
+        if (options.cache && options.cacheID)
             cache.set(options.cacheID, obj);
     }
 

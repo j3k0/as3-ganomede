@@ -5,6 +5,7 @@ import fovea.events.Event;
 import fovea.utils.ReadyStatus;
 import openfl.utils.Object;
 import fovea.net.AjaxError;
+import fovea.net.Ajax;
 import openfl.errors.Error;
 
 @:expose
@@ -110,9 +111,11 @@ class GanomedeUsers extends ApiClient
         var endpoint:String = "/" + username + "/metadata/" + key;
         var obj:Object = cached("GET", endpoint);
         if (obj) {
+            // if (Ajax.verbose) Ajax.dtrace(endpoint + ": Loading metadata using cache.");
             deferred.resolve(obj.data);
         }
         else {
+            // if (Ajax.verbose) Ajax.dtrace(endpoint + ": request and cache metadata.");
             cachedAjax("GET", endpoint)
             .then(function metadataLoaded(obj:Object):Void {
                 deferred.resolve(obj.data);
@@ -201,6 +204,11 @@ class GanomedeUsers extends ApiClient
         });
     }
 
+    public function removeFromUserCache(username:String, key:String):Void {
+        var endpoint:String = "/" + username + "/metadata/" + key;
+        removeFromCache("GET", endpoint);
+    }
+
     // Save metadata for the current user
     public function saveMetadata(key:String, value:String):Promise {
         if (me.token == null || me.token == "undefined") {
@@ -258,6 +266,12 @@ class GanomedeUsers extends ApiClient
         var endpoint:String = "/auth/" + me.token + "/otp/submit";
         return ajax("POST", endpoint, {
             data: { accessCode: otp }
+        })
+        .then(function(outcome:Object):Void {
+            if (outcome.data.ok && outcome.data.isValid) {
+                Reflect.deleteField(me.metadata, "$confirmedemails");
+                removeFromUserCache("auth/" + me.token, "$confirmedemails");
+            }
         });
     }
 
