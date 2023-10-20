@@ -282,6 +282,10 @@ class GanomedeUsers extends ApiClient
         });
     }
 
+    public function deleteProfile():Promise {
+        return ajax("POST", "/auth/" + me.token + "/deleteAccount");
+    }
+
     public function encodeURIComponent(s:String):String {
         return StringTools.replace(s, "/", "%2F");
     }
